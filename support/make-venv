@@ -1,0 +1,5 @@
+#!/bin/bash
+rm -rf venv
+virtualenv --python python2.7 venv
+. ./venv/bin/activate
+pip install -r support/requirements.txt
