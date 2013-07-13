@@ -1,0 +1,10 @@
+NColony is developed in a double-test-driven methodoloy.
+This means:
+* Do not write code if there are no failing unit tests
+* Do not write unit tests if there are no failing integration tests
+
+The proper way to implement a feature if to first write an integration
+test that exercises that feature "from the outside". This will fail.
+Then write unit tests that "fail in the same way", but with every unit
+tests using mocking to isolate it. Then fix those unit tests, and
+see if this fixed the integration test. If not, add/change the unit tests.
