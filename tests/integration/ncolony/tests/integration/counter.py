@@ -6,7 +6,7 @@ import logging
 import subprocess
 
 from ncolony.nidl import interface
-from ncolony.test.integration import base
+from ncolony.tests.integration import base
 
 LOG = logging.getLogger(__name__)
 

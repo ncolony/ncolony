@@ -14,7 +14,7 @@ test-unit: venv
 	./venv/bin/python ./bin/ncexec ./venv/bin/nosetests --where tests/unit --with-coverage --cover-min-percentage=100 --cover-package=`cat support/package`
 
 test-integration: venv
-	./venv/bin/nosetests --where tests/integration
+	./venv/bin/python ./bin/ncexec ./venv/bin/nosetests --where tests/integration
 
 test-text: venv
 	./venv/bin/python ./support/check-python

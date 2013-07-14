@@ -13,7 +13,7 @@ def getVarDir():
     var = os.path.join(home, 'var')
     return var
 
-def getHome()
+def getHome():
     venvBin = os.path.dirname(sys.executable)
     venvHome = os.path.dirname(venvBin)
     home = os.path.dirname(venvHome)
