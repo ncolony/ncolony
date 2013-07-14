@@ -8,10 +8,10 @@ clean:
 	rm -f .coverage
 
 venv: support/requirements.txt
-	support/make-venv
+	./support/make-venv
 
 test-unit: venv
-	./venv/bin/python ./bin/pyskexec ./venv/bin/nosetests --where tests/unit --with-coverage --cover-min-percentage=100 --cover-package=`cat support/package`
+	./venv/bin/python ./bin/ncexec ./venv/bin/nosetests --where tests/unit --with-coverage --cover-min-percentage=100 --cover-package=`cat support/package`
 
 test-integration: venv
 	./venv/bin/nosetests --where tests/integration
@@ -35,4 +35,4 @@ test: test-unit test-integration test-text test-syntax test-packages test-git
 package: venv test
 	rm -rf build
 	mkdir build
-	./venv/bin/python ./bin/pyskexec support/setup.py sdist --dist-dir=build --manifest=build/MANIFEST
+	./venv/bin/python ./bin/ncexec support/setup.py sdist --dist-dir=build --manifest=build/MANIFEST
