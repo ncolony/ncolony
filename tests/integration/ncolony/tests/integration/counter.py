@@ -6,17 +6,18 @@ import logging
 import subprocess
 
 from ncolony.nidl import interface
+from ncolony.nidl import decorators as d
 from ncolony.tests.integration import base
 
 LOG = logging.getLogger(__name__)
 
 class ICounter(interface.Interface):
     location = 'com.example.counter'
-    @role("ad")
+    @d.role("ad")
     def increment(a=types.Integer(min=0, max=5)):
         return dict()
-    @role("ad", "op")
-    @get()
+    @d.role("ad", "op")
+    @d.get()
     def value():
         return dict(a=types.Integer(min=0))
 
