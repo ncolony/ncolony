@@ -32,7 +32,6 @@ class Counter(object):
         return dict(a=self.current)
 
 CONF_TEMPLATE = """
-"""
 {
  "loop": "ncolony.%(style)s.server.loop",
  "server": {
