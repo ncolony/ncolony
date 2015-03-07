@@ -1,6 +1,8 @@
 # Copyright (c) Moshe Zadka
 # See LICENSE for details.
 
+"""Functional/integration test for ncolony"""
+
 if __name__ != '__main__':
     raise ImportError("This module is not designed to be imported", __name__)
 
@@ -15,13 +17,13 @@ try:
 except KeyError:
     sys.exit('Refusing to run without a virtual environment')
 
-bin = os.path.join(envLocation, 'bin')
+binLocation = os.path.join(envLocation, 'bin')
 here = sys.argv[0]
 while not os.path.exists(os.path.join(here, '.gitignore')):
     here = os.path.dirname(here)
 here = os.path.join(here, 'build')
 
-if sys.executable != os.path.join(bin, 'python'):
+if sys.executable != os.path.join(binLocation, 'python'):
     sys.exit('Refusing to run on the wrong interpreter '+sys.executable)
 
 FUNC_TEMP = os.path.join(here, '_func_temp')
@@ -31,13 +33,15 @@ CONFIGS = os.path.join(FUNC_TEMP, 'configs')
 MESSAGES = os.path.join(FUNC_TEMP, 'messages')
 os.makedirs(CONFIGS)
 os.makedirs(MESSAGES)
-DEFAULTS=['--messages', MESSAGES, '--config', CONFIGS]
+DEFAULTS = ['--messages', MESSAGES, '--config', CONFIGS]
 SLEEP = "import time, sys;print 'START';sys.stdout.flush();time.sleep(2);print 'STOP'"
 SLEEPER = ['--arg=-c', '--arg', SLEEP]
-subprocess.check_call([sys.executable, '-m', 'ncolony.ctl'] + DEFAULTS + ['add', 'sleeper', '--cmd', sys.executable] + SLEEPER)
+subprocess.check_call([sys.executable, '-m', 'ncolony.ctl'] + DEFAULTS +
+                      ['add', 'sleeper', '--cmd', sys.executable] + SLEEPER)
 PID_FILE = os.path.join(FUNC_TEMP, 'twistd.pid')
 LOG_FILE = os.path.join(FUNC_TEMP, 'twistd.log')
-subprocess.check_call([os.path.join(bin, 'twistd'), '--logfile', LOG_FILE, '--pidfile', PID_FILE, 'ncolony'] +
+subprocess.check_call([os.path.join(binLocation, 'twistd'), '--logfile', LOG_FILE,
+                       '--pidfile', PID_FILE, 'ncolony'] +
                       DEFAULTS +
                       ['--freq', '1'])
 for i in range(10):

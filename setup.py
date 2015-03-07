@@ -41,6 +41,12 @@ class FunctionalTests(OptionLessCommand):
         command = [sys.executable, '-m', module.__name__+'.tests.functional_test']
         subprocess.check_call(command)
 
+class Lint(OptionLessCommand):
+
+    def run(self):
+        command = ['pylint', '--rcfile', 'admin/pylintrc', module.__name__]
+        subprocess.check_call(command)
+
 class All(OptionLessCommand):
 
     def run(self):
@@ -70,6 +76,6 @@ setuptools.setup(
         'test': ['coverage', 'pylint'],
         'dev': ['wheel'],
     },
-    cmdclass=dict(test=CoverageTrialCommand, integration=FunctionalTests, all=All),
+    cmdclass=dict(test=CoverageTrialCommand, integration=FunctionalTests, lint=Lint, all=All),
     **module.metadata
 )
