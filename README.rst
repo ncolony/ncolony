@@ -3,7 +3,11 @@
 
 ## Synopsis
 
-ForepersonD: A wrapper around Twisted process monitor which allows runtime configuration via file-based communication
+EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL
+YOU SHOULD PROBABLY NOT USE IT IN PRODUCTION!!!
+THIS CODE IS EXTREMELY UNTESTED
+
+NColony: Infrastructure for running "colonies" of processes.
 
 ## Code Example
 
@@ -13,10 +17,6 @@ Assuming an environment where 'pip install ncolony' has been done
   $ twistd ncolony $DEFAULT
   $ python -m ncolony.ctl $DEFAULT add sleeper --cmd=/bin/sleep --arg=10
   $ python -m ncolony.ctl $DEFAULT restart sleeper
-
-## Motivation
-
-Twisted has a pretty good process monitor, but the only twistd-based interface to it is something that allows monitoring of only one process specified via the twistd command-line. This is a more sophisticated wrapper, allowing run-time configuration (including forcing restarts of some or all of the processes) via dropping or removing files in pre-designated directories. A simple utility ('python -m ncolony.ctl') is included to allow dropping/removing such files from shell script.
 
 ## Installation
 
