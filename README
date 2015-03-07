@@ -1,7 +1,0 @@
-NColony: A colony of interacting processes
-
-NColony (Net-Colony) is infrastructure to
-have several lightweight processes interact
-with each other semi-transparently without
-having to worry about the low-level details
-of hooking them up.
