@@ -1,0 +1,8 @@
+#!/bin/sh
+# Copyright (c) Moshe Zadka
+# See LICENSE for details.
+set -e
+(./env/bin/coverage run ./env/bin/trial ncolony &&
+./env/bin/coverage report --include 'ncolony*' --omit 'ncolony/tests/*,ncolony/interfaces*' --fail-under=100 &&
+ ./env/bin/pylint --reports=no ncolony --disable=locally-disabled --disable=locally-enabled --disable=invalid-name --disable=star-args --disable=import-error --disable=unbalanced-tuple-unpacking --no-docstring-rgx='_.*' &&
+echo 'SUCCESS') || echo 'FAILURE'

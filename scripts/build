@@ -1,0 +1,8 @@
+#!/bin/sh
+# Copyright (c) Moshe Zadka
+# See LICENSE for details.
+set -e
+. ./env/bin/activate
+python setup.py bdist_wheel
+cd docs/
+sphinx-build -b html -d ../build/doctrees   . ../build/html
