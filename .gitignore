@@ -1,9 +1,6 @@
-env*
-_*_temp/
 *.pyc
 .coverage
 dropin.cache
 build/
-_build/
 dist/
-forepersond.egg-info/
+ncolony.egg-info/

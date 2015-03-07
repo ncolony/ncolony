@@ -10,6 +10,36 @@ THIS CODE IS EXTREMELY UNTESTED
 
 NColony: Infrastructure for running "colonies" of processes.
 
+Hacking
+===========
+
+In order to start hacking, run
+
+  $ ./admin/setup-dev
+  $ . ./build/env/bin/activate
+
+This will put the shell into a Python virtual
+environment which is suitable for development.
+
+For testing and building:
+
+  $ python setup.py all
+
+Code changes where this command does not finish
+successfully are almost certain not to be merged
+as-is.
+
+It is recommended to occasionally do
+
+  $ deactivate
+  $ git clean -dxf
+  $ ./admin/setup-dev
+  $ . ./build/env/bin/activate
+  $ python setup.py all
+
+In order to make sure that a clean repository
+builds cleanly.
+
 Code Example
 =========
 
@@ -20,22 +50,12 @@ Assuming an environment where 'pip install ncolony' has been done
   $ python -m ncolony.ctl $DEFAULT add sleeper --cmd=/bin/sleep --arg=10
   $ python -m ncolony.ctl $DEFAULT restart sleeper
 
-Installation
-=========
-
-For deployment in production:
-  $ pip install ncolony
 
 API Reference
 =========
 
-TBD
-
-Tests
-=========
-
-The following will set up your development environment and run the unit and functional tests.
- $ ./setup-dev && ./runtests && ./functional-test 
+While not existing publically, after building, the API reference
+will be in build/sphinx/html/index.html
 
 Contributors
 =========

@@ -3,7 +3,7 @@
 
 """ncolony -- a process starter/monitor"""
 
-__version__ = '0.0.1'
+__version__ = '0.0.1-dev'
 
 metadata = dict(
     name='ncolony',
