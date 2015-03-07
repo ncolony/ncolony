@@ -1,5 +1,0 @@
-venv
-var
-*.pyc
-.coverage
-build
