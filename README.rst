@@ -1,7 +1,8 @@
 .. Copyright (c) Moshe Zadka
    See LICENSE for details.
 
-## Synopsis
+Synopsis
+=========
 
 EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL
 YOU SHOULD PROBABLY NOT USE IT IN PRODUCTION!!!
@@ -9,7 +10,8 @@ THIS CODE IS EXTREMELY UNTESTED
 
 NColony: Infrastructure for running "colonies" of processes.
 
-## Code Example
+Code Example
+=========
 
 Assuming an environment where 'pip install ncolony' has been done
 
@@ -18,24 +20,29 @@ Assuming an environment where 'pip install ncolony' has been done
   $ python -m ncolony.ctl $DEFAULT add sleeper --cmd=/bin/sleep --arg=10
   $ python -m ncolony.ctl $DEFAULT restart sleeper
 
-## Installation
+Installation
+=========
 
 For deployment in production:
   $ pip install ncolony
 
-## API Reference
+API Reference
+=========
 
 TBD
 
-## Tests
+Tests
+=========
 
 The following will set up your development environment and run the unit and functional tests.
  $ ./setup-dev && ./runtests && ./functional-test 
 
-## Contributors
+Contributors
+=========
 
-TBD
+Moshe Zadka <zadka.moshe@gmail.com>
 
-## License
+License
+=======
 
 MIT License
