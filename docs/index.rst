@@ -7,6 +7,8 @@ ncolony
 .. toctree::
    :maxdepth: 2
 
+.. automodule:: ncolony.service
+   :members:
 .. automodule:: ncolony.ctllib
    :members:
 .. automodule:: ncolony.directory_monitor
@@ -15,5 +17,5 @@ ncolony
    :members:
 .. automodule:: ncolony.process_events
    :members:
-.. automodule:: ncolony.service
+.. automodule:: ncolony.schedulelib
    :members:

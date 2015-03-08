@@ -1,6 +1,18 @@
 # Copyright (c) Moshe Zadka
 # See LICENSE for details.
-"""ncolony.service -- construct a Twisted service for process monitoring"""
+"""ncolony.service
+==========================================================================
+
+Implement the 'ncolony' twistd plugin.
+
+.. code-block:: bash
+
+  $ twistd ncolony --config <dir> --messages <dir>
+
+Will run a service that brings up all processes described in files
+in the configuration directory (and shuts them down if the files
+ago away), and listens for restart messages on the messages directory.
+"""
 
 from twisted.python import usage
 from twisted.application import service as taservice, internet
@@ -12,9 +24,18 @@ from ncolony import directory_monitor, process_events
 
 class TransportDirectoryDict(dict):
 
-    """Dict-like object that writes the 'pid' value to a directory"""
+    """Dict-like object that writes the 'pid' value to a directory
+
+    This dict-like object assumes all the values have a 'pid' attribute,
+    and writes that attribute into a file named the same as the key
+    in the given directory.
+    """
 
     def __init__(self, output):
+        """Initialize
+
+        :param output: a {twisted.python.filepath.FilePath} object
+        """
         super(TransportDirectoryDict, self).__init__()
         self.output = output
 
@@ -38,6 +59,15 @@ def get(config, messages, freq, pidDir=None, reactor=None):
 
     It also listens for restart and restart-all messages on the 'messages'
     directory.
+
+    :param config: string, location of configuration directory
+    :param messages: string, location of messages directory
+    :param freq: number, frequency to check for new messages and configuration updates
+    :param pidDir: {twisted.python.filepath.FilePath} or None, location to keep pid files
+    :param reactor: something implementing the interfaces
+                       {twisted.internet.interfaces.IReactorTime} and
+                       {twisted.internet.interfaces.IReactorProcess} and
+    :returns: service, {twisted.application.interfaces.IService}
     """
     ret = taservice.MultiService()
     args = ()
@@ -80,7 +110,13 @@ class Options(usage.Options):
 ## pylint: enable=too-few-public-methods
 
 def makeService(opt):
-    """Return a service based on parsed command-line options"""
+    """Return a service based on parsed command-line options
+
+    :param opt: dict-like object. Relevant keys are config, messages,
+                pid, frequency, threshold, killtime, minrestartdelay
+                and maxrestartdelay
+    :returns: service, {twisted.application.interfaces.IService}
+    """
     ret = get(config=opt['config'], messages=opt['messages'],
               pidDir=opt['pid'], freq=opt['frequency'])
     pm = ret.getServiceNamed("procmon")

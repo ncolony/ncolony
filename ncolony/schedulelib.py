@@ -1,6 +1,14 @@
 # Copyright (c) Moshe Zadka
 # See LICENSE for details.
-"""ncolony.schedulelib -- construct a Twisted service for process scheduling"""
+"""ncolony.schedulelib
+========================
+
+Construct a Twisted service for process scheduling.
+
+.. code-block:: bash
+
+   $ twistd -n ncolonysched --timeout 2 --grace 1 --frequency 10 --arg /bin/echo --arg hello
+"""
 
 import os
 
@@ -26,13 +34,20 @@ class ProcessProtocol(object):
 
     ## pylint: disable=no-self-use
     def childDataReceived(self, fd, data):
-        """Log data from process"""
+        """Log data from process
+
+        :params fd: File descriptor data is coming from
+        :params data: The bytes the process returned
+        """
         for line in data.splitlines():
             print '[%d]' % fd, line
     ## pylint: enable=no-self-use
 
     def processEnded(self, reason):
-        """Report process end to deferred"""
+        """Report process end to deferred
+
+        :params reason: a Failure
+        """
         self.deferred.errback(reason)
 
     def processExited(self, reason):
@@ -48,7 +63,16 @@ class ProcessProtocol(object):
         pass
 
 def runProcess(args, timeout, grace, reactor):
-    """Run a process, return a deferred that fires when it is done"""
+    """Run a process, return a deferred that fires when it is done
+
+    :params args: Process arguments
+    :params timeout: Time before terminating process
+    :params grace: Time before killing process after terminating it
+    :params reactor: IReactorProcess and IReactorTime
+    :returns: deferred that fires with success when the process ends,
+              or fails if there was a problem spawning/terminating
+              the process
+    """
     deferred = defer.Deferred()
     protocol = ProcessProtocol(deferred)
     process = reactor.spawnProcess(protocol, args[0], args, env=os.environ)
@@ -91,7 +115,11 @@ class Options(usage.Options):
                 raise ValueError(elem)
 
 def makeService(opts):
-    """Make scheduler service"""
+    """Make scheduler service
+
+    :params opts: dict-like object.
+       keys: frequency, args, timeout, grace
+    """
     ret = tainternet.TimerService(opts['frequency'], runProcess, opts['args'],
                                   opts['timeout'], opts['grace'], tireactor)
     return ret
