@@ -9,5 +9,5 @@ serviceMaker = ServiceMaker(
     "ncolony Scheduler",
     "ncolony.schedulelib",
     "A command-line scheduler",
-    "ncolonysched",
+    "ncolony-scheduler",
 )
