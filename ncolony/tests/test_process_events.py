@@ -73,24 +73,52 @@ class TestReceiver(unittest.TestCase):
         """Test a simple process addition"""
         message = json.dumps(dict(args=['/bin/echo', 'hello']))
         self.receiver.add('hello', message)
-        self.assertEquals(self.monitor.events,
-                          [('ADD', 'hello', ['/bin/echo', 'hello'], None, None, {})])
+        self.assertEquals(len(self.monitor.events), 1)
+        (tp, name, args, uid, gid, env), = self.monitor.events
+        self.assertEquals(tp, 'ADD')
+        self.assertEquals(name, 'hello')
+        self.assertEquals(args, ['/bin/echo', 'hello'])
+        self.assertEquals(uid, None)
+        self.assertEquals(gid, None)
+        self.assertIn('NCOLONY_CONFIG', env)
+        self.assertEquals(env['NCOLONY_CONFIG'], message)
+        env.pop('NCOLONY_CONFIG')
+        self.assertEquals(env, {})
         self.assertEquals(self.logMessages, ['Added monitored process: hello'])
 
     def test_add_complicated(self):
         """Test a process addition with all the optional arguments"""
         message = json.dumps(dict(args=['/bin/echo', 'hello'], uid=0, gid=0, env={'world': '616'}))
         self.receiver.add('hello', message)
-        self.assertEquals(self.monitor.events,
-                          [('ADD', 'hello', ['/bin/echo', 'hello'], 0, 0, {'world': '616'})])
+        self.assertEquals(len(self.monitor.events), 1)
+        (tp, name, args, uid, gid, env), = self.monitor.events
+        self.assertEquals(tp, 'ADD')
+        self.assertEquals(name, 'hello')
+        self.assertEquals(args, ['/bin/echo', 'hello'])
+        self.assertEquals(uid, 0)
+        self.assertEquals(gid, 0)
+        self.assertIn('NCOLONY_CONFIG', env)
+        self.assertEquals(env['NCOLONY_CONFIG'], message)
+        env.pop('NCOLONY_CONFIG')
+        self.assertEquals(env, {'world': '616'})
         self.assertEquals(self.logMessages, ['Added monitored process: hello'])
 
     def test_add_with_junk(self):
         """Test a process addition with all the optional arguments"""
         message = json.dumps(dict(something=1, args=['/bin/echo', 'hello']))
         self.receiver.add('hello', message)
-        self.assertEquals(self.monitor.events,
-                          [('ADD', 'hello', ['/bin/echo', 'hello'], None, None, {})])
+        self.assertEquals(len(self.monitor.events), 1)
+        (tp, name, args, uid, gid, env), = self.monitor.events
+        self.assertEquals(tp, 'ADD')
+        self.assertEquals(name, 'hello')
+        self.assertEquals(args, ['/bin/echo', 'hello'])
+        self.assertEquals(uid, None)
+        self.assertEquals(gid, None)
+        self.assertIn('NCOLONY_CONFIG', env)
+        self.assertEquals(env['NCOLONY_CONFIG'], message)
+        self.assertEquals(self.logMessages, ['Added monitored process: hello'])
+        env.pop('NCOLONY_CONFIG')
+        self.assertEquals(env, {})
         self.assertEquals(self.logMessages, ['Added monitored process: hello'])
 
     def test_remove(self):

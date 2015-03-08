@@ -37,12 +37,14 @@ class Receiver(object):
            parsed as JSON for process params
         :returns: None
         """
-        contents = json.loads(contents)
-        contents = {key: value
-                    for key, value in contents.iteritems()
-                    if key in VALID_KEYS}
-        contents['name'] = name
-        self.monitor.addProcess(**contents)
+        parsedContents = json.loads(contents)
+        parsedContents = {key: value
+                          for key, value in parsedContents.iteritems()
+                          if key in VALID_KEYS}
+        parsedContents['name'] = name
+        parsedContents['env'] = parsedContents.get('env', {})
+        parsedContents['env']['NCOLONY_CONFIG'] = contents
+        self.monitor.addProcess(**parsedContents)
         log.msg("Added monitored process: ", name)
 
     def remove(self, name):
