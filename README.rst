@@ -62,8 +62,7 @@ Assuming an environment where 'pip install ncolony' has been done
 API Reference
 ==============
 
-While not existing publically, after building, the API reference
-will be in build/sphinx/html/index.html
+http://ncolony.readthedocs.org/en/latest/
 
 Contributors
 =============
