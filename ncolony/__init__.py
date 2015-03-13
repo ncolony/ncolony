@@ -10,7 +10,7 @@ metadata = dict(
     version=__version__,
     description='A process starter/monitor',
     long_description="""\
-ForepersonD: A wrapper around Twisted process monitor which allows runtime configuration via file-based communication
+ncolony: A wrapper around Twisted process monitor which allows runtime configuration via file-based communication
 """,
     author='Moshe Zadka',
     author_email='zadka.moshe@gmail.com',
