@@ -32,7 +32,7 @@ class CoverageTrialCommand(OptionLessCommand):
         omit = ','.join([testDir, interfaceModules])
         include = module.__name__+'*'
         command = ['coverage', 'report', '--include', include, '--omit', omit,
-                   '--fail-under=100']
+                   '--show-missing', '--fail-under=100']
         subprocess.check_call(command)
 
 class FunctionalTests(OptionLessCommand):
