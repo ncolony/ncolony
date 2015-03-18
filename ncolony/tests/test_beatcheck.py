@@ -15,6 +15,7 @@ from twisted.python import filepath, usage
 from twisted.application import internet as tainternet
 
 from ncolony import beatcheck, ctllib
+from ncolony.tests import test_heart
 
 class TestBeatChecker(unittest.TestCase):
 
@@ -136,7 +137,8 @@ class TestBeatChecker(unittest.TestCase):
                    messages='messages',
                    freq=5)
         before = time.time()
-        service = beatcheck.makeService(opt)
+        masterService = beatcheck.makeService(opt)
+        service = masterService.getServiceNamed("beatcheck")
         after = time.time()
         self.assertIsInstance(service, tainternet.TimerService)
         self.assertEquals(service.step, 5)
@@ -155,6 +157,17 @@ class TestBeatChecker(unittest.TestCase):
         self.assertEquals(path.basename(), 'config')
         self.assertLessEqual(before, start)
         self.assertLessEqual(start, after)
+
+    def test_make_service_with_health(self):
+        """Test beatcheck with heart beater"""
+        opt = dict(config='config',
+                   messages='messages',
+                   freq=5)
+        myEnv = test_heart.buildEnv()
+        test_heart.replaceEnvironment(self, myEnv)
+        masterService = beatcheck.makeService(opt)
+        service = masterService.getServiceNamed('heart')
+        test_heart.checkHeartService(self, service)
 
 class TestOptions(unittest.TestCase):
 

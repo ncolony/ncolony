@@ -21,7 +21,9 @@ from twisted.internet import defer
 from twisted.internet import error as tierror
 from twisted.internet import reactor as tireactor
 
-from twisted.application import internet as tainternet
+from twisted.application import internet as tainternet, service
+
+from ncolony import heart
 
 class ProcessProtocol(object):
 
@@ -120,6 +122,10 @@ def makeService(opts):
     :params opts: dict-like object.
        keys: frequency, args, timeout, grace
     """
-    ret = tainternet.TimerService(opts['frequency'], runProcess, opts['args'],
+    ser = tainternet.TimerService(opts['frequency'], runProcess, opts['args'],
                                   opts['timeout'], opts['grace'], tireactor)
+    ret = service.MultiService()
+    ser.setName('scheduler')
+    ser.setServiceParent(ret)
+    heart.maybeAddHeart(ret)
     return ret

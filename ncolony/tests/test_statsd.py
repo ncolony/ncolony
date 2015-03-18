@@ -11,7 +11,8 @@ from twisted.python import usage
 from twisted.internet import protocol as tiprotocol, task as titask
 from twisted.application import service as taservice, internet as tainternet
 
-from ncolony import statsd as statsd
+from ncolony import statsd
+from ncolony.tests import test_heart
 
 class TestGetSamples(unittest.TestCase):
 
@@ -545,6 +546,18 @@ class TestPluginStuff(unittest.TestCase):
         self.assertLessEqual(store.lastNow, after)
         factory = self._check_carbon_subservice(service, opt)
         self._check_publisher_subservice(service, opt, factory, store)
+
+    def test_service_making_with_health(self):
+        """Test makeService"""
+        opt = {'interface': '127.0.0.1', 'port': 8111,
+               'carbon-host': 'carbon.example.org', 'carbon-port': 1111,
+               'prefix': 'localhost.localdomain', 'freq': 63,
+              }
+        myEnv = test_heart.buildEnv()
+        test_heart.replaceEnvironment(self, myEnv)
+        service = statsd.makeService(opt)
+        myHeart = service.getServiceNamed('heart')
+        test_heart.checkHeartService(self, myHeart)
 
     def _check_publisher_subservice(self, service, opt, factory, store):
         publisher = service.getServiceNamed('publisher')

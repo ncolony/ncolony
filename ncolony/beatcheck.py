@@ -24,9 +24,9 @@ import time
 
 from twisted.python import filepath, usage
 
-from twisted.application import internet as tainternet
+from twisted.application import internet as tainternet, service
 
-from ncolony import ctllib
+from ncolony import ctllib, heart
 
 def check(path, start, now):
     """check which processes need to be restarted
@@ -75,13 +75,17 @@ def makeService(opt):
               checks for stale processes in opt['config'], and sends
               restart messages through opt['messages']
     """
+    ret = service.MultiService()
     places = ctllib.Places(config=opt['config'], messages=opt['messages'])
     restarter = functools.partial(ctllib.restart, places)
     path = filepath.FilePath(opt['config'])
     now = time.time()
     checker = functools.partial(check, path, now)
-    return tainternet.TimerService(opt['freq'], run, restarter, checker, time.time)
-
+    beatcheck = tainternet.TimerService(opt['freq'], run, restarter, checker, time.time)
+    beatcheck.setName('beatcheck')
+    beatcheck.setServiceParent(ret)
+    heart.maybeAddHeart(ret)
+    return ret
 
 ## pylint: disable=too-few-public-methods
 

@@ -3,6 +3,8 @@
 
 """Test ncolony.schedulelib"""
 
+from __future__ import division
+
 import os
 import unittest
 import StringIO
@@ -22,22 +24,7 @@ from twisted.runner.test import test_procmon
 
 from ncolony import schedulelib
 
-## Monkey patch ##
-def processEnded(self, status):
-    """
-    Deliver the process ended event to C{self.proto}.
-    """
-    if self.pid is None:
-        return
-    self.pid = None
-    statusMap = {
-        0: test_procmon.ProcessDone,
-        1: test_procmon.ProcessTerminated,
-    }
-    self.proto.processEnded(test_procmon.Failure(statusMap[status](status)))
-test_procmon.DummyProcess.processEnded = processEnded
-## Monkey patch ##
-
+from ncolony.tests import test_heart
 
 class TestProcessProtocol(unittest.TestCase):
 
@@ -256,10 +243,21 @@ class TestService(unittest.TestCase):
         opts['timeout'] = 10
         opts['grace'] = 2
         opts['frequency'] = 30
-        service = schedulelib.makeService(opts)
+        masterService = schedulelib.makeService(opts)
+        service = masterService.getServiceNamed('scheduler')
         self.assertIsInstance(service, tainternet.TimerService)
         func, args, kwargs = service.call
         self.assertFalse(kwargs)
         self.assertIs(func, schedulelib.runProcess)
         self.assertEquals(args, (opts['args'], opts['timeout'], opts['grace'], reactor))
         self.assertEquals(service.step, opts['frequency'])
+
+    def test_make_service_with_health(self):
+        """Test schedulelib with heart beater"""
+        opts = dict(timeout=10, grace=2, frequency=30)
+        opts['args'] = ['/bin/echo', 'hello']
+        myEnv = test_heart.buildEnv()
+        test_heart.replaceEnvironment(self, myEnv)
+        masterService = schedulelib.makeService(opts)
+        service = masterService.getServiceNamed('heart')
+        test_heart.checkHeartService(self, service)

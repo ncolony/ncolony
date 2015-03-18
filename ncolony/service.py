@@ -95,8 +95,8 @@ class Options(usage.Options):
     """Options for ncolony service"""
 
     optParameters = [
-        ["messages", None, None, "Directory for messages"],
         ["config", None, None, "Directory for configuration"],
+        ["messages", None, None, "Directory for messages"],
         ["frequency", None, 10, "Frequency of checking for updates", float],
         ["pid", None, None, "Directory of PID files"],
     ] + procmontap.Options.optParameters

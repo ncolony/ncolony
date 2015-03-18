@@ -20,6 +20,8 @@ from twisted.python import usage
 from twisted.internet import protocol as tiprotocol
 from twisted.application import service, internet as tainternet
 
+from ncolony import heart
+
 Sample = collections.namedtuple('Sample', 'meaning key fields')
 Summary = collections.namedtuple('Summary', 'category key value')
 
@@ -289,6 +291,7 @@ def makeService(opt):
                                         time.time)
     publisher.setName('publisher')
     publisher.setServiceParent(ret)
+    heart.maybeAddHeart(ret)
     return ret
 
 ## pylint: disable=too-few-public-methods
