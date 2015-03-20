@@ -1,5 +1,6 @@
-## Copyright (C) Moshe Zadka
-## See LICENSE for details
+# Copyright (c) Moshe Zadka
+# See LICENSE for details.
+
 """ncolony.heart
 ==================
 
