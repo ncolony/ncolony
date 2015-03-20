@@ -83,6 +83,9 @@ class TestReceiver(unittest.TestCase):
         self.assertIn('NCOLONY_CONFIG', env)
         self.assertEquals(env['NCOLONY_CONFIG'], message)
         env.pop('NCOLONY_CONFIG')
+        self.assertIn('NCOLONY_NAME', env)
+        self.assertEquals(env['NCOLONY_NAME'], 'hello')
+        env.pop('NCOLONY_NAME')
         self.assertEquals(env, {})
         self.assertEquals(self.logMessages, ['Added monitored process: hello'])
 
@@ -100,6 +103,7 @@ class TestReceiver(unittest.TestCase):
         self.assertIn('NCOLONY_CONFIG', env)
         self.assertEquals(env['NCOLONY_CONFIG'], message)
         env.pop('NCOLONY_CONFIG')
+        env.pop('NCOLONY_NAME')
         self.assertEquals(env, {'world': '616'})
         self.assertEquals(self.logMessages, ['Added monitored process: hello'])
 
@@ -118,6 +122,7 @@ class TestReceiver(unittest.TestCase):
         self.assertEquals(env['NCOLONY_CONFIG'], message)
         self.assertEquals(self.logMessages, ['Added monitored process: hello'])
         env.pop('NCOLONY_CONFIG')
+        env.pop('NCOLONY_NAME')
         self.assertEquals(env, {})
         self.assertEquals(self.logMessages, ['Added monitored process: hello'])
 

@@ -44,6 +44,7 @@ class Receiver(object):
         parsedContents['name'] = name
         parsedContents['env'] = parsedContents.get('env', {})
         parsedContents['env']['NCOLONY_CONFIG'] = contents
+        parsedContents['env']['NCOLONY_NAME'] = name
         self.monitor.addProcess(**parsedContents)
         log.msg("Added monitored process: ", name)
 
