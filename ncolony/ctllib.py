@@ -46,7 +46,7 @@ NEXT = functools.partial(next, itertools.count(0))
 Places = collections.namedtuple('Places', 'config messages')
 
 ## pylint: disable=too-many-arguments
-def add(places, name, cmd, args, env=None, uid=None, gid=None):
+def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None):
     """Add a process.
 
     :param places: a Places instance
@@ -73,6 +73,8 @@ def add(places, name, cmd, args, env=None, uid=None, gid=None):
         details['uid'] = uid
     if gid is not None:
         details['gid'] = gid
+    if extras is not None:
+        details.update(extras)
     content = json.dumps(details)
     fle.setContent(content)
 ## pylint: enable=too-many-arguments
@@ -113,6 +115,11 @@ def restartAll(places):
     content = json.dumps(dict(type='RESTART-ALL'))
     _addMessage(places, content)
 
+def _parseJSON(fname):
+    with open(fname) as fp:
+        data = fp.read()
+    return json.loads(data)
+
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument('--messages', required=True)
 PARSER.add_argument('--config', required=True)
@@ -132,6 +139,7 @@ _add_parser.add_argument('--arg', dest='args', action='append')
 _add_parser.add_argument('--env', action='append')
 _add_parser.add_argument('--uid', type=int)
 _add_parser.add_argument('--gid', type=int)
+_add_parser.add_argument('--extras', type=_parseJSON)
 _add_parser.set_defaults(func=add)
 
 def call(results):

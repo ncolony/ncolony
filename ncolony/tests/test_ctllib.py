@@ -58,16 +58,23 @@ class TestArgParsing(unittest.TestCase):
 
     def test_add_full(self):
         """Check add subcommand parsing when all optional arguments are given"""
+        extras = {'ncolony.beatcheck': {'period': 10, 'grace': 3, 'status': 'foo.status'}}
+        extrasJSON = json.dumps(extras)
+        fp = file('extras.json', 'w')
+        fp.write(extrasJSON)
+        fp.close()
         res = self.parser.parse_args(self.base+['add', 'hello', '--cmd', '/bin/echo',
                                                 '--arg', 'hello', '--arg', 'world',
                                                 '--env', 'world=616', '--env', 'status=good',
-                                                '--uid', '5', '--gid', '6'])
+                                                '--uid', '5', '--gid', '6',
+                                                '--extra', 'extras.json'])
         self.assertEquals(res.name, 'hello')
         self.assertEquals(res.cmd, '/bin/echo')
         self.assertEquals(res.args, ['hello', 'world'])
         self.assertEquals(res.env, ['world=616', 'status=good'])
         self.assertEquals(res.uid, 5)
         self.assertEquals(res.gid, 6)
+        self.assertEquals(res.extras, extras)
         self.assertIs(res.func, ctllib.add)
 
     def test_remove(self):
@@ -134,12 +141,16 @@ class TestController(unittest.TestCase):
         ctllib.remove(self.places, 'hello')
         self.assertFalse(os.path.exists(fname))
 
-    def test_add_with_env(self):
+    def test_add_with_env_and_extras(self):
         """Test that add with optional environment works"""
-        ctllib.add(self.places, 'hello', cmd='/bin/echo', args=['hello'], env=['world=616'])
+        extras = dict(goodbye=[1, 2, 3])
+        ctllib.add(self.places, 'hello', cmd='/bin/echo',
+                   args=['hello'], env=['world=616'], extras=extras)
         fname = os.path.join(self.places.config, 'hello')
         d = json.loads(file(fname).read())
-        self.assertEquals(d, dict(env={'world': '616'}, args=['/bin/echo', 'hello']))
+        self.assertEquals(d, dict(env={'world': '616'},
+                                  goodbye=[1, 2, 3],
+                                  args=['/bin/echo', 'hello']))
 
     def test_add_with_uid(self):
         """Test that add with optional uid works"""
