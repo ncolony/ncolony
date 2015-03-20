@@ -20,39 +20,15 @@ class OptionLessCommand(cmd.Command):
     def finalize_options(self):
         pass
 
-class CoverageTrialCommand(OptionLessCommand):
+class ToxTestCommand(OptionLessCommand):
 
     def run(self):
-        trial = spawn.find_executable('trial')
-        tempDir = os.path.join(os.path.dirname(sys.argv[0]), 'build', '_trial_temp')
-        command = ['coverage', 'run', trial, '--temp-directory', tempDir, module.__name__]
-        subprocess.check_call(command)
-        testDir = os.path.join(module.__name__, 'tests', '*')
-        interfaceModules = os.path.join(module.__name__, 'interfaces*')
-        omit = ','.join([testDir, interfaceModules])
-        include = module.__name__+'*'
-        command = ['coverage', 'report', '--include', include, '--omit', omit,
-                   '--show-missing', '--fail-under=100']
-        subprocess.check_call(command)
-
-class FunctionalTests(OptionLessCommand):
-
-    def run(self):
-        command = [sys.executable, '-m', module.__name__+'.tests.functional_test']
-        subprocess.check_call(command)
-
-class Lint(OptionLessCommand):
-
-    def run(self):
-        command = ['pylint', '--rcfile', 'admin/pylintrc', module.__name__]
-        subprocess.check_call(command)
+        subprocess.check_call(['tox'])
 
 class All(OptionLessCommand):
 
     def run(self):
         self.run_command('test')
-        self.run_command('lint')
-        self.run_command('integration')
         self.run_command('bdist_wheel')
         self.run_command('build_sphinx')
 
@@ -73,9 +49,9 @@ setuptools.setup(
     packages=[module.__name__, 'twisted.plugins'],
     install_requires=['Twisted'],
     extras_require = {
-        'test': ['coverage', 'pylint'],
-        'dev': ['wheel'],
+        'test': ['tox'],
+        'dev': ['wheel', 'sphinx'],
     },
-    cmdclass=dict(test=CoverageTrialCommand, integration=FunctionalTests, lint=Lint, all=All),
+    cmdclass=dict(test=ToxTestCommand, all=All),
     **module.metadata
 )

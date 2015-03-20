@@ -198,34 +198,34 @@ class TestStatsStore(unittest.TestCase):
         self.store.update(statsd.Sample('gauge', 'foo', ['1']))
         self.store.update(statsd.Sample('gauge', 'bar', ['3']))
         allThings = self._getAll(1)
-        self.assertEquals(allThings,
-                          [statsd.Summary(category='gauges', key='foo', value=1),
-                           statsd.Summary(category='gauges', key='bar', value=3),
-                          ])
+        self.assertEquals(set(allThings),
+                          set([statsd.Summary(category='gauges', key='foo', value=1),
+                               statsd.Summary(category='gauges', key='bar', value=3),
+                              ]))
         allThings = self._getAll(1)
-        self.assertEquals(allThings,
-                          [statsd.Summary(category='gauges', key='foo', value=1),
-                           statsd.Summary(category='gauges', key='bar', value=3),
-                          ])
+        self.assertEquals(set(allThings),
+                          set([statsd.Summary(category='gauges', key='foo', value=1),
+                               statsd.Summary(category='gauges', key='bar', value=3),
+                              ]))
         self.store.update(statsd.Sample('gauge', 'foo', ['+1']))
         allThings = self._getAll(1)
-        self.assertEquals(allThings,
-                          [statsd.Summary(category='gauges', key='foo', value=2),
-                           statsd.Summary(category='gauges', key='bar', value=3),
-                          ])
+        self.assertEquals(set(allThings),
+                          set([statsd.Summary(category='gauges', key='foo', value=2),
+                               statsd.Summary(category='gauges', key='bar', value=3),
+                              ]))
         self.store.update(statsd.Sample('gauge', 'foo', ['-2']))
         allThings = self._getAll(1)
-        self.assertEquals(allThings,
-                          [statsd.Summary(category='gauges', key='foo', value=0),
-                           statsd.Summary(category='gauges', key='bar', value=3),
-                          ])
+        self.assertEquals(set(allThings),
+                          set([statsd.Summary(category='gauges', key='foo', value=0),
+                               statsd.Summary(category='gauges', key='bar', value=3),
+                              ]))
         self.store.update(statsd.Sample('gauge', 'foo', ['+1']))
         self.store.update(statsd.Sample('gauge', 'foo', ['4']))
         allThings = self._getAll(1)
-        self.assertEquals(allThings,
-                          [statsd.Summary(category='gauges', key='foo', value=4),
-                           statsd.Summary(category='gauges', key='bar', value=3),
-                          ])
+        self.assertEquals(set(allThings),
+                          set([statsd.Summary(category='gauges', key='foo', value=4),
+                               statsd.Summary(category='gauges', key='bar', value=3),
+                              ]))
 
     def test_add_set(self):
         """Test add several set items"""
