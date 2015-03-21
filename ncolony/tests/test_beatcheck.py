@@ -43,7 +43,6 @@ class TestBeatChecker(unittest.TestCase):
 
     def test_no_heart(self):
         """Test checking a config directory with one file that does not beat"""
-        status = os.path.join(self.status, 'foo')
         check = {}
         jsonCheck = json.dumps(check)
         fooFile = self.filepath.child('foo')

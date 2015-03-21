@@ -12,12 +12,9 @@ import subprocess
 import sys
 import time
 
-try:
-    envLocation = os.environ['VIRTUAL_ENV']
-except KeyError:
-    sys.exit('Refusing to run without a virtual environment')
-
+envLocation = os.environ['VIRTUAL_ENV']
 binLocation = os.path.join(envLocation, 'bin')
+
 here = sys.argv[0]
 while not os.path.exists(os.path.join(here, '.gitignore')):
     here = os.path.dirname(here)
