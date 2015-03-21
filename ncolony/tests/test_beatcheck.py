@@ -41,6 +41,16 @@ class TestBeatChecker(unittest.TestCase):
         """Test checking an empty config directory"""
         self.assertFalse(self.checker(0, 0))
 
+    def test_no_heart(self):
+        """Test checking a config directory with one file that does not beat"""
+        status = os.path.join(self.status, 'foo')
+        check = {}
+        jsonCheck = json.dumps(check)
+        fooFile = self.filepath.child('foo')
+        fooFile.setContent(jsonCheck)
+        mtime = fooFile.getModificationTime()
+        self.assertFalse(self.checker(mtime, mtime))
+
     def test_one_check(self):
         """Test checking a config directory with one file"""
         status = os.path.join(self.status, 'foo')

@@ -42,7 +42,9 @@ def check(path, start, now):
 def _isbad(child, start, now):
     content = child.getContent()
     parsed = json.loads(content)
-    params = parsed['ncolony.beatcheck']
+    params = parsed.get('ncolony.beatcheck')
+    if params is None:
+        return False
     period = params['period']
     grace = params['grace']
     mtime = max(child.getModificationTime(), start)
