@@ -39,7 +39,7 @@ def replaceEnvironment(case, myEnv):
     case.addCleanup(_cleanup)
     os.environ = myEnv
 
-def checkHeartService(case, service):
+def checkHeartService(case, service, statusName='my.status'):
     """Check that a heart service is correct
 
     :params case: a unittest.TestCase
@@ -55,14 +55,15 @@ def checkHeartService(case, service):
     case.assertIsInstance(myHeart, heart.Heart)
     fp = myHeart.getFile()
     case.assertIsInstance(fp, filepath.FilePath)
-    case.assertEquals(fp.basename(), 'my.status')
+    case.assertEquals(fp.basename(), statusName)
 
-def buildEnv():
+def buildEnv(params=None):
     """Build an environment with NCOLONY_CONFIG
 
     :returns: copy of the environment dict and NCOLONY_CONFIG
     """
-    params = dict(status='my.status', period=10, grace=3)
+    if params is None:
+        params = dict(status='my.status', period=10, grace=3)
     config = {'ncolony.beatcheck': params}
     configJSON = json.dumps(config)
     myEnv = dict(os.environ)
@@ -87,11 +88,18 @@ class TestHeart(unittest.TestCase):
     def test_make_service(self):
         """Test make service builds the service based on os.environ"""
         myEnv = buildEnv()
-
-
         replaceEnvironment(self, myEnv)
         service = heart.makeService()
         checkHeartService(self, service)
+
+    def test_make_service_default_name(self):
+        """Test make service builds the service based on os.environ"""
+        params = dict(status='.', period=10, grace=3)
+        myEnv = buildEnv(params=params)
+        myEnv['NCOLONY_NAME'] = 'hello'
+        replaceEnvironment(self, myEnv)
+        service = heart.makeService()
+        checkHeartService(self, service, 'hello')
 
     def test_make_service_no_env(self):
         """Test make service builds the service based on os.environ"""

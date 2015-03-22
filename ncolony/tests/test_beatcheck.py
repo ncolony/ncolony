@@ -72,6 +72,23 @@ class TestBeatChecker(unittest.TestCase):
         self.assertFalse(self.checker(mtime, newMTime+9))
         self.assertEquals(self.checker(mtime, newMTime+11), ['foo'])
 
+    def test_one_default_check(self):
+        """Test checking a config directory with one file"""
+        status = os.path.join(self.status, 'foo')
+        check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': self.status}}
+        jsonCheck = json.dumps(check)
+        fooFile = self.filepath.child('foo')
+        fooFile.setContent(jsonCheck)
+        mtime = fooFile.getModificationTime()
+        statusFile = filepath.FilePath(status, 'foo')
+        statusFile.setContent("111")
+        newMTime = statusFile.getModificationTime()
+        newMTime += 100
+        ## Back...to the future
+        statusFile.changed()
+        os.utime(status, (newMTime, newMTime))
+        self.assertFalse(self.checker(mtime, newMTime))
+
     def test_grace(self):
         """Test checking that grace period is respected"""
         status = os.path.join(self.status, 'foo')

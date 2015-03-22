@@ -43,7 +43,11 @@ def makeService():
     params = config.get('ncolony.beatcheck')
     if params is None:
         return
-    heart = Heart(filepath.FilePath(params['status']))
+    myFilePath = filepath.FilePath(params['status'])
+    if myFilePath.isdir():
+        name = os.environ['NCOLONY_NAME']
+        myFilePath = myFilePath.child(name)
+    heart = Heart(myFilePath)
     ret = tainternet.TimerService(params['period']/3, heart.beat)
     return ret
 

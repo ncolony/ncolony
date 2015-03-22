@@ -54,6 +54,8 @@ def _isbad(child, start, now):
     statusPath = child.clonePath(status)
     if not statusPath.exists():
         return True
+    if statusPath.isdir():
+        statusPath = statusPath.child(child.basename())
     statusMtime = statusPath.getModificationTime()
     return (statusMtime + period) < now
 
