@@ -24,7 +24,7 @@ from twisted.runner.test import test_procmon
 
 from ncolony import schedulelib
 
-from ncolony.tests import test_heart
+from ncolony.client.tests import test_heart
 
 class TestProcessProtocol(unittest.TestCase):
 

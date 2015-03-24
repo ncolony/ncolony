@@ -34,7 +34,7 @@ from twisted.internet import reactor, endpoints
 from twisted.web import resource, static, server
 from twisted.application import internet, service
 
-from ncolony import heart
+from ncolony.client import heart
 
 begin = resource.Resource()
 hello = static.Data(type='text/html', data='Hello world')

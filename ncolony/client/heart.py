@@ -1,8 +1,8 @@
 # Copyright (c) Moshe Zadka
 # See LICENSE for details.
 
-"""ncolony.heart
-==================
+"""ncolony.client.heart
+=====================
 
 A heart beater.
 """

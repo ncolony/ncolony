@@ -15,7 +15,7 @@ from twisted.python import filepath, usage
 from twisted.application import internet as tainternet
 
 from ncolony import beatcheck, ctllib
-from ncolony.tests import test_heart
+from ncolony.client.tests import test_heart
 
 class TestBeatChecker(unittest.TestCase):
 

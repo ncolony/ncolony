@@ -21,7 +21,7 @@ from twisted.python import usage
 from twisted.internet import protocol as tiprotocol
 from twisted.application import service, internet as tainternet
 
-from ncolony import heart
+from ncolony.client import heart
 
 Sample = collections.namedtuple('Sample', 'meaning key fields')
 Summary = collections.namedtuple('Summary', 'category key value')

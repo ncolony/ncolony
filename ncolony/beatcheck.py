@@ -26,7 +26,8 @@ from twisted.python import filepath, usage
 
 from twisted.application import internet as tainternet, service
 
-from ncolony import ctllib, heart
+from ncolony import ctllib
+from ncolony.client import heart
 
 def check(path, start, now):
     """check which processes need to be restarted

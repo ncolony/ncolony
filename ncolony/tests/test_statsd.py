@@ -12,7 +12,7 @@ from twisted.internet import protocol as tiprotocol, task as titask
 from twisted.application import service as taservice, internet as tainternet
 
 from ncolony import statsd
-from ncolony.tests import test_heart
+from ncolony.client.tests import test_heart
 
 class TestGetSamples(unittest.TestCase):
 

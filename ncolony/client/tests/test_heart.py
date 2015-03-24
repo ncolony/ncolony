@@ -11,7 +11,7 @@ import unittest
 from twisted.python import filepath
 from twisted.application import internet as tainternet
 
-from ncolony import heart
+from ncolony.client import heart
 
 ## pylint: disable=too-few-public-methods
 

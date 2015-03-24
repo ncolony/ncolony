@@ -23,7 +23,7 @@ from twisted.internet import reactor as tireactor
 
 from twisted.application import internet as tainternet, service
 
-from ncolony import heart
+from ncolony.client import heart
 
 class ProcessProtocol(object):
 
