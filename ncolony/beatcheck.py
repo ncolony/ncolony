@@ -24,7 +24,7 @@ import time
 
 from twisted.python import filepath, usage
 
-from twisted.application import internet as tainternet, service
+from twisted.application import internet as tainternet
 
 from ncolony import ctllib
 from ncolony.client import heart
@@ -72,6 +72,17 @@ def run(restarter, checker, timer):
     for bad in checker(timer()):
         restarter(bad)
 
+def parseConfig(opt):
+    """Parse configuration
+
+    :params opt: dict-like object with config and messages keys
+    :returns: restarter, path
+    """
+    places = ctllib.Places(config=opt['config'], messages=opt['messages'])
+    restarter = functools.partial(ctllib.restart, places)
+    path = filepath.FilePath(opt['config'])
+    return restarter, path
+
 def makeService(opt):
     """Make a service
 
@@ -80,17 +91,12 @@ def makeService(opt):
               checks for stale processes in opt['config'], and sends
               restart messages through opt['messages']
     """
-    ret = service.MultiService()
-    places = ctllib.Places(config=opt['config'], messages=opt['messages'])
-    restarter = functools.partial(ctllib.restart, places)
-    path = filepath.FilePath(opt['config'])
+    restarter, path = parseConfig(opt)
     now = time.time()
     checker = functools.partial(check, path, now)
     beatcheck = tainternet.TimerService(opt['freq'], run, restarter, checker, time.time)
     beatcheck.setName('beatcheck')
-    beatcheck.setServiceParent(ret)
-    heart.maybeAddHeart(ret)
-    return ret
+    return heart.wrapHeart(beatcheck)
 
 ## pylint: disable=too-few-public-methods
 

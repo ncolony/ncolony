@@ -186,14 +186,17 @@ class TestBeatChecker(unittest.TestCase):
 
     def test_make_service_with_health(self):
         """Test beatcheck with heart beater"""
-        opt = dict(config='config',
-                   messages='messages',
-                   freq=5)
-        myEnv = test_heart.buildEnv()
-        test_heart.replaceEnvironment(self, myEnv)
-        masterService = beatcheck.makeService(opt)
-        service = masterService.getServiceNamed('heart')
-        test_heart.checkHeartService(self, service)
+        testWrappedHeart(self, beatcheck.makeService)
+
+def testWrappedHeart(utest, serviceMaker):
+    """Service has a child heart beater"""
+    opt = dict(config='config',
+               messages='messages',
+               freq=5)
+    test_heart.replaceEnvironment(utest)
+    masterService = serviceMaker(opt)
+    service = masterService.getServiceNamed('heart')
+    test_heart.checkHeartService(utest, service)
 
 class TestOptions(unittest.TestCase):
 
