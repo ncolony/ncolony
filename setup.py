@@ -10,28 +10,6 @@ import setuptools
 
 import ncolony as module
 
-class OptionLessCommand(cmd.Command):
-
-    user_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-class ToxTestCommand(OptionLessCommand):
-
-    def run(self):
-        subprocess.check_call(['tox'])
-
-class All(OptionLessCommand):
-
-    def run(self):
-        self.run_command('test')
-        self.run_command('bdist_wheel')
-        self.run_command('build_sphinx')
-
 setuptools.setup(
     url='https://github.com/moshez/ncolony',
     classifiers=[
@@ -46,12 +24,7 @@ setuptools.setup(
         'Programming Language :: Python :: 2.7',
     ],
     keywords='process monitoring supervisor daemon',
-    packages=[module.__name__, 'twisted.plugins'],
+    packages=setuptools.find_packages() + ['twisted.plugins'],
     install_requires=['Twisted'],
-    extras_require = {
-        'test': ['tox'],
-        'dev': ['wheel', 'sphinx'],
-    },
-    cmdclass=dict(test=ToxTestCommand, all=All),
     **module.metadata
 )
