@@ -26,8 +26,9 @@ differ = difflib.Differ()
 
 ## Check .pyc files
 for dirpath, dirnames, filenames in os.walk(here, topdown=True):
-    if 'build' in dirpath:
+    if 'build' in dirpath or '__pycache__' in dirpath:
         dirnames[:] = []
+        continue
     for filename in filenames:
         fullname = os.path.join(dirpath, filename)
         if fullname.endswith('.pyc'):
