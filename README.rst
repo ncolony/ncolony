@@ -1,17 +1,24 @@
 .. Copyright (c) Moshe Zadka
    See LICENSE for details.
 
-Synopsis
-=========
+Ncolony
+-------
+
+Infrastructure for running "colonies" of processes.
+
+.. image:: https://travis-ci.org/moshez/ncolony.svg?branch=master
+    :target: https://travis-ci.org/moshez/ncolony
+
+Warning
+=======
 
 EXPERIMENTAL EXPERIMENTAL EXPERIMENTAL
 YOU SHOULD PROBABLY NOT USE IT IN PRODUCTION!!!
 THIS CODE IS EXTREMELY UNTESTED
 
-NColony: Infrastructure for running "colonies" of processes.
 
 Hacking
-===========
+=======
 
 In order to start hacking, run
 
