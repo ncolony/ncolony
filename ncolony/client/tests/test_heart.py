@@ -28,11 +28,13 @@ class DummyFile(object):
 
 ## pylint: enable=too-few-public-methods
 
-def replaceEnvironment(case, myEnv):
+def replaceEnvironment(case, myEnv=None):
     """Replace environment temporarily, restoring it at end of test
 
     :params myEnv: a dict-like object
     """
+    if myEnv == None:
+        myEnv = buildEnv()
     oldEnviron = os.environ
     def _cleanup():
         os.environ = oldEnviron

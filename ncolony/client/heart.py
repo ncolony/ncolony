@@ -12,7 +12,7 @@ import json
 import os
 
 from twisted.python import filepath
-from twisted.application import internet as tainternet
+from twisted.application import internet as tainternet, service as taservice
 
 class Heart(object):
 
@@ -64,3 +64,10 @@ def maybeAddHeart(master):
         return
     heartSer.setName('heart')
     heartSer.setServiceParent(master)
+
+def wrapHeart(service):
+    """Wrap a service in a MultiService with a heart"""
+    master = taservice.MultiService()
+    service.setServiceParent(master)
+    maybeAddHeart(master)
+    return master
