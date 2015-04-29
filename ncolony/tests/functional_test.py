@@ -24,19 +24,24 @@ if sys.executable != os.path.join(binLocation, 'python'):
     sys.exit('Refusing to run on the wrong interpreter '+sys.executable)
 
 FUNC_TEMP = os.path.join(here, '_func_temp')
+PID_FILE = os.path.join(FUNC_TEMP, 'twistd.pid')
+LOG_FILE = os.path.join(FUNC_TEMP, 'twistd.log')
 if os.path.exists(FUNC_TEMP):
+    while os.path.exists(PID_FILE):
+        print 'Old process remains -- shutting it down'
+        fp = file(PID_FILE)
+        pid = int(fp.read())
+        os.kill(pid, 15)
     shutil.rmtree(FUNC_TEMP)
 CONFIGS = os.path.join(FUNC_TEMP, 'configs')
 MESSAGES = os.path.join(FUNC_TEMP, 'messages')
 os.makedirs(CONFIGS)
 os.makedirs(MESSAGES)
 DEFAULTS = ['--messages', MESSAGES, '--config', CONFIGS]
-SLEEP = "import time, sys;print 'START';sys.stdout.flush();time.sleep(2);print 'STOP'"
+SLEEP = "import time, sys;print 'START';sys.stdout.flush();time.sleep(3);print 'STOP'"
 SLEEPER = ['--arg=-c', '--arg', SLEEP]
 subprocess.check_call([sys.executable, '-m', 'ncolony.ctl'] + DEFAULTS +
                       ['add', 'sleeper', '--cmd', sys.executable] + SLEEPER)
-PID_FILE = os.path.join(FUNC_TEMP, 'twistd.pid')
-LOG_FILE = os.path.join(FUNC_TEMP, 'twistd.log')
 subprocess.check_call([os.path.join(binLocation, 'twistd'), '--logfile', LOG_FILE,
                        '--pidfile', PID_FILE, 'ncolony'] +
                       DEFAULTS +
@@ -69,9 +74,23 @@ for i in range(10):
 else:
     sys.exit("twistd did not shutdown")
 LINES = list(file(LOG_FILE))
-STARTS = sum(1 for line in LINES if 'START' in line)
-STOPS = sum(1 for line in LINES if 'STOP' in line)
-if STARTS != 6:
-    sys.exit('Wrong number of START messages: %d' % STARTS)
-if STOPS != 4:
-    sys.exit('Wrong number of STOP messages: %d' % STOPS)
+STATES = [line for line in LINES if 'START' in line or 'STOP' in line]
+if 'START' in STATES[-1]:
+    STATES.pop()
+## Consume in pairs
+STATES_ITER = enumerate(iter(STATES))
+for i, el in STATES_ITER:
+    if 'START' not in el:
+        sys.exit('Unexpected STOP %d' % i)
+    i, nextEl = next(STATES_ITER)
+    if 'START' in nextEl:
+        break
+else:
+    sys.exit('No restart detected')
+i, nextEl = next(STATES_ITER)
+for i, el in STATES_ITER:
+    if 'START' not in el:
+        sys.exit('Unexpected STOP %d:%r' % (i, el))
+    i, nextEl = next(STATES_ITER)
+    if 'START' not in nextEl:
+        sys.exit('Unexpected restart')
