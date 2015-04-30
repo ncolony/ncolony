@@ -118,7 +118,8 @@ class TestService(unittest.TestCase):
 
     def _write(self, tp, name, content):
         name = os.path.join(self.testDirs[tp], name)
-        file(name, 'w').write(content)
+        with file(name, 'w') as fp:
+            fp.write(content)
 
     def _remove(self, tp, name):
         name = os.path.join(self.testDirs[tp], name)

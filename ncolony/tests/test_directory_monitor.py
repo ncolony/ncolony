@@ -94,7 +94,8 @@ class DirectoryBasedTest(unittest.TestCase):
     def write(self, name, content):
         """Write a file in the directory"""
         name = os.path.join(self.testDirectory, name)
-        file(name, 'w').write(content)
+        with file(name, 'w') as fp:
+            fp.write(content)
 
     def remove(self, name):
         """Remove a file from the directory"""

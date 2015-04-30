@@ -34,8 +34,8 @@ class TestArgParsing(unittest.TestCase):
     def test_restart_all(self):
         """Check restart-all subcommand parsing"""
         res = self.parser.parse_args(self.base+['restart-all'])
-        self.assertIs(res.messages, 'messages')
-        self.assertIs(res.config, 'config')
+        self.assertEquals(res.messages, 'messages')
+        self.assertEquals(res.config, 'config')
         self.assertIs(res.func, ctllib.restartAll)
 
     def test_restart(self):
