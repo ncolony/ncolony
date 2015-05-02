@@ -25,6 +25,6 @@ setuptools.setup(
     ],
     keywords='process monitoring supervisor daemon',
     packages=setuptools.find_packages() + ['twisted.plugins'],
-    install_requires=['Twisted'],
+    install_requires=['Twisted>=15.1'],
     **module.metadata
 )
