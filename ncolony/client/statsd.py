@@ -12,26 +12,47 @@ def _isFormatter(func):
 
 @_isFormatter
 def _timing(delta):
+    if delta == None:
+        raise ValueError('timing without value')
     return '{:d}|ms'.format(delta)
 
 @_isFormatter
 def _incr(delta):
+    if delta == None:
+        delta = 1
     return '{:d}|c'.format(delta)
 
 @_isFormatter
 def _decr(delta):
+    if delta == None:
+        delta = -1
     return incr(stat, -delta)
 
 @_isFormatter
 def _set(value):
+    if delta == None:
+        raise ValueError('set without value')
     return '{}|c'.format(value)
 
 @_isFormatter
 def _gaugeDelta(value):
+    if value == None:
+        raise ValueError('gaugeDelta without value')
     if value > 0:
         prefix = '+'
     else:
         prefix = ''
+    return '{}{}|g'.format(prefix, value)
+
+@_isFormatter
+def _gaugeSet(value):
+    if value == None:
+        raise ValueError('gaugeSet without value')
+    if value < 0:
+        prefix = '0|g\n'
+    else:
+        prefix = ''
+    return '{}{}|g'.format(prefix, value)
 
 ## TODO - Gauge set
 
@@ -40,7 +61,8 @@ def _format(stat, tp, value, prefix):
         prefix += '.'
     stat = prefix + stat
     data = _formatters[tp](value)
-    return '{}:{}'.format(stat, data)
+    for line in data.splitlines():
+        return '{}:{}'.format(stat, line)
 
 @characteristic.immutable([characteristic.Attribute('original'),
                            characteristic.Attribute('maxsize'),
@@ -131,10 +153,10 @@ def _sendToPipeline(pipeline, randomizer, formatter, stat, tp, value, prefix=Non
         return
     if prefix == None:
         prefix = defaultPrefix
-    formatted = _format(*args, **kwargs)
-    pipeline.write(formatted)
+    for formatted in _format(*args, **kwargs):
+        pipeline.write(formatted)
 
-def sendStat(stat, tp, value, prefix=None, rate=None):
+def sendStat(stat, tp, value=None, prefix=None, rate=None):
     for sender in _SENDERS:
         sender(stat=stat, tp=tp, value=value, prefix=prefix, rate=rate)
 
