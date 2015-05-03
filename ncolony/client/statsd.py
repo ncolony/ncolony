@@ -1,11 +1,14 @@
 import characteristic
 
+from zope import interface
+
 from twisted.internet import protocol
+from twisted.application import service
 
 _formatters = {}
 
 def _isFormatter(func):
-    formatters[func.__name__.lstrip('_')] = func
+    _formatters[func.__name__.lstrip('_')] = func
 
 @_isFormatter
 def _timing(delta):
@@ -70,7 +73,7 @@ class _Pipeline(object):
 
 @characteristic.immutable([characteristic.Attribute('host'),
                            characteristic.Attribute('port')])
-class _ConnectingUDPProtocol(protocol.DatagramProtocol):
+class _ConnectingUDPProtocol(object, protocol.DatagramProtocol):
 
     def __init__(self, host, port):
         self.host = host
@@ -135,8 +138,9 @@ def sendStat(stat, tp, value, prefix=None, rate=None):
     for sender in _SENDERS:
         sender(stat=stat, tp=tp, value=value, prefix=prefix, rate=rate)
 
-@interface.implements(service.IService)
 class Service(object):
+
+    interface.implements(service.IService)
 
     def __init__(self, client):
         self.client = client
@@ -157,4 +161,3 @@ class Service(object):
         params = Params(**kwargs)
         client = makeClient(params)
         return cls(client)
-        
