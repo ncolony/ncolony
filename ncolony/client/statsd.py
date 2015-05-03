@@ -1,3 +1,7 @@
+import characteristic
+
+from twisted.internet import protocol
+
 _formatters = {}
 
 def _isFormatter(func):
@@ -32,18 +36,18 @@ def _format(stat, tp, value, prefix):
     if prefix != '':
         prefix += '.'
     stat = prefix + stat
-    data = formatters[tp](value)
+    data = _formatters[tp](value)
     return '{}:{}'.format(stat, data)
 
-## Characteristic
+@characteristic.immutable([characteristic.Attribute('original'),
+                           characteristic.Attribute('maxsize'),
+                           characteristic.Attribute('delay'),
+                           characteristic.Attribute('reactor'),
+                           characteristic.Attribute('preprocess'),
+                          ])
 class _Pipeline(object):
 
-    def __init__(self, original, maxsize, delay, reactor, preprocess):
-        self.original = original
-        self.maxsize = maxsize
-        self.reactor = reactor
-        self.preprocess = preprocess
-        self.delay = delay
+    def __init__(self):
         self.outstanding = None
         self.buffer = ''
 
@@ -64,6 +68,8 @@ class _Pipeline(object):
             return
         self.outstanding = reactor.callLater(delay, self._reallyWrite)
 
+@characteristic.immutable([characteristic.Attribute('host'),
+                           characteristic.Attribute('port')])
 class _ConnectingUDPProtocol(protocol.DatagramProtocol):
 
     def __init__(self, host, port):
@@ -82,32 +88,73 @@ class _ConnectingUDPProtocol(protocol.DatagramProtocol):
 def _preprocess(s):
     return s.rstrip('\n')
 
-def makePipeline(maxsize=512, delay=1, host='127.0.0.1', port=8125, interface='127.0.0.1', reactor=None, prefix=''):
-    if reactor == None:
+@characteristic.immutable([characteristic.Attribute('maxsize', default_value=512),
+                           characteristic.Attribute('delay', default_value=1),
+                           characteristic.Attribute('host', default_value='127.0.0.1'),
+                           characteristic.Attribute('port', default_value=8125),
+                           characteristic.Attribute('interface', default_value='127.0.0.1'),
+                           characteristic.Attribute('reactor', None),
+                           characteristic.Attribute('prefix', ''),
+                          ])
+class Params(object):
+    pass
+
+@characteristic.immutable([characteristic.Attribute('sender'),
+                           characteristic.Attribute('protocol')])
+class Client(object):
+    pass
+
+def makeClient(params):
+    reactor = params.reactor
+    if params.reactor == None:
         from twisted.internet import reactor as defaultReactor
         reactor = defaultReactor
-    original = _ConnectingUDPProtocol(host, port)
-    pipeline = _Pipeline(original, maxsize, delay, reactor, _preprocess)
-    @functools.wraps(_format)
-    def _send(*args, **kwargs):
-        rate = kwargs.get('rate')
-        if rate != None and rate != 1 and random.random()<rate:
-            return
-        if kwargs.get('prefix') == None:
-            kwargs['prefix'] = prefix
-        formatted = _format(*args, **kwargs)
-        pipeline.write(formatted)
-    reactor.listenUDP(0, original)
-    return _send
+    original = _ConnectingUDPProtocol(params.host, params.port)
+    pipeline = _Pipeline(original, params.maxsize, params.delay, reactor, _preprocess)
+    formatter = functools.partial(format, prefix=params.prefix)
+    sender = functools.partial(_sendToPipeline, pipeline=pipeline, randomizer=random.random, formatter=formatter)
+    return Client(sender=sender, protocol=original)
 
 _SENDERS = []
 
 def addClient(sender):
     _SENDERS.append(sender)
 
-def clearClients():
-    _SENDERS[:] = []
+def removeClient(sender):
+    _SENDERS.remove(sender)
+
+def _sendToPipeline(pipeline, randomizer, formatter, stat, tp, value, prefix=None, rate=None):
+    if rate != None and rate != 1 and randomizer() < rate:
+        return
+    if prefix == None:
+        prefix = defaultPrefix
+    formatted = _format(*args, **kwargs)
+    pipeline.write(formatted)
 
 def sendStat(stat, tp, value, prefix=None, rate=None):
-    for sender in _SENDER:
+    for sender in _SENDERS:
         sender(stat=stat, tp=tp, value=value, prefix=prefix, rate=rate)
+
+@interface.implements(service.IService)
+class Service(object):
+
+    def __init__(self, client):
+        self.client = client
+
+    def privilegedStartService(self):
+        pass
+
+    def startService(self):
+        addClient(self.client.sender)
+        self.port = reactor.listenUDP(0, self.client.original)
+
+    def stopService(self):
+        removeClient(self.client.sender)
+        self.port.stopListening()
+
+    @classmethod
+    def fromDetails(cls, **kwargs):
+        params = Params(**kwargs)
+        client = makeClient(params)
+        return cls(client)
+        
