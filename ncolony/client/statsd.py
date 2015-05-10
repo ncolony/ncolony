@@ -44,16 +44,16 @@ def _set(value):
         raise ValueError('set without value')
     return '{}|s'.format(value)
 
-## @_isFormatter
-## def _gaugeDelta(value):
-##     if value == None:
-##         raise ValueError('gaugeDelta without value')
-##     if value > 0:
-##         prefix = '+'
-##     else:
-##         prefix = ''
-##     return '{}{}|g'.format(prefix, value)
-## 
+@_isFormatter
+def _gaugeDelta(value):
+    if value == None:
+        raise ValueError('gaugeDelta without value')
+    if value > 0:
+        prefix = '+'
+    else:
+        prefix = ''
+    return '{}{}|g'.format(prefix, value)
+
 ## @_isFormatter
 ## def _gaugeSet(value):
 ##     if value == None:
