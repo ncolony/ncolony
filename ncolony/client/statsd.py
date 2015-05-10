@@ -5,43 +5,39 @@
 ## from twisted.internet import protocol
 ## from twisted.application import service
 
-## _formatters = {}
+_formatters = {}
 
-## def _isFormatter(func):
-##     _formatters[func.__name__.lstrip('_')] = func
+def _isFormatter(func):
+    _formatters[func.__name__.lstrip('_')] = func
+    return func
 
 def _format(stat, tp, value, prefix):
     if prefix != None:
         stat = prefix + '.' + stat
-    if value == None:
-        value = 1
-    if tp == 'decr':
-        value = -value
-    data = '{}:{}|c'.format(stat, value) ## _formatters[tp](value)
+    data = _formatters[tp](value)
+    data = '{}:{}'.format(stat, data)
     ## for line in data.splitlines():
     ##     return '{}:{}'.format(stat, line)
     return data
 
- 
-## 
-## @_isFormatter
-## def _timing(delta):
-##     if delta == None:
-##         raise ValueError('timing without value')
-##     return '{:d}|ms'.format(delta)
-## 
-## @_isFormatter
-## def _incr(delta):
-##     if delta == None:
-##         delta = 1
-##     return '{:d}|c'.format(delta)
-## 
-## @_isFormatter
-## def _decr(delta):
-##     if delta == None:
-##         delta = -1
-##     return incr(stat, -delta)
-## 
+@_isFormatter
+def _timing(delta):
+    if delta == None:
+        raise ValueError('timing without value')
+    return '{:d}|ms'.format(delta)
+
+@_isFormatter
+def _incr(delta):
+    if delta == None:
+        delta = 1
+    return '{:d}|c'.format(delta)
+
+@_isFormatter
+def _decr(delta):
+    if delta == None:
+        delta = 1
+    return _incr(-delta)
+
 ## @_isFormatter
 ## def _set(value):
 ##     if delta == None:
