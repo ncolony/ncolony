@@ -15,6 +15,8 @@ def _format(stat, tp, value, prefix):
         stat = prefix + '.' + stat
     if value == None:
         value = 1
+    if tp == 'decr':
+        value = -value
     data = '{}:{}|c'.format(stat, value) ## _formatters[tp](value)
     ## for line in data.splitlines():
     ##     return '{}:{}'.format(stat, line)
