@@ -38,12 +38,12 @@ def _decr(delta):
         delta = 1
     return _incr(-delta)
 
-## @_isFormatter
-## def _set(value):
-##     if delta == None:
-##         raise ValueError('set without value')
-##     return '{}|c'.format(value)
-## 
+@_isFormatter
+def _set(value):
+    if value == None:
+        raise ValueError('set without value')
+    return '{}|s'.format(value)
+
 ## @_isFormatter
 ## def _gaugeDelta(value):
 ##     if value == None:
