@@ -4,11 +4,23 @@
 ## 
 ## from twisted.internet import protocol
 ## from twisted.application import service
-## 
+
 ## _formatters = {}
-## 
+
 ## def _isFormatter(func):
 ##     _formatters[func.__name__.lstrip('_')] = func
+
+def _format(stat, tp, value, prefix):
+    if prefix != None:
+        stat = prefix + '.' + stat
+    if value == None:
+        value = 1
+    data = '{}:{}|c'.format(stat, value) ## _formatters[tp](value)
+    ## for line in data.splitlines():
+    ##     return '{}:{}'.format(stat, line)
+    return data
+
+ 
 ## 
 ## @_isFormatter
 ## def _timing(delta):
@@ -56,14 +68,7 @@
 ## 
 ## ## TODO - Gauge set
 ## 
-## def _format(stat, tp, value, prefix):
-##     if prefix != '':
-##         prefix += '.'
-##     stat = prefix + stat
-##     data = _formatters[tp](value)
-##     for line in data.splitlines():
-##         return '{}:{}'.format(stat, line)
-## 
+
 ## @characteristic.immutable([characteristic.Attribute('original'),
 ##                            characteristic.Attribute('maxsize'),
 ##                            characteristic.Attribute('delay'),
