@@ -15,10 +15,10 @@ def _format(stat, tp, value, prefix):
     if prefix != None:
         stat = prefix + '.' + stat
     data = _formatters[tp](value)
-    data = '{}:{}'.format(stat, data)
-    ## for line in data.splitlines():
-    ##     return '{}:{}'.format(stat, line)
-    return data
+    things = []
+    for line in data.splitlines():
+        things.append('{}:{}'.format(stat, line))
+    return '\n'.join(things)
 
 @_isFormatter
 def _timing(delta):
@@ -54,18 +54,15 @@ def _gaugeDelta(value):
         prefix = ''
     return '{}{}|g'.format(prefix, value)
 
-## @_isFormatter
-## def _gaugeSet(value):
-##     if value == None:
-##         raise ValueError('gaugeSet without value')
-##     if value < 0:
-##         prefix = '0|g\n'
-##     else:
-##         prefix = ''
-##     return '{}{}|g'.format(prefix, value)
-## 
-## ## TODO - Gauge set
-## 
+@_isFormatter
+def _gaugeSet(value):
+    if value == None:
+        raise ValueError('gaugeSet without value')
+    if value < 0:
+        prefix = '0|g\n'
+    else:
+        prefix = ''
+    return '{}{}|g'.format(prefix, value)
 
 ## @characteristic.immutable([characteristic.Attribute('original'),
 ##                            characteristic.Attribute('maxsize'),
