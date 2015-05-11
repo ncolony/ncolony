@@ -91,7 +91,7 @@ class _Pipeline(object):
         if self.outstanding:
             return
         self.outstanding = self.reactor.callLater(self.delay, self._reallyWrite)
-## 
+
 ## @characteristic.immutable([characteristic.Attribute('host'),
 ##                            characteristic.Attribute('port')])
 ## class _ConnectingUDPProtocol(object, protocol.DatagramProtocol):
@@ -103,114 +103,118 @@ class _Pipeline(object):
 ## 
 ##     def startProtocol(self):
 ##         self.transport.connect(self.host, self.port)
+
+## def write(protocol, buffer):
+##    transport = protocol.transport
+##     if transport == None:
+##        return
+##     buffer = buffer.rstrip('\n')
+##     transport.write(buffer)
 ## 
-##     def write(self, data):
-##         if self.transport is None:
-##             return
-##         self.transport.write(data)
-## 
-## def _preprocess(s):
-##     return s.rstrip('\n')
-## 
-## @characteristic.immutable([characteristic.Attribute('maxsize', default_value=512),
-##                            characteristic.Attribute('delay', default_value=1),
-##                            characteristic.Attribute('host', default_value='127.0.0.1'),
-##                            characteristic.Attribute('port', default_value=8125),
-##                            characteristic.Attribute('interface', default_value='127.0.0.1'),
-##                            characteristic.Attribute('reactor', None),
-##                            characteristic.Attribute('prefix', ''),
-##                           ])
-## class Params(object):
-##     pass
-## 
-## @characteristic.immutable([characteristic.Attribute('sender'),
-##                            characteristic.Attribute('protocol')])
-## class Client(object):
-##     pass
-## 
-## def makeClient(params):
-##     reactor = params.reactor
-##     if params.reactor == None:
-##         from twisted.internet import reactor as defaultReactor
-##         reactor = defaultReactor
-##     original = _ConnectingUDPProtocol(params.host, params.port)
-##     pipeline = _Pipeline(original, params.maxsize, params.delay, reactor, _preprocess)
-##     formatter = functools.partial(format, prefix=params.prefix)
-##     sender = functools.partial(_sendToPipeline, pipeline=pipeline, randomizer=random.random, formatter=formatter)
-##     return Client(sender=sender, protocol=original)
-## 
-## _SENDERS = []
-## 
-## def addClient(sender):
-##     _SENDERS.append(sender)
-## 
-## def removeClient(sender):
-##     _SENDERS.remove(sender)
-## 
-## def _sendToPipeline(pipeline, randomizer, formatter, stat, tp, value, prefix=None, rate=None):
-##     if rate != None and rate != 1 and randomizer() < rate:
-##         return
-##     if prefix == None:
-##         prefix = defaultPrefix
-##     for formatted in _format(*args, **kwargs):
-##         pipeline.write(formatted)
-## 
-## def sendStat(stat, tp, value=None, rate=None):
-##     for sender in _SENDERS:
-##         sender(stat=stat, tp=tp, value=value, rate=rate)
-##
-## class _StatsSender(object):
-##
-##     def __init__(self):
-##        for formatter in _formatters:
-##            setattr(self, formatter, _StatsSenderMetric(formatter))
-##
-## class _StatsSenderMetric(object):
-##
-##     def __init__(self, formatter, prefix=''):
-##         self._prefix = prefix
-##         self._formatter = formatter
+## @characteristic.attributes([characteristic.Attribute('sender'),
+##                             characteristic.Attribute('tp'),
+##                             characteristic.Attribute('path'),
+##                            ],
+##                           apply_immutable=True)
+## class _TypedMetricSender(object):
 ## 
 ##     def __getattr__(self, name):
-##         return StatsSenderMetric(self._formatter, self._prefix+'.'+name)
-##
+##         if name.startswith('_'):
+##             raise AttributeError(name)
+##         return self.__class__(sender=self.sender, tp=self.tp, path=self.path+[name])
+## 
 ##     def __call__(self, value=None, rate=None):
-##         sendStat(self._prefix, self._formatter, value=value, rate=None)
-##
-##
-## metric = _StatsSender()
-##
+##         self.sender.send(self.tp, '.'.join(self.path), value, rate)
+## 
+## @characteristic.attributes([characteristic.Attribute('target'),
+##                             characteristic.Attribute('prefix', default=''),
+##                             characteristic.Attribute('rate', default=1),
+##                             characteristic.Attribute('randomizer', default=random.random),
+##                            ],
+##                            apply_immutable=True)
+## class MetricsSender(object):
+## 
+##     def __getattr__(self, name):
+##         if name not in _formatters:
+##             raise AttributeError(name)
+##         return _TypedMetricsSender(tp=name, sender=self, path=[])
+## 
+##     def send(self, tp, stat, value=None, rate=None):
+##         if rate == None:
+##             rate = self.params.rate
+##         if rate < 1 and rate < self.randomizer():
+##             return
+##         formatted = _format(stat, tp, value, self.params.prefix)
+##         self.target(formatted + '\n')
+
+## class DummySender(object):
+## 
+##     def __getattr__(self, name):
+##         if name not in _formatters and name.startswith('_'):
+##             raise AttributeError(name)
+##         return self
+## 
+##     def __call__(self, value=None, rate=None):
+##         pass
+## 
+##     def send(self, tp, stat, value=None, rate=None):
+##         pass
+## 
+## _SENDER = DummySender()
+## 
+## def setSender(sender):
+##     global _SENDER
+##     _SENDER = sender
+## 
+## def unsetSender():
+##     global _SENDER
+##     _SENDER = DummySender()
+## 
+## def getSender():
+##     return _SENDER
+
+## @characteristic.attributes([characteristic.Attribute('metricsSender'),
+##                             characteristic.Attribute('protocol'),
+##                             characteristic.Attribute('interface'),
+##                             characteristic.Attribute('reactor'),
+##                            ],
+##                            apply_immutable=True)
 ## class Service(object):
 ## 
 ##     interface.implements(service.IService)
 ## 
-##     def __init__(self, client):
-##         self.client = client
+##     def __init__(self):
 ##         self.setServiceName('statsd')
 ## 
 ##     def privilegedStartService(self):
 ##         pass
 ## 
 ##     def startService(self):
-##         addClient(self.client.sender)
-##         self.port = reactor.listenUDP(0, self.client.original)
+##         setSender(self.metricsSender)
+##         self.port = self.reactor.listenUDP(0, self.protocol)
 ## 
 ##     def stopService(self):
-##         removeClient(self.client.sender)
+##         unsetSender(self.metricsSender)
 ##         self.port.stopListening()
 ## 
 ##     @classmethod
-##     def fromDetails(cls, **kwargs):
-##         params = Params(**kwargs)
-##         client = makeClient(params)
-##         return cls(client)
-##
+##     def fromParameters(cls, host='127.0.0.1', port=8125, interfce='127.0.0.1', prefix='', rate=1, maxsize=512, delay=0.5, reactor=None):
+##         if reactor == None:
+##             from twisted.internet import reactor as myReactor
+##             reactor = myReactor 
+##         protocol = _ConnectedUDPProtocol(host=host, port=port)
+##         originalWrite = functools.partial(write, protocol)
+##         pipeline = _Pipeline(originalWrite=originalWrite, maxsize=maxsize, delay=delay, reactor=reactor)
+##         target = pipeline.write
+##         sender = MetricsSender(target=target, prefix=prefix, rate=rate, randomizer=random.random)
+##         return cls(metricsSender=sender, protocol=protocol, interface=interface, reactor=reactor)
+## 
 ##     @classmethod
 ##     def fromEnvironment(cls):
 ##         config = json.loads(os.environ['NCOLONY_CONFIG'])
 ##         kwargs = config.get('ncolony.client.statsd')
 ##         if kwargs != None:
-##             return cls.fromDetails(cls, **kwargs)
+##             return cls.fromParameters(**kwargs)
 ##
 ##    @classmethod
 ##    def enhanceMultiService(cls, ms):
@@ -225,5 +229,5 @@ class _Pipeline(object):
 ## in client code, add
 ## class Login(resource.Resource):
 ##     def render_GET(self, request):
-##         statsd.metric.login.hits.incr()
+##         statsd.getSender().login.hits.incr()
 ## For example
