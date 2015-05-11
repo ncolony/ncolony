@@ -167,6 +167,19 @@ class TestPipeline(unittest.TestCase):
         self.clock.advance(2)
         self.assertEquals(written, ['ab'])
 
+    def test_write_eventually(self):
+        written = []
+        preprocess = lambda s: s
+        pipeline = statsd._Pipeline(originalWrite=written.append, maxsize=513, delay=5, reactor=self.clock, preprocess=preprocess)
+        pipeline.write('a')
+        self.assertEquals(written, [])
+        self.clock.advance(10)
+        self.assertEquals(written, ['a'])
+        pipeline.write('b')
+        self.clock.advance(10)
+        self.assertEquals(written, ['a', 'b'])
+
+
 ## 
 ##     def _reallyWrite(self):
 ##         if self.outstanding:

@@ -78,10 +78,10 @@ class _Pipeline(object):
         self.buffer = ''
 
     def _reallyWrite(self):
-##         if self.outstanding:
-##            if not self.outstanding.called:
-##                self.outstanding.cancel()
-##            self.outstanding = None
+        if self.outstanding:
+           if not self.outstanding.called:
+               self.outstanding.cancel()
+           self.outstanding = None
         self.originalWrite(self.buffer)
         self.buffer = ''
 
