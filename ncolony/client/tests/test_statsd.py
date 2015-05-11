@@ -137,24 +137,35 @@ class TestPipeline(unittest.TestCase):
             with self.assertRaises(AttributeError):
                 setattr(pipeline, attr, getattr(pipeline, attr))
 
-    def test_no_one_write(self):
+    def test_one_write(self):
         written = []
         preprocess = lambda s: s
         pipeline = statsd._Pipeline(originalWrite=written.append, maxsize=513, delay=0.213, reactor=self.clock, preprocess=preprocess)
         pipeline.write('hello')
-        self.assertEquals(''.join(written), '')
+        self.assertEquals(written, [])
         self.clock.advance(0.25)
-        self.assertEquals(''.join(written), 'hello')
+        self.assertEquals(written, ['hello'])
 
-    def not_test_simple_flush(self):
+    def test_simple_flush(self):
         written = []
         preprocess = lambda s: s
         pipeline = statsd._Pipeline(originalWrite=written.append, maxsize=513, delay=0.213, reactor=self.clock, preprocess=preprocess)
         pipeline.write('a'*512)
         pipeline.write('b'*10)
-        self.assertEquals(''.join(written), 'a'*512)
+        self.assertEquals(written, ['a'*512])
         self.clock.advance(0.3)
-        self.assertEquals(''.join(written), 'a'*512+'b'*10)
+        self.assertEquals(written, ['a'*512, 'b'*10])
+
+    def test_no_incremenetal_delay(self):
+        written = []
+        preprocess = lambda s: s
+        pipeline = statsd._Pipeline(originalWrite=written.append, maxsize=513, delay=5, reactor=self.clock, preprocess=preprocess)
+        pipeline.write('a')
+        self.assertEquals(written, [])
+        self.clock.advance(4)
+        pipeline.write('b')
+        self.clock.advance(2)
+        self.assertEquals(written, ['ab'])
 
 ## 
 ##     def _reallyWrite(self):

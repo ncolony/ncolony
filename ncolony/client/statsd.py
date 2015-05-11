@@ -76,23 +76,22 @@ class _Pipeline(object):
     def __init__(self):
         self.outstanding = None
         self.buffer = ''
-## 
-##     def _reallyWrite(self):
+
+    def _reallyWrite(self):
 ##         if self.outstanding:
-##             if not self.outstanding.called:
-##                 self.outstanding.cancel()
-##             self.outstanding = None
-##         self.original.write(preprocess(self.buffer))
-##         self.buffer = ''
-## 
-##     def write(self, datum):
-##         if len(self.buffer) + len(datum) > 0:
-##             self._reallySend()
-##             return
-##         self.buffer += datum
-##         if self.outstanding:
-##             return
-##         self.outstanding = reactor.callLater(delay, self._reallyWrite)
+##            if not self.outstanding.called:
+##                self.outstanding.cancel()
+##            self.outstanding = None
+        self.originalWrite(self.buffer)
+        self.buffer = ''
+
+    def write(self, datum):
+        if len(self.buffer) + len(datum) > self.maxsize:
+            self._reallyWrite()
+        self.buffer += datum
+        if self.outstanding:
+            return
+        self.outstanding = self.reactor.callLater(self.delay, self._reallyWrite)
 ## 
 ## @characteristic.immutable([characteristic.Attribute('host'),
 ##                            characteristic.Attribute('port')])
