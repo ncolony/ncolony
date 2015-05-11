@@ -1,4 +1,4 @@
-## import characteristic
+import characteristic
 ## 
 ## from zope import interface
 ## 
@@ -64,17 +64,18 @@ def _gaugeSet(value):
         prefix = ''
     return '{}{}|g'.format(prefix, value)
 
-## @characteristic.immutable([characteristic.Attribute('original'),
-##                            characteristic.Attribute('maxsize'),
-##                            characteristic.Attribute('delay'),
-##                            characteristic.Attribute('reactor'),
-##                            characteristic.Attribute('preprocess'),
-##                           ])
-## class _Pipeline(object):
-## 
-##     def __init__(self):
-##         self.outstanding = None
-##         self.buffer = ''
+@characteristic.attributes([characteristic.Attribute('originalWrite'),
+                           characteristic.Attribute('maxsize'),
+                           characteristic.Attribute('delay'),
+                           characteristic.Attribute('reactor'),
+                           characteristic.Attribute('preprocess'),
+                          ],
+                          apply_immutable=True)
+class _Pipeline(object):
+
+    def __init__(self):
+        self.outstanding = None
+        self.buffer = ''
 ## 
 ##     def _reallyWrite(self):
 ##         if self.outstanding:
