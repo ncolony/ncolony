@@ -68,7 +68,6 @@ def _gaugeSet(value):
                            characteristic.Attribute('maxsize'),
                            characteristic.Attribute('delay'),
                            characteristic.Attribute('reactor'),
-                           characteristic.Attribute('preprocess'),
                           ],
                           apply_immutable=True)
 class _Pipeline(object):
