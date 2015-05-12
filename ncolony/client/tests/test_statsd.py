@@ -1,6 +1,7 @@
 import unittest
 
 from twisted.internet import task
+from twisted.test import proto_helpers
 
 from ncolony.client import statsd
 
@@ -171,4 +172,72 @@ class TestPipeline(unittest.TestCase):
         self.assertEquals(written, ['a'])
         pipeline.write('b')
         self.clock.advance(10)
-        self.assertEquals(written, ['a', 'b'])
+
+class _FakePortState(object):
+
+    def __init__(self):
+        self._datagrams = []
+        self._online = False
+        self._address = None
+
+    def startListening(self):
+        self._online = True
+
+    def connect(self, host, port):
+        if not self._online:
+            raise ValueError('cannot connect to offline port')
+        self._address = host, port
+
+    def write(self, datagram):
+        if not self._online:
+            raise ValueError('cannot write to offline port')
+        if self._address == None:
+            raise ValueError('cannot write to disconnected port')
+        self._datagrams.append(datagram)
+
+    def stopListening(self):
+        self._online = False
+
+class _FakePort(object):
+
+    def __init__(self, port, protocol, interface, maxPacketSize, reactor):
+        self.port = port
+        self.protocol = protocol
+        self.interface = interface
+        self.maxPacketSize = maxPacketSize
+        self.reactor = reactor
+        self._state = _FakePortState()
+
+    def startListening(self):
+        self._state.startListening()
+        self.protocol.makeConnection(self)
+
+    def connect(self, host, port):
+        self._state.connect(host, port)
+
+    def write(self, datagram):
+        self._state.write(datagram)
+
+    def stopListening(self):
+        self._state.stopListening()
+
+class _FakeReactorUDP(object):
+
+    def listenUDP(self, port, protocol, interface='', maxPacketSize=8192):
+        p = _FakePort(port, protocol, interface, maxPacketSize, self)
+        p.startListening()
+        return p
+
+class TestConnectingUDPProtocol(unittest.TestCase):
+
+    def setUp(self):
+        self.reactor = _FakeReactorUDP()
+        self.dp = statsd._ConnectingUDPProtocol(host='example.com', port=8133)
+
+    def test_properties(self):
+        self.assertEquals(self.dp.host, 'example.com')
+        self.assertEquals(self.dp.port, 8133)
+
+    def test_listenUDP(self):
+        port = self.reactor.listenUDP(0, self.dp)
+        self.assertEquals(port._state._address, ('example.com', 8133))

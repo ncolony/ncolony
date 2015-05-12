@@ -2,7 +2,7 @@ import characteristic
 ## 
 ## from zope import interface
 ## 
-## from twisted.internet import protocol
+from twisted.internet import protocol
 ## from twisted.application import service
 
 _formatters = {}
@@ -92,17 +92,14 @@ class _Pipeline(object):
             return
         self.outstanding = self.reactor.callLater(self.delay, self._reallyWrite)
 
-## @characteristic.immutable([characteristic.Attribute('host'),
-##                            characteristic.Attribute('port')])
-## class _ConnectingUDPProtocol(object, protocol.DatagramProtocol):
-## 
-##     def __init__(self, host, port):
-##         self.host = host
-##         self.port = port
-##         self.transport = None
-## 
-##     def startProtocol(self):
-##         self.transport.connect(self.host, self.port)
+@characteristic.attributes([characteristic.Attribute('host'),
+                            characteristic.Attribute('port'),
+                           ],
+                           apply_immutable=True)
+class _ConnectingUDPProtocol(object, protocol.DatagramProtocol):
+
+    def startProtocol(self):
+        self.transport.connect(self.host, self.port)
 
 ## def write(protocol, buffer):
 ##    transport = protocol.transport
