@@ -237,7 +237,20 @@ class TestConnectingUDPProtocol(unittest.TestCase):
     def test_properties(self):
         self.assertEquals(self.dp.host, 'example.com')
         self.assertEquals(self.dp.port, 8133)
+        self.assertEquals(self.dp.transport, None)
 
     def test_listenUDP(self):
         port = self.reactor.listenUDP(0, self.dp)
         self.assertEquals(port._state._address, ('example.com', 8133))
+
+## class _FakeProtocol(object):
+##     pass
+## 
+## class TestWrite(unittest.TestCase):
+## 
+##     def setUp(self):
+##         self.protocol = protocol
+##         self.protocol.transport = None
+## 
+##     def test_write_no_transport(self):
+##         
