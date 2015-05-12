@@ -101,12 +101,12 @@ class _ConnectingUDPProtocol(object, protocol.DatagramProtocol):
     def startProtocol(self):
         self.transport.connect(self.host, self.port)
 
-## def write(protocol, buffer):
-##    transport = protocol.transport
-##     if transport == None:
-##        return
-##     buffer = buffer.rstrip('\n')
-##     transport.write(buffer)
+def _write(protocol, buffer):
+    transport = protocol.transport
+    if transport == None:
+        return
+    buffer = buffer.rstrip('\n')
+    transport.write(buffer)
 ## 
 ## @characteristic.attributes([characteristic.Attribute('sender'),
 ##                             characteristic.Attribute('tp'),

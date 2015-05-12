@@ -243,14 +243,30 @@ class TestConnectingUDPProtocol(unittest.TestCase):
         port = self.reactor.listenUDP(0, self.dp)
         self.assertEquals(port._state._address, ('example.com', 8133))
 
-## class _FakeProtocol(object):
-##     pass
-## 
-## class TestWrite(unittest.TestCase):
-## 
-##     def setUp(self):
-##         self.protocol = protocol
-##         self.protocol.transport = None
-## 
-##     def test_write_no_transport(self):
-##         
+class _FakeProtocol(object):
+
+    def makeConnection(self, port):
+        pass
+
+class TestWrite(unittest.TestCase):
+
+    def setUp(self):
+        self.protocol = _FakeProtocol()
+        self.protocol.transport = None
+        self.transport = _FakePort(None, None, None, None, None)
+        self.transport.protocol = self.protocol
+        self.transport.startListening()
+        self.transport.connect(None, None)
+
+    def test_write(self):
+        self.protocol.transport = self.transport
+        statsd._write(self.protocol, 'hello')
+        self.assertEquals(self.transport._state._datagrams, ['hello'])
+
+    def test_write_strip_newline(self):
+        self.protocol.transport = self.transport
+        statsd._write(self.protocol, 'hello\n')
+        self.assertEquals(self.transport._state._datagrams, ['hello'])
+
+    def test_write_no_transport(self):
+        statsd._write(self.protocol, 'hello')
