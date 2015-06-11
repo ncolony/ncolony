@@ -3,7 +3,9 @@
 
 """ncolony -- a process starter/monitor"""
 
-__version__ = '0.0.2-dev'
+from ncolony._version import get_versions as _get_versions
+
+__version__ = _get_versions()['version']
 
 _long_description = '''\
 ncolony_: A wrapper around Twisted process monitor which allows runtime configuration via file-based communication
@@ -13,7 +15,6 @@ ncolony_: A wrapper around Twisted process monitor which allows runtime configur
 
 metadata = dict(
     name='ncolony',
-    version=__version__,
     description='A process starter/monitor',
     long_description=_long_description,
     author='Moshe Zadka',
