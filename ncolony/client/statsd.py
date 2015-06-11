@@ -107,7 +107,7 @@ def _write(protocol, buffer):
         return
     buffer = buffer.rstrip('\n')
     transport.write(buffer)
-## 
+
 ## @characteristic.attributes([characteristic.Attribute('sender'),
 ##                             characteristic.Attribute('tp'),
 ##                             characteristic.Attribute('path'),
