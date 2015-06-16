@@ -8,9 +8,9 @@ See if the plugins are registered correctly.
 
 import unittest
 
-from ncolony import service, statsd, beatcheck, schedulelib
+from ncolony import service, beatcheck, schedulelib
 
-from twisted.plugins import ncolony_service, ncolony_statsd, ncolony_beatcheck, ncolony_schedulelib
+from twisted.plugins import ncolony_service, ncolony_beatcheck, ncolony_schedulelib
 
 class TestServices(unittest.TestCase):
 
@@ -26,19 +26,6 @@ class TestServices(unittest.TestCase):
         self.assertEquals(options['messages'], 'foo')
         self.assertEquals(options['config'], 'bar')
         self.assertIs(service.makeService, sm.makeService)
-
-    def test_statsd_service(self):
-        """Options and makeService in statsd service are correct"""
-        sm = ncolony_statsd.serviceMaker
-        self.assertEquals(sm.tapname, 'ncolony-statsd')
-        self.assertNotEquals(sm.description, '')
-        options = sm.options()
-        options.parseOptions(['--prefix', 'gtgt', '--frequency', '5',
-                              '--carbon-host', 'foo.example.com'])
-        self.assertEquals(options['frequency'], 5)
-        self.assertEquals(options['prefix'], 'gtgt')
-        self.assertEquals(options['carbon-host'], 'foo.example.com')
-        self.assertIs(statsd.makeService, sm.makeService)
 
     def test_beatcheck_service(self):
         """Options and makeService in beatcheck service are correct"""
