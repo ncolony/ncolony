@@ -36,7 +36,7 @@ for dirpath, dirnames, filenames in os.walk(here, topdown=True):
             if not os.path.isfile(pyFile):
                 errors += 1
                 print("Byte code file with no source:", fullname, file=sys.stderr)
-        if fullname.endswith('.py'):
+        if fullname.endswith('.py') and not fullname.endswith('versioneer.py'):
             with open(fullname) as fp:
                 header = fp.readline()+ fp.readline()
                 if header != PROPER_HEADER:

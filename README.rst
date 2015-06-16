@@ -25,17 +25,12 @@ Hacking
 Should DTRT -- if it passes, it means
 unit tests are passing, and 100% coverage.
 
-Example
+Release
 ========
 
-Assuming an environment where 'pip install ncolony' has been done
-
-.. code-block:: bash
-
-  $ DEFAULT="--config config --messages messages"
-  $ twistd ncolony $DEFAULT
-  $ python -m ncolony.ctl $DEFAULT add sleeper --cmd=/bin/sleep --arg=10
-  $ python -m ncolony.ctl $DEFAULT restart sleeper
+* admin/release <next version number>
+* GPG sign dist/*<version number>*
+* twine upload
 
 Contributors
 =============

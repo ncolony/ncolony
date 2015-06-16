@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 import setuptools
+import versioneer
 
 import ncolony as module
 
@@ -26,5 +27,7 @@ setuptools.setup(
     keywords='process monitoring supervisor daemon',
     packages=setuptools.find_packages() + ['twisted.plugins'],
     install_requires=['Twisted'],
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     **module.metadata
 )
