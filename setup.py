@@ -1,7 +1,5 @@
 # Copyright (c) Moshe Zadka
 # See LICENSE for details.
-from distutils import cmd, spawn
-
 import os
 import subprocess
 import sys
@@ -26,7 +24,7 @@ setuptools.setup(
     ],
     keywords='process monitoring supervisor daemon',
     packages=setuptools.find_packages() + ['twisted.plugins'],
-    install_requires=['Twisted'],
+    install_requires=['Twisted', 'mainland'],
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     **module.metadata

@@ -8,11 +8,12 @@ import functools
 import os
 import signal
 import subprocess
-import sys
 import time
 import traceback
 
-SyncReactor = collections.namedtuple('SyncReactor', 'args install run wait sleep')
+SyncReactor = collections.namedtuple('SyncReactor', 'install run wait sleep')
+
+NCOLONY_MAIN_OK = True
 
 def reap(reactor, specialPid):
     """Reap children, stop when reaping expected child
@@ -44,7 +45,7 @@ PARSER = argparse.ArgumentParser()
 PARSER.add_argument('command', nargs='+', help='Actual command to run')
 
 ## pylint: disable=bare-except
-def baseMain(reactor):
+def baseMain(reactor, argv):
     """Main loop
 
     Install signals, run command and wait for child to die.
@@ -52,7 +53,7 @@ def baseMain(reactor):
     Before exiting, terminate child and then kill it.
     """
     installSignals(reactor)
-    args = PARSER.parse_args(reactor.args[1:])
+    args = PARSER.parse_args(argv[1:])
     process = reactor.run(args.command)
     try:
         reap(reactor, process.pid)
@@ -72,8 +73,7 @@ def baseMain(reactor):
 ## pylint: enable=bare-except
 
 main = functools.partial(baseMain,
-                         SyncReactor(args=sys.argv,
-                                     install=signal.signal,
+                         SyncReactor(install=signal.signal,
                                      run=subprocess.Popen,
                                      wait=os.wait,
                                      sleep=time.sleep))

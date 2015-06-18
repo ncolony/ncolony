@@ -7,7 +7,6 @@ import argparse
 import json
 import os
 import shutil
-import sys
 import unittest
 
 from ncolony import ctllib
@@ -20,6 +19,10 @@ class TestArgParsing(unittest.TestCase):
         """Initialize the parser, required arguments"""
         self.parser = ctllib.PARSER
         self.base = ['--messages', 'messages', '--config', 'config']
+
+    def test_main_ok(self):
+        """module is marked as executable by mainland"""
+        self.assertTrue(ctllib.NCOLONY_MAIN_OK)
 
     def test_required_messages(self):
         """Make sure it fails if --messages is missing"""
@@ -117,16 +120,12 @@ class TestController(unittest.TestCase):
 
     def test_main(self):
         """Test that control via the main() function works"""
-        old_argv = sys.argv
-        def _cleanup():
-            sys.argv = old_argv
-        self.addCleanup(_cleanup)
-        sys.argv = ['ctl',
-                    '--messages', self.places.messages,
-                    '--config', self.places.config,
-                    'restart-all',
-                   ]
-        ctllib.main()
+        argv = ['ctl',
+                '--messages', self.places.messages,
+                '--config', self.places.config,
+                'restart-all',
+               ]
+        ctllib.main(argv)
         fname, = os.listdir(self.places.messages)
         fname = os.path.join(self.places.messages, fname)
         d = json.loads(file(fname).read())

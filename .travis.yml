@@ -6,6 +6,7 @@ env:
   - TOX_ENV=py27-func
   - TOX_ENV=pypy-unit
   - TOX_ENV=pypy-func
+  - TOX_ENV=py27-wheel
   - TOX_ENV=docs
 install:
   - pip install tox
