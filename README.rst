@@ -29,8 +29,11 @@ Release
 ========
 
 * admin/release <next version number>
-* GPG sign dist/*<version number>*
-* twine upload
+* gpg --use-agent -u zadka.moshe@gmail.com --detach-sign --armor dist/*.whl
+* gpg --use-agent -u zadka.moshe@gmail.com --detach-sign --armor dist/*.zip
+* admin/upload
+* Manually verify on testpypi
+* admin/upload --prod
 
 Contributors
 =============
