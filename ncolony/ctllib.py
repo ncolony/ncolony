@@ -41,6 +41,8 @@ import os
 
 from twisted.python import filepath
 
+NCOLONY_MAIN_OK = True
+
 NEXT = functools.partial(next, itertools.count(0))
 
 Places = collections.namedtuple('Places', 'config messages')
@@ -153,7 +155,7 @@ def call(results):
     func = results.pop('func')
     func(places, **results)
 
-def main():
+def main(argv):
     """command-line entry point
 
         --messages: messages directory
@@ -181,5 +183,5 @@ def main():
         restart-all:
             no arguments
     """
-    ns = PARSER.parse_args()
+    ns = PARSER.parse_args(argv[1:])
     call(ns)

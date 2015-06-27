@@ -19,8 +19,12 @@ class TestReap(unittest.TestCase):
         self.wait = None
         def _wait():
             return self.wait()
-        self.reactor = reaperlib.SyncReactor(args=None, install=None,
-                                             run=None, sleep=None, wait=_wait)
+        self.reactor = reaperlib.SyncReactor(install=None, run=None,
+                                             sleep=None, wait=_wait)
+
+    def test_main_ok(self):
+        """Can be run from command-line"""
+        self.assertTrue(reaperlib.NCOLONY_MAIN_OK)
 
     def test_simple(self):
         """Test reaping our child"""
@@ -52,8 +56,7 @@ class TestInstall(unittest.TestCase):
         handlers = {}
         def _install(signum, value):
             handlers[signum] = value
-        reactor = reaperlib.SyncReactor(args=None, install=_install,
-                                        run=None, sleep=None, wait=None)
+        reactor = reaperlib.SyncReactor(install=_install, run=None, sleep=None, wait=None)
         reaperlib.installSignals(reactor)
         self.assertEquals(set(handlers), set([signal.SIGTERM, signal.SIGINT, signal.SIGALRM]))
         self.assertEquals(len(set(handlers.itervalues())), 1)
@@ -118,9 +121,8 @@ class TestBaseMain(unittest.TestCase):
         naps = []
         def _sleep(tm):
             naps.append(tm)
-        reactor = reaperlib.SyncReactor(args=[None, 'ls'], install=_install,
-                                        run=_run, sleep=_sleep, wait=_wait)
-        reaperlib.baseMain(reactor)
+        reactor = reaperlib.SyncReactor(install=_install, run=_run, sleep=_sleep, wait=_wait)
+        reaperlib.baseMain(reactor, [None, 'ls'])
         self.assertEquals(waitCount[0], 1)
         self.assertEquals(naps, [])
         self.assertEquals(set(handlers), set([signal.SIGTERM, signal.SIGINT, signal.SIGALRM]))
@@ -139,9 +141,8 @@ class TestBaseMain(unittest.TestCase):
             raise KeyboardInterrupt()
         def _sleep(dummyTm):
             pass
-        reactor = reaperlib.SyncReactor(args=[None, 'ls'], install=_install,
-                                        run=_run, sleep=_sleep, wait=_wait)
-        reaperlib.baseMain(reactor)
+        reactor = reaperlib.SyncReactor(install=_install, run=_run, sleep=_sleep, wait=_wait)
+        reaperlib.baseMain(reactor, [None, 'ls'])
         self.assertTrue(True)
 
     def test_system_error(self):
@@ -157,9 +158,8 @@ class TestBaseMain(unittest.TestCase):
             raise SystemError()
         def _sleep(dummyTm):
             pass
-        reactor = reaperlib.SyncReactor(args=[None, 'ls'], install=_install,
-                                        run=_run, sleep=_sleep, wait=_wait)
-        reaperlib.baseMain(reactor)
+        reactor = reaperlib.SyncReactor(install=_install, run=_run, sleep=_sleep, wait=_wait)
+        reaperlib.baseMain(reactor, [None, 'ls'])
         self.assertTrue(True)
 
     def test_value_error(self):
@@ -175,14 +175,13 @@ class TestBaseMain(unittest.TestCase):
             raise ValueError()
         def _sleep(dummyTm):
             pass
-        reactor = reaperlib.SyncReactor(args=[None, 'ls'], install=_install,
-                                        run=_run, sleep=_sleep, wait=_wait)
+        reactor = reaperlib.SyncReactor(install=_install, run=_run, sleep=_sleep, wait=_wait)
         oldStderr = sys.stderr
         def _cleanup():
             sys.stderr = oldStderr
         self.addCleanup(_cleanup)
         sys.stderr = StringIO()
-        reaperlib.baseMain(reactor)
+        reaperlib.baseMain(reactor, [None, 'ls'])
         ## pylint: disable=no-member
         lines = sys.stderr.getvalue().splitlines()
         ## pylint: enable=no-member
@@ -214,14 +213,13 @@ class TestBaseMain(unittest.TestCase):
             ret.kill = _kill
             ret.poll = _poll
             return ret
-        reactor = reaperlib.SyncReactor(args=[None, 'ls'], install=_install,
-                                        run=_run, sleep=_sleep, wait=_wait)
+        reactor = reaperlib.SyncReactor(install=_install, run=_run, sleep=_sleep, wait=_wait)
         oldStderr = sys.stderr
         def _cleanup():
             sys.stderr = oldStderr
         self.addCleanup(_cleanup)
         sys.stderr = StringIO()
-        reaperlib.baseMain(reactor)
+        reaperlib.baseMain(reactor, [None, 'ls'])
         self.assertEquals(terminations[0], 1)
         self.assertEquals(killings[0], 0)
         self.assertEquals(sleeps, [1, 1])
@@ -251,14 +249,13 @@ class TestBaseMain(unittest.TestCase):
             ret.kill = _kill
             ret.poll = _poll
             return ret
-        reactor = reaperlib.SyncReactor(args=[None, 'ls'], install=_install,
-                                        run=_run, sleep=_sleep, wait=_wait)
+        reactor = reaperlib.SyncReactor(install=_install, run=_run, sleep=_sleep, wait=_wait)
         oldStderr = sys.stderr
         def _cleanup():
             sys.stderr = oldStderr
         self.addCleanup(_cleanup)
         sys.stderr = StringIO()
-        reaperlib.baseMain(reactor)
+        reaperlib.baseMain(reactor, [None, 'ls'])
         self.assertEquals(terminations[0], 1)
         self.assertEquals(sleeps, [1]*30)
         self.assertEquals(killings[0], 1)
@@ -273,7 +270,6 @@ class TestMain(unittest.TestCase):
         self.assertIs(reaperlib.main.func, reaperlib.baseMain)
         self.assertFalse(reaperlib.main.keywords)
         reactor, = reaperlib.main.args
-        self.assertIs(reactor.args, sys.argv)
         self.assertIs(reactor.install, signal.signal)
         self.assertIs(reactor.run, reaperlib.subprocess.Popen)
         self.assertIs(reactor.sleep, reaperlib.time.sleep)
