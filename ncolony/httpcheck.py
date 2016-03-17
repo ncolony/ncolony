@@ -8,6 +8,8 @@ import functools
 import json
 import sys
 
+import automat
+
 import twisted
 
 from twisted.application import internet as tainternet
@@ -61,17 +63,106 @@ class State(object):
 
     KEY = 'ncolony.httpcheck'
 
+    machine = automat.MethodicalMachine()
+
+    @machine.state(initial=True)
+    def initial(self):
+        pass
+
+    @machine.state()
+    def closed(self):
+        """All further inputs should error out"""
+
+    @machine.state()
+    def hasURL(self):
+        """This is a process that does not require HTTP checking
+
+        Anything other than content_changed should error out"""
+
+    @machine.state()
+    def inPing(self):
+        pass
+
+    @machine.state()
+    def bad(self):
+        pass
+
+    @machine.input()
+    def readContent(self, newContent):
+        pass
+
+    @machine.input()
+    def contentChanged(self):
+        pass
+
+    @machine.input()
+    def gotBadReponse(self):
+        pass
+
+    @machine.input()
+    def gotGoodReponse(self):
+        pass
+
+    @machine.input()
+    def check(self):
+        pass
+
+    @machine.input()
+    def noURL(self):
+        pass
+
+    @machine.input()
+    def setURL(self, config):
+        pass
+
+    initial.upon(check, outputs=[machine.output()(lambda self: False)], collector=any)
+
     def __init__(self, location, settings):
         self.location = location
         self.settings = settings
-        self.closed = False
         self.content = None
-        self.call = None
-        self.card = None
-        self.url = None
-        self.nextCheck = None
-        self.period = None
-        self.timeout = None
+
+    @machine.output()
+    def checkContent(self, newContent):
+        if self.content == newContent:
+            pass
+        self.content = newContent
+        parsed = json.loads(self.content)
+        config = parsed.get(self.KEY)
+        if config is None:
+            self.noURL()
+        else:
+            self.setURL(config)
+
+    @machine.output()
+    def genericSetURL(self, config):
+        self.card = _ScoreCard(config['maxBad'])
+        self.timeout = min(self.period, config['timeout'])
+        self.nextCheck = self.settings.reactor.seconds() + config['grace'] * self.period
+        self.url = config['url']
+        self.period = config['period']
+
+    initial.upon(readContent, outputs=[checkContent])
+    noURL.upon(readContent, outputs=[checkContent])
+    inPing.upon(readContent, outputs=[checkContent])
+    bad.upon(readContent, outputs=[checkContent])
+    good.upon(readContent, outputs=[checkContent])
+
+    initial.upon(noURL, enter=initial)
+    inPing.upon(noURL, outputs=[clearRunningCheck], enter=initial)
+    good.upon(noURL, enter=initial)
+    bad.upon(noURL, enter=initial)
+    inPing.upon(setURL, outputs=[clearRunningCheck, genericSetURL], enter=hasURL)
+    initial.upon(setURL, outputs=[genericSetURL], enter=hasURL)
+    good.upon(setURL, outputs=[genericSetURL], enter=hasURL)
+    bad.upon(setURL, outputs=[genericSetURL], enter=hasURL)
+
+    good.upon(check, outputs=[machine.output()(lambda self: False)], enter=hasURL, collector=any)
+    bad.upon(check, outputs=[machine.output()(lambda self: True)], enter=hasURL, collector=any)
+
+    @machine.output()
+    def clearRunningCheck(self, config=None):
+        self.call.cancel()
 
     def __repr__(self):
         return ('<%(klass)s:%(id)s:location=%(location)s,settings=%(settings)s,'
@@ -113,9 +204,7 @@ class State(object):
         if content == self.content:
             return
         self.content = content
-        if self.call is not None:
-            self.call.cancel()
-            self.call = None
+
         parsed = json.loads(self.content)
         config = parsed.get(self.KEY)
         if config is None:
