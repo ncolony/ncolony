@@ -120,7 +120,7 @@ class State(object):
     def __init__(self, location, settings):
         self.location = location
         self.settings = settings
-        self.content = None
+        self.content = json.dumps({})
 
     @machine.output()
     def checkContent(self, newContent):
@@ -128,11 +128,10 @@ class State(object):
             pass
         self.content = newContent
         parsed = json.loads(self.content)
-        config = parsed.get(self.KEY)
-        if config is None:
-            self.noURL()
+        if self.KEY in parsed:
+            self.setURL(parsed[self.KEY])
         else:
-            self.setURL(config)
+            self.noURL()
 
     @machine.output()
     def genericSetURL(self, config):
@@ -146,19 +145,27 @@ class State(object):
     noURL.upon(readContent, outputs=[checkContent])
     inPing.upon(readContent, outputs=[checkContent])
     bad.upon(readContent, outputs=[checkContent])
-    good.upon(readContent, outputs=[checkContent])
+    hasURL.upon(readContent, outputs=[checkContent])
+
+    initial.upon(close, enter=closed)
+    noURL.upon(close, enter=closed)
+    inPing.upon(close, enter=closed)
+    hasURL.upon(close, enter=closed)
+    bad.upon(close, enter=closed)
 
     initial.upon(noURL, enter=initial)
     inPing.upon(noURL, outputs=[clearRunningCheck], enter=initial)
-    good.upon(noURL, enter=initial)
+    hasURL.upon(noURL, enter=initial)
     bad.upon(noURL, enter=initial)
     inPing.upon(setURL, outputs=[clearRunningCheck, genericSetURL], enter=hasURL)
     initial.upon(setURL, outputs=[genericSetURL], enter=hasURL)
-    good.upon(setURL, outputs=[genericSetURL], enter=hasURL)
+    hasURL.upon(setURL, outputs=[genericSetURL], enter=hasURL)
     bad.upon(setURL, outputs=[genericSetURL], enter=hasURL)
 
-    good.upon(check, outputs=[machine.output()(lambda self: False)], enter=hasURL, collector=any)
+    hasURL.upon(check, outputs=[maybeCheck, machine.output()(lambda self: False)], enter=hasURL, collector=lambda x: x[1])
     bad.upon(check, outputs=[machine.output()(lambda self: True)], enter=hasURL, collector=any)
+    inPing.upon(check, outputs=[machine.output()(lambda self: False)], enter=inPing, collector=any)
+    inPing.upon(setBad, enter=bad, collector=any)
 
     @machine.output()
     def clearRunningCheck(self, config=None):
@@ -175,55 +182,9 @@ class State(object):
                      call=self.call,
                      card=self.card))
 
-    def _reset(self):
-        self.content = None
-        self._maybeReset()
-
-    def close(self):
-        """Discard data and cancel all calls.
-
-        Instance cannot be reused after closing.
-        """
-        if self.closed:
-            raise ValueError("Cannot close a closed state")
-        if self.call is not None:
-            self.call.cancel()
-        self.closed = True
-
-    def check(self):
-        """Check the state of HTTP"""
-        if self.closed:
-            raise ValueError("Cannot check a closed state")
-        self._maybeReset()
-        if self.url is None:
-            return False
-        return self._maybeCheck()
-
-    def _maybeReset(self):
-        content = self.location.getContent()
-        if content == self.content:
-            return
-        self.content = content
-
-        parsed = json.loads(self.content)
-        config = parsed.get(self.KEY)
-        if config is None:
-            self.url = None
-            self.card = _ScoreCard()
-            return
-        self.url = config['url']
-        self.period = config['period']
-        self.card = _ScoreCard(config['maxBad'])
-        self.timeout = min(self.period, config['timeout'])
-        self.nextCheck = self.settings.reactor.seconds() + config['grace'] * self.period
-
-    def _maybeCheck(self):
+    def maybeCheck(self):
         if self.settings.reactor.seconds() <= self.nextCheck:
             return False
-        assert self.call is None, 'Timeout reached, call still outstanding'
-        if self.card.isBad():
-            self._reset()
-            return True
         self.nextCheck = self.settings.reactor.seconds() + self.period
         self.call = self.settings.agent.request('GET', self.url, _standardHeaders, None)
         delayedCall = self.settings.reactor.callLater(self.timeout, self.call.cancel)
@@ -233,7 +194,8 @@ class State(object):
             return result
         self.call.addBoth(_gotResult)
         self.call.addErrback(defer.logError)
-        self.call.addCallbacks(callback=self.card.markGood, errback=self.card.markBad)
+        self.call.addCallbacks(put some state transitions here)
+callback=self.card.markGood, errback=self.card.markBad)
         def _removeCall(dummy):
             self.call = None
         self.call.addCallback(_removeCall)
