@@ -65,26 +65,37 @@ class State(object):
 
     machine = automat.MethodicalMachine()
 
-    @machine.state(initial=True)
+    def __init__(self, location, settings):
+        self.location = location
+        self.settings = settings
+        self.content = json.dumps({})
+
+    #### States #####
+    @machine.state(serialized="initial", initial=True)
     def initial(self):
         pass
 
-    @machine.state()
+    @machine.state(serialized="closed")
     def closed(self):
         """All further inputs should error out"""
 
-    @machine.state()
+    @machine.state(serialized="hasURL")
     def hasURL(self):
         """This is a process that does not require HTTP checking
 
         Anything other than content_changed should error out"""
 
-    @machine.state()
+    #### Inputs #####
+    @machine.state(serialized="inPing")
     def inPing(self):
         pass
 
-    @machine.state()
+    @machine.state(serialized="bad")
     def bad(self):
+        pass
+
+    @machine.input()
+    def close(self):
         pass
 
     @machine.input()
@@ -115,13 +126,19 @@ class State(object):
     def setURL(self, config):
         pass
 
-    initial.upon(check, outputs=[machine.output()(lambda self: False)], collector=any)
+    @machine.input()
+    def pingStarted(self):
+        pass
 
-    def __init__(self, location, settings):
-        self.location = location
-        self.settings = settings
-        self.content = json.dumps({})
+    @machine.input()
+    def pingFinished(self):
+        pass
 
+    @machine.input()
+    def setBad(self):
+        pass
+
+    #### Outputs #####
     @machine.output()
     def checkContent(self, newContent):
         if self.content == newContent:
@@ -141,50 +158,22 @@ class State(object):
         self.url = config['url']
         self.period = config['period']
 
-    initial.upon(readContent, outputs=[checkContent])
-    noURL.upon(readContent, outputs=[checkContent])
-    inPing.upon(readContent, outputs=[checkContent])
-    bad.upon(readContent, outputs=[checkContent])
-    hasURL.upon(readContent, outputs=[checkContent])
-
-    initial.upon(close, enter=closed)
-    noURL.upon(close, enter=closed)
-    inPing.upon(close, enter=closed)
-    hasURL.upon(close, enter=closed)
-    bad.upon(close, enter=closed)
-
-    initial.upon(noURL, enter=initial)
-    inPing.upon(noURL, outputs=[clearRunningCheck], enter=initial)
-    hasURL.upon(noURL, enter=initial)
-    bad.upon(noURL, enter=initial)
-    inPing.upon(setURL, outputs=[clearRunningCheck, genericSetURL], enter=hasURL)
-    initial.upon(setURL, outputs=[genericSetURL], enter=hasURL)
-    hasURL.upon(setURL, outputs=[genericSetURL], enter=hasURL)
-    bad.upon(setURL, outputs=[genericSetURL], enter=hasURL)
-
-    hasURL.upon(check, outputs=[maybeCheck, machine.output()(lambda self: False)], enter=hasURL, collector=lambda x: x[1])
-    bad.upon(check, outputs=[machine.output()(lambda self: True)], enter=hasURL, collector=any)
-    inPing.upon(check, outputs=[machine.output()(lambda self: False)], enter=inPing, collector=any)
-    inPing.upon(setBad, enter=bad, collector=any)
-
     @machine.output()
-    def clearRunningCheck(self, config=None):
+    def clearRunningCheckWithConfig(self, config):
         self.call.cancel()
 
-    def __repr__(self):
-        return ('<%(klass)s:%(id)s:location=%(location)s,settings=%(settings)s,'
-                'closed=%(closed)s,content=%(content)s,call=%(call)s,card=%(card)s>' %
-                dict(klass=self.__class__.__name__, id=hex(id(self)),
-                     location=self.location,
-                     settings=self.settings,
-                     closed=self.closed,
-                     content=self.content,
-                     call=self.call,
-                     card=self.card))
+    @machine.output()
+    def clearRunningCheck(self):
+        self.call.cancel()
 
+    @machine.output()
     def maybeCheck(self):
         if self.settings.reactor.seconds() <= self.nextCheck:
-            return False
+            return
+        self.startPing()
+
+    @machine.output()
+    def doStartPing(self):
         self.nextCheck = self.settings.reactor.seconds() + self.period
         self.call = self.settings.agent.request('GET', self.url, _standardHeaders, None)
         delayedCall = self.settings.reactor.callLater(self.timeout, self.call.cancel)
@@ -194,12 +183,55 @@ class State(object):
             return result
         self.call.addBoth(_gotResult)
         self.call.addErrback(defer.logError)
-        self.call.addCallbacks(put some state transitions here)
-callback=self.card.markGood, errback=self.card.markBad)
-        def _removeCall(dummy):
-            self.call = None
-        self.call.addCallback(_removeCall)
-        return False
+        self.call.addCallbacks(callback=self.card.markGood, errback=self.card.markBad)
+        def finishPing(dummy):
+            if self.card.isBad():
+                self.setBad()
+            else:
+                self.pingFinished()
+        self.call.addCallback(finishPing)
+
+    ### Transitions ####
+    initial.upon(readContent, outputs=[checkContent], enter=initial)
+    inPing.upon(readContent, outputs=[checkContent], enter=inPing)
+    bad.upon(readContent, outputs=[checkContent], enter=bad)
+    hasURL.upon(readContent, outputs=[checkContent], enter=hasURL)
+
+    initial.upon(close, outputs=[], enter=closed)
+    inPing.upon(close, outputs=[], enter=closed)
+    hasURL.upon(close, outputs=[], enter=closed)
+    bad.upon(close, outputs=[], enter=closed)
+
+    initial.upon(noURL, outputs=[], enter=initial)
+    inPing.upon(noURL, outputs=[clearRunningCheck], enter=initial)
+    hasURL.upon(noURL, outputs=[], enter=initial)
+    bad.upon(noURL, outputs=[], enter=initial)
+
+    inPing.upon(setURL, outputs=[clearRunningCheckWithConfig, genericSetURL], enter=hasURL)
+    initial.upon(setURL, outputs=[genericSetURL], enter=hasURL)
+    hasURL.upon(setURL, outputs=[genericSetURL], enter=hasURL)
+    bad.upon(setURL, outputs=[genericSetURL], enter=hasURL)
+
+    initial.upon(check, outputs=[machine.output()(lambda self: False)], enter=initial, collector=any)
+    hasURL.upon(check, outputs=[maybeCheck, machine.output()(lambda self: False)], enter=hasURL, collector=lambda x: x[1])
+    bad.upon(check, outputs=[machine.output()(lambda self: True)], enter=hasURL, collector=any)
+    inPing.upon(check, outputs=[machine.output()(lambda self: False)], enter=inPing, collector=any)
+
+    hasURL.upon(pingStarted, outputs=[doStartPing], enter=inPing)
+    inPing.upon(setBad, outputs=[], enter=bad, collector=any)
+    inPing.upon(pingFinished, outputs=[], enter=hasURL)
+
+    @machine.serializer()
+    def __repr__(self, state):
+        return ('<%(klass)s:%(id)s:location=%(location)s,settings=%(settings)s,'
+                'state=%(state)s,content=%(content)s,call=%(call)s,card=%(card)s>' %
+                dict(klass=self.__class__.__name__, id=hex(id(self)),
+                     location=self.location,
+                     settings=self.settings,
+                     state=self.state,
+                     content=self.content,
+                     card=getattr(self, 'card', None)))
+
 
 ## pylint: enable=too-many-instance-attributes
 
