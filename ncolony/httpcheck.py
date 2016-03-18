@@ -85,7 +85,6 @@ class State(object):
 
         Anything other than content_changed should error out"""
 
-    #### Inputs #####
     @machine.state(serialized="inPing")
     def inPing(self):
         pass
@@ -94,6 +93,7 @@ class State(object):
     def bad(self):
         pass
 
+    #### Inputs #####
     @machine.input()
     def close(self):
         pass
@@ -140,9 +140,10 @@ class State(object):
 
     #### Outputs #####
     @machine.output()
-    def checkContent(self, newContent):
+    def checkContent(self):
+        newContent = self.location.getContent()
         if self.content == newContent:
-            pass
+            return
         self.content = newContent
         parsed = json.loads(self.content)
         if self.KEY in parsed:
@@ -153,10 +154,10 @@ class State(object):
     @machine.output()
     def genericSetURL(self, config):
         self.card = _ScoreCard(config['maxBad'])
-        self.timeout = min(self.period, config['timeout'])
-        self.nextCheck = self.settings.reactor.seconds() + config['grace'] * self.period
         self.url = config['url']
         self.period = config['period']
+        self.timeout = min(self.period, config['timeout'])
+        self.nextCheck = self.settings.reactor.seconds() + config['grace'] * self.period
 
     @machine.output()
     def clearRunningCheckWithConfig(self, config):
@@ -170,10 +171,11 @@ class State(object):
     def maybeCheck(self):
         if self.settings.reactor.seconds() <= self.nextCheck:
             return
-        self.startPing()
+        self.pingStarted()
 
     @machine.output()
     def doStartPing(self):
+        import sys
         self.nextCheck = self.settings.reactor.seconds() + self.period
         self.call = self.settings.agent.request('GET', self.url, _standardHeaders, None)
         delayedCall = self.settings.reactor.callLater(self.timeout, self.call.cancel)
@@ -192,10 +194,10 @@ class State(object):
         self.call.addCallback(finishPing)
 
     ### Transitions ####
-    initial.upon(readContent, outputs=[checkContent], enter=initial)
-    inPing.upon(readContent, outputs=[checkContent], enter=inPing)
-    bad.upon(readContent, outputs=[checkContent], enter=bad)
-    hasURL.upon(readContent, outputs=[checkContent], enter=hasURL)
+    initial.upon(check, outputs=[checkContent, machine.output()(lambda self: False)], enter=initial, collector=any)
+    hasURL.upon(check, outputs=[checkContent, maybeCheck, machine.output()(lambda self: False)], enter=hasURL, collector=lambda x: list(x)[1])
+    bad.upon(check, outputs=[checkContent, machine.output()(lambda self: True)], enter=hasURL, collector=any)
+    inPing.upon(check, outputs=[checkContent, machine.output()(lambda self: False)], enter=inPing, collector=any)
 
     initial.upon(close, outputs=[], enter=closed)
     inPing.upon(close, outputs=[], enter=closed)
@@ -212,11 +214,6 @@ class State(object):
     hasURL.upon(setURL, outputs=[genericSetURL], enter=hasURL)
     bad.upon(setURL, outputs=[genericSetURL], enter=hasURL)
 
-    initial.upon(check, outputs=[machine.output()(lambda self: False)], enter=initial, collector=any)
-    hasURL.upon(check, outputs=[maybeCheck, machine.output()(lambda self: False)], enter=hasURL, collector=lambda x: x[1])
-    bad.upon(check, outputs=[machine.output()(lambda self: True)], enter=hasURL, collector=any)
-    inPing.upon(check, outputs=[machine.output()(lambda self: False)], enter=inPing, collector=any)
-
     hasURL.upon(pingStarted, outputs=[doStartPing], enter=inPing)
     inPing.upon(setBad, outputs=[], enter=bad, collector=any)
     inPing.upon(pingFinished, outputs=[], enter=hasURL)
@@ -224,11 +221,11 @@ class State(object):
     @machine.serializer()
     def __repr__(self, state):
         return ('<%(klass)s:%(id)s:location=%(location)s,settings=%(settings)s,'
-                'state=%(state)s,content=%(content)s,call=%(call)s,card=%(card)s>' %
+                'state=%(state)s,content=%(content)s,card=%(card)s>' %
                 dict(klass=self.__class__.__name__, id=hex(id(self)),
                      location=self.location,
                      settings=self.settings,
-                     state=self.state,
+                     state=state,
                      content=self.content,
                      card=getattr(self, 'card', None)))
 
