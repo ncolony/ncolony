@@ -184,9 +184,9 @@ class TestState(BaseTestHTTPChecker):
     def test_close(self):
         """Checking closing causes APIs to error out"""
         self.state.close()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             self.state.close()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             self.state.check()
 
 
