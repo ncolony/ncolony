@@ -143,9 +143,6 @@ class TestState(BaseTestHTTPChecker):
         self.reactor.advance(3)
         self.assertFalse(self.state.check())
         self.state.close()
-        self.assertTrue(self.state.closed)
-        error, = self.flushLoggedErrors()
-        error.trap(defer.CancelledError)
 
     def test_reset_after_check(self):
         """Closing state"""

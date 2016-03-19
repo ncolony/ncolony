@@ -73,70 +73,72 @@ class State(object):
     #### States #####
     @machine.state(serialized="initial", initial=True)
     def initial(self):
-        pass
+        pass # pragma: no cover
 
     @machine.state(serialized="closed")
     def closed(self):
         """All further inputs should error out"""
+        pass # pragma: no cover
 
     @machine.state(serialized="hasURL")
     def hasURL(self):
         """This is a process that does not require HTTP checking
 
         Anything other than content_changed should error out"""
+        pass # pragma: no cover
 
     @machine.state(serialized="inPing")
     def inPing(self):
-        pass
+        pass # pragma: no cover
 
     @machine.state(serialized="bad")
     def bad(self):
-        pass
+        pass # pragma: no cover
 
     #### Inputs #####
     @machine.input()
     def close(self):
-        pass
+        pass # pragma: no cover
 
     @machine.input()
     def readContent(self, newContent):
-        pass
+        pass # pragma: no cover
 
     @machine.input()
     def contentChanged(self):
-        pass
+        pass # pragma: no cover
 
     @machine.input()
     def gotBadReponse(self):
-        pass
+        pass # pragma: no cover
 
     @machine.input()
     def gotGoodReponse(self):
-        pass
+        pass # pragma: no cover
 
     @machine.input()
     def check(self):
-        pass
+        pass # pragma: no cover
 
     @machine.input()
     def noURL(self):
-        pass
+        pass # pragma: no cover
 
     @machine.input()
     def setURL(self, config):
-        pass
+        pass # pragma: no cover
 
     @machine.input()
     def pingStarted(self):
-        pass
+        pass # pragma: no cover
 
     @machine.input()
     def pingFinished(self):
-        pass
+        pass # pragma: no cover
 
     @machine.input()
     def setBad(self):
-        pass
+        pass # pragma: no cover
 
     #### Outputs #####
     @machine.output()
