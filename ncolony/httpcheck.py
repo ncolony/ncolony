@@ -167,6 +167,8 @@ class State(object):
 
     @machine.output()
     def clearRunningCheck(self):
+        print "\nlalala cancelling", self.call, repr(self), "\n"
+        self.card = _ScoreCard(0)
         self.call.cancel()
 
     @machine.output()
@@ -177,7 +179,6 @@ class State(object):
 
     @machine.output()
     def doStartPing(self):
-        import sys
         self.nextCheck = self.settings.reactor.seconds() + self.period
         self.call = self.settings.agent.request('GET', self.url, _standardHeaders, None)
         delayedCall = self.settings.reactor.callLater(self.timeout, self.call.cancel)
@@ -189,15 +190,19 @@ class State(object):
         self.call.addErrback(defer.logError)
         self.call.addCallbacks(callback=self.card.markGood, errback=self.card.markBad)
         def finishPing(dummy):
+            print "finishing ping woo"
             if self.card.isBad():
                 self.setBad()
             else:
                 self.pingFinished()
         self.call.addCallback(finishPing)
+        def foo(err):
+            print "woo moshe", err
+        self.call.addErrback(foo)
 
     ### Transitions ####
     initial.upon(check, outputs=[checkContent, machine.output()(lambda self: False)], enter=initial, collector=any)
-    hasURL.upon(check, outputs=[checkContent, maybeCheck, machine.output()(lambda self: False)], enter=hasURL, collector=lambda x: list(x)[1])
+    hasURL.upon(check, outputs=[checkContent, maybeCheck, machine.output()(lambda self: False)], enter=hasURL, collector=lambda x: list(x)[-1])
     bad.upon(check, outputs=[checkContent, machine.output()(lambda self: True)], enter=hasURL, collector=any)
     inPing.upon(check, outputs=[checkContent, machine.output()(lambda self: False)], enter=inPing, collector=any)
 
@@ -215,6 +220,12 @@ class State(object):
     initial.upon(setURL, outputs=[genericSetURL], enter=hasURL)
     hasURL.upon(setURL, outputs=[genericSetURL], enter=hasURL)
     bad.upon(setURL, outputs=[genericSetURL], enter=hasURL)
+
+    ## It is possible to get a pingStarted after having transitioned
+    ## to "initial" because the new content has no URL checking.
+    ## Do nothing. 
+    initial.upon(pingStarted, outputs=[], enter=initial)
+    initial.upon(pingFinished, outputs=[], enter=initial)
 
     hasURL.upon(pingStarted, outputs=[doStartPing], enter=inPing)
     inPing.upon(setBad, outputs=[], enter=bad, collector=any)

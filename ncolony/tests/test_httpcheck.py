@@ -178,6 +178,30 @@ class TestState(BaseTestHTTPChecker):
         self.assertFalse(self.state.check())
         self.assertLessEqual(len(self.agent.calls), 1)
 
+    def test_seturl_in_flight(self):
+        """Check changing URL in flight works"""
+        self.location.setContent(json.dumps(self.params))
+        self.assertFalse(self.state.check())
+        self.reactor.advance(3)
+        self.location.setContent(json.dumps({}))
+        self.assertFalse(self.state.check())
+        self.reactor.advance(1)
+
+    def test_seturl_in_flight2(self):
+        """Check changing URL in flight works"""
+        self.location.setContent(json.dumps(self.params))
+        self.assertFalse(self.state.check())
+        self.reactor.advance(3)
+        self.assertFalse(self.state.check())
+        self.location.setContent(json.dumps({}))
+        self.assertFalse(self.state.check())
+        self.reactor.advance(1)
+        print "woo", self.agent.pending
+        #d, = self.agent.pending.values()[0]
+        #def checkErr(err):
+        #    err.trap(defer.CancelledError)
+        #d.addErrback(checkErr)
+
     def test_close(self):
         """Checking closing causes APIs to error out"""
         self.state.close()
