@@ -9,12 +9,12 @@ import difflib
 import os
 import sys
 
+from ncolony import main as mainlib
+
 PROPER_HEADER = """\
 # Copyright (c) Moshe Zadka
 # See LICENSE for details.
 """
-
-from ncolony import main as mainlib
 
 @mainlib.COMMANDS.register(name='nitpicker')
 def main(argv):
