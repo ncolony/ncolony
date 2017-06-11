@@ -14,9 +14,9 @@ PROPER_HEADER = """\
 # See LICENSE for details.
 """
 
-NCOLONY_MAIN_OK = True
+from ncolony import main as mainlib
 
-
+@mainlib.COMMANDS.register(name='nitpicker')
 def main(argv):
     """Pick nits in code"""
     argv = argv
