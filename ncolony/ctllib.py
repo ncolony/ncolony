@@ -41,7 +41,7 @@ import os
 
 from twisted.python import filepath
 
-NCOLONY_MAIN_OK = True
+from ncolony import main as mainlib
 
 NEXT = functools.partial(next, itertools.count(0))
 
@@ -158,6 +158,7 @@ def call(results):
     func = results.pop('func')
     func(places, **results)
 
+@mainlib.COMMANDS.register(name='ctl')
 def main(argv):
     """command-line entry point
 
