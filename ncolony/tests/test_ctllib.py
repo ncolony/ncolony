@@ -177,7 +177,7 @@ class TestController(unittest.TestCase):
         names = set()
         for thing in things:
             self.assertEquals(thing.pop('type'), 'RESTART')
-            (k, v), = thing.iteritems()
+            (k, v), = six.iteritems(thing)
             self.assertEquals(k, 'name')
             names.add(v)
         self.assertEquals(names, set(('hello', 'goodbye')))

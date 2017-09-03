@@ -71,7 +71,7 @@ class TestReceiver(unittest.TestCase):
 
     def test_add_simple(self):
         """Test a simple process addition"""
-        message = json.dumps(dict(args=['/bin/echo', 'hello']))
+        message = json.dumps(dict(args=['/bin/echo', 'hello'])).encode('utf-8')
         self.receiver.add('hello', message)
         self.assertEquals(len(self.monitor.events), 1)
         (tp, name, args, uid, gid, env), = self.monitor.events
