@@ -13,11 +13,10 @@ from zope.interface import verify
 from ncolony import directory_monitor
 from ncolony import interfaces
 
+@interface.implementer(interfaces.IMonitorEventReceiver)
 class EventRecorder(object):
 
     """An event receiver that just records the events"""
-
-    interface.implements(interfaces.IMonitorEventReceiver)
 
     def __init__(self):
         """Initialize the event list"""
@@ -36,21 +35,19 @@ class EventRecorder(object):
         self.events.append(('MESSAGE', contents))
 
 ## pylint: disable=too-few-public-methods
+@interface.implementer(interfaces.IMonitorEventReceiver)
 class EventRecorderNoAdd(object):
 
     """Dummy bad implementation of event receiver interface"""
-
-    interface.implements(interfaces.IMonitorEventReceiver)
 
     def remove(self, name):
         """Dummy remove method"""
         pass
 
+@interface.implementer(interfaces.IMonitorEventReceiver)
 class EventRecorderNoRemove(object):
 
     """Dummy bad implementation of event receiver interface"""
-
-    interface.implements(interfaces.IMonitorEventReceiver)
 
     def add(self, name, content):
         """Dummy add method"""
