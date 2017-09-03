@@ -5,3 +5,4 @@ build/
 dist/
 ncolony.egg-info/
 /.eggs
+/.python-version

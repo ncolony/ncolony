@@ -8,6 +8,8 @@ Convert events into process monitoring actions.
 
 import json
 
+import six
+
 from zope import interface
 
 from twisted.python import log
@@ -16,14 +18,13 @@ from ncolony import interfaces
 
 VALID_KEYS = frozenset(['args', 'uid', 'gid', 'env'])
 
+@interface.implementer(interfaces.IMonitorEventReceiver)
 class Receiver(object):
 
     """A wrapper around ProcessMonitor that responds to events
 
     :params monitor: a ProcessMonitor
     """
-
-    interface.implements(interfaces.IMonitorEventReceiver)
 
     def __init__(self, monitor):
         """Initialize from ProcessMonitor"""
@@ -39,7 +40,7 @@ class Receiver(object):
         """
         parsedContents = json.loads(contents)
         parsedContents = {key: value
-                          for key, value in parsedContents.iteritems()
+                          for key, value in six.iteritems(parsedContents)
                           if key in VALID_KEYS}
         parsedContents['name'] = name
         parsedContents['env'] = parsedContents.get('env', {})
