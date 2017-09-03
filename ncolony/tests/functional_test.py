@@ -36,7 +36,10 @@ def main(argv):
             print 'Old process remains -- shutting it down'
             fp = file(PID_FILE)
             pid = int(fp.read())
-            os.kill(pid, 15)
+            try:
+                os.kill(pid, 15)
+            except OSError:
+                break
             time.sleep(5)
         shutil.rmtree(FUNC_TEMP)
     CONFIGS = os.path.join(FUNC_TEMP, 'configs')
