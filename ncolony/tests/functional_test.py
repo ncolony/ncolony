@@ -3,6 +3,7 @@
 
 """Functional/integration test for ncolony"""
 
+import errno
 import os
 import shutil
 import subprocess
@@ -25,8 +26,11 @@ def _killPatiently(pidFile):
         pid = int(fp.read())
         try:
             os.kill(pid, 15)
-        except OSError:
-            break
+        except OSError as e:
+            if e.errno == errno.ESRCH:
+                break
+            else:
+                raise
         time.sleep(5)
 
 def main(argv):
