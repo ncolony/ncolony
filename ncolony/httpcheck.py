@@ -8,6 +8,8 @@ import functools
 import json
 import sys
 
+import six
+
 import twisted
 
 from twisted.application import internet as tainternet
@@ -164,7 +166,7 @@ def check(settings, states, location):
         del states[name]
     for name in added:
         states[name] = State(location=children[name], settings=settings)
-    return [name for name, state in states.iteritems() if state.check()]
+    return [name for name, state in six.iteritems(states) if state.check()]
 
 def run(restarter, checker):
     """Run restarter on the checker's output
