@@ -109,7 +109,7 @@ class TestReceiver(unittest.TestCase):
 
     def test_add_with_junk(self):
         """Test a process addition with all the optional arguments"""
-        message = json.dumps(dict(something=1, args=['/bin/echo', 'hello']))
+        message = json.dumps(dict(something=1, args=['/bin/echo', 'hello'])).encode('utf-8')
         self.receiver.add('hello', message)
         self.assertEquals(len(self.monitor.events), 1)
         (tp, name, args, uid, gid, env), = self.monitor.events
@@ -135,7 +135,7 @@ class TestReceiver(unittest.TestCase):
 
     def test_restart(self):
         """Test a process restart"""
-        message = json.dumps(dict(type='RESTART', name='hello'))
+        message = json.dumps(dict(type='RESTART', name='hello')).encode('utf-8')
         self.receiver.message(message)
         self.assertEquals(self.monitor.events,
                           [('RESTART', 'hello')])
@@ -143,13 +143,13 @@ class TestReceiver(unittest.TestCase):
 
     def test_unknown_message(self):
         """Test that we reject unknown messages"""
-        message = json.dumps(dict(type='LALALA', name='goodbye'))
+        message = json.dumps(dict(type='LALALA', name='goodbye')).encode('utf-8')
         with self.assertRaises(ValueError):
             self.receiver.message(message)
 
     def test_restart_all(self):
         """Test a global restart"""
-        message = json.dumps(dict(type='RESTART-ALL'))
+        message = json.dumps(dict(type='RESTART-ALL')).encode('utf-8')
         self.receiver.message(message)
         self.assertEquals(self.monitor.events,
                           [('RESTART-ALL',)])

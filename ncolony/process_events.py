@@ -38,7 +38,7 @@ class Receiver(object):
            parsed as JSON for process params
         :returns: None
         """
-        parsedContents = json.loads(contents)
+        parsedContents = json.loads(contents.decode('utf-8'))
         parsedContents = {key: value
                           for key, value in six.iteritems(parsedContents)
                           if key in VALID_KEYS}
@@ -67,7 +67,7 @@ class Receiver(object):
            ('value') should exist with a logical process
            name.
         """
-        contents = json.loads(contents)
+        contents = json.loads(contents.decode('utf-8'))
         tp = contents['type']
         if tp == 'RESTART':
             self.monitor.stopProcess(contents['name'])
