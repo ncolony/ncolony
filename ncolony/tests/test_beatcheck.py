@@ -62,7 +62,7 @@ class TestBeatChecker(unittest.TestCase):
         self.assertFalse(self.checker(mtime, mtime+9))
         self.assertEquals(self.checker(mtime, mtime+20), ['foo'])
         statusFile = filepath.FilePath(status)
-        statusFile.setContent("111")
+        statusFile.setContent(b"111")
         newMTime = statusFile.getModificationTime()
         newMTime += 100
         ## Back...to the future
@@ -81,7 +81,7 @@ class TestBeatChecker(unittest.TestCase):
         fooFile.setContent(jsonCheck)
         mtime = fooFile.getModificationTime()
         statusFile = filepath.FilePath(status, 'foo')
-        statusFile.setContent("111")
+        statusFile.setContent(b"111")
         newMTime = statusFile.getModificationTime()
         newMTime += 100
         ## Back...to the future
@@ -136,7 +136,7 @@ class TestBeatChecker(unittest.TestCase):
             fileObj = self.filepath.child(fname)
             fileObj.setContent(jsonCheck)
             statusFile = filepath.FilePath(status)
-            statusFile.setContent("111")
+            statusFile.setContent(b"111")
             newMTime = statusFile.getModificationTime()
             mtime = max([mtime, newMTime, fileObj.getModificationTime()])
         self.assertFalse(self.checker(mtime, mtime))

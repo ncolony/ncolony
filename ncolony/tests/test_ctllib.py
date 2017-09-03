@@ -9,6 +9,8 @@ import os
 import shutil
 import unittest
 
+import six
+
 from ncolony import ctllib
 
 class TestArgParsing(unittest.TestCase):
