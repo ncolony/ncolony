@@ -213,7 +213,7 @@ class TestCheck(BaseTestHTTPChecker):
         self.location.child('child').setContent(json.dumps(self.params).encode('utf-8'))
         ret = httpcheck.check(self.settings, self.states, self.location)
         self.assertEquals(ret, [])
-        (name, state), = self.states.iteritems()
+        (name, state), = six.iteritems(self.states)
         self.assertEquals(name, 'child')
         httpcheck.check(self.settings, self.states, self.location)
         self.assertEquals(ret, [])
