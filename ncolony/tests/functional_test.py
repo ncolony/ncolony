@@ -18,6 +18,17 @@ def _getHere():
     here = os.path.join(here, 'build')
     return here
 
+def _killPatiently(pidFile):
+    while os.path.exists(pidFile):
+        print 'Old process remains -- shutting it down'
+        fp = file(pidFile)
+        pid = int(fp.read())
+        try:
+            os.kill(pid, 15)
+        except OSError:
+            break
+        time.sleep(5)
+
 def main(argv):
     """Run ncolony with a simple process"""
     argv = argv
@@ -32,15 +43,7 @@ def main(argv):
     PID_FILE = os.path.join(FUNC_TEMP, 'twistd.pid')
     LOG_FILE = os.path.join(FUNC_TEMP, 'twistd.log')
     if os.path.exists(FUNC_TEMP):
-        while os.path.exists(PID_FILE):
-            print 'Old process remains -- shutting it down'
-            fp = file(PID_FILE)
-            pid = int(fp.read())
-            try:
-                os.kill(pid, 15)
-            except OSError:
-                break
-            time.sleep(5)
+        _killPatiently(PID_FILE)
         shutil.rmtree(FUNC_TEMP)
     CONFIGS = os.path.join(FUNC_TEMP, 'configs')
     MESSAGES = os.path.join(FUNC_TEMP, 'messages')
