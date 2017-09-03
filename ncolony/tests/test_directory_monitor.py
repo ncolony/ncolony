@@ -117,7 +117,7 @@ class TestMessageSender(DirectoryBasedTest):
 
     def test_ignore_new(self):
         """Test ignoring messages with .new extension"""
-        self.write('00Message.new', 'hello')
+        self.write('00Message.new', b'hello')
         self.message()
         self.assertFalse(self.receiver.events)
 
