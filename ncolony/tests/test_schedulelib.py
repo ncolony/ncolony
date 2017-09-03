@@ -7,7 +7,7 @@ from __future__ import division
 
 import os
 import unittest
-from io import StringIO
+from io import BytesIO
 import sys
 
 import six
@@ -33,7 +33,7 @@ class TestProcessProtocol(unittest.TestCase):
     """Test schedulelib.ProcessProtocol"""
 
     def setUp(self):
-        out = StringIO()
+        out = BytesIO()
         oldstdout = sys.stdout
         def _cleanup():
             sys.stdout = oldstdout
@@ -81,7 +81,7 @@ class TestRunProcess(unittest.TestCase):
 
     def setUp(self):
         self.reactor = test_procmon.DummyProcessReactor()
-        out = StringIO()
+        out = BytesIO()
         oldstdout = sys.stdout
         def _cleanup():
             sys.stdout = oldstdout
