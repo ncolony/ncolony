@@ -1,13 +1,21 @@
 language: python
 python: 2.7
-env:
-  - TOX_ENV=py27-unit
-  - TOX_ENV=py27-lint
-  - TOX_ENV=py27-func
-  - TOX_ENV=pypy-unit
-  - TOX_ENV=pypy-func
-  - TOX_ENV=py27-wheel
-  - TOX_ENV=docs
+matrix:
+  include:
+    - python: 2.7
+      env: TOX_ENV=py27-unit
+    - python: 2.7
+      env: TOX_ENV=py27-lint
+    - python: 2.7
+      env: TOX_ENV=py27-func
+    - python: pypy2.7-5.8.0
+      env: TOX_ENV=pypy-unit
+    - python: pypy2.7-5.8.0
+      env: TOX_ENV=pypy-func
+    - python: 2.7
+      env: TOX_ENV=py27-wheel
+    - python: 2.7
+      env: TOX_ENV=docs
 install:
   - pip install tox
 script:

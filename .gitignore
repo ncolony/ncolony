@@ -4,3 +4,4 @@ dropin.cache
 build/
 dist/
 ncolony.egg-info/
+/.eggs
