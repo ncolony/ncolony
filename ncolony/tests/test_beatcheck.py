@@ -44,7 +44,7 @@ class TestBeatChecker(unittest.TestCase):
     def test_no_heart(self):
         """Test checking a config directory with one file that does not beat"""
         check = {}
-        jsonCheck = json.dumps(check)
+        jsonCheck = json.dumps(check).encode('utf-8')
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
         mtime = fooFile.getModificationTime()
@@ -54,7 +54,7 @@ class TestBeatChecker(unittest.TestCase):
         """Test checking a config directory with one file"""
         status = os.path.join(self.status, 'foo')
         check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': status}}
-        jsonCheck = json.dumps(check)
+        jsonCheck = json.dumps(check).encode('utf-8')
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
         mtime = fooFile.getModificationTime()
@@ -76,7 +76,7 @@ class TestBeatChecker(unittest.TestCase):
         """Test checking a config directory with one file"""
         status = os.path.join(self.status, 'foo')
         check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': self.status}}
-        jsonCheck = json.dumps(check)
+        jsonCheck = json.dumps(check).encode('utf-8')
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
         mtime = fooFile.getModificationTime()
@@ -93,7 +93,7 @@ class TestBeatChecker(unittest.TestCase):
         """Test checking that grace period is respected"""
         status = os.path.join(self.status, 'foo')
         check = {'ncolony.beatcheck': {'period': 10, 'grace': 3, 'status': status}}
-        jsonCheck = json.dumps(check)
+        jsonCheck = json.dumps(check).encode('utf-8')
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
         mtime = fooFile.getModificationTime()
@@ -105,7 +105,7 @@ class TestBeatChecker(unittest.TestCase):
         """Test that start time is being respected"""
         status = os.path.join(self.status, 'foo')
         check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': status}}
-        jsonCheck = json.dumps(check)
+        jsonCheck = json.dumps(check).encode('utf-8')
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
         mtime = fooFile.getModificationTime()
@@ -119,7 +119,7 @@ class TestBeatChecker(unittest.TestCase):
         for fname in ['foo', 'bar']:
             status = os.path.join(self.status, fname)
             check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': status}}
-            jsonCheck = json.dumps(check)
+            jsonCheck = json.dumps(check).encode('utf-8')
             fileObj = self.filepath.child(fname)
             fileObj.setContent(jsonCheck)
             mtime = max([mtime, fileObj.getModificationTime()])
@@ -132,7 +132,7 @@ class TestBeatChecker(unittest.TestCase):
         for fname in ['foo', 'bar']:
             status = os.path.join(self.status, fname)
             check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': status}}
-            jsonCheck = json.dumps(check)
+            jsonCheck = json.dumps(check).encode('utf-8')
             fileObj = self.filepath.child(fname)
             fileObj.setContent(jsonCheck)
             statusFile = filepath.FilePath(status)
