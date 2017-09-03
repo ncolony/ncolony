@@ -29,7 +29,7 @@ def main(argv):
 
     ## Check .pyc files
     for dirpath, dirnames, filenames in os.walk(here, topdown=True):
-        if 'build' in dirpath or '__pycache__' in dirpath:
+        if 'build' in dirpath or '__pycache__' in dirpath or '.eggs' in dirpath:
             dirnames[:] = []
             continue
         for filename in filenames:
