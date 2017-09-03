@@ -3,19 +3,19 @@ python: 2.7
 matrix:
   include:
     - python: 2.7
-      env: TOXENV=py27-unit
+      env: TOX_ENV=py27-unit
     - python: 2.7
-      env: TOXENV=py27-lint
+      env: TOX_ENV=py27-lint
     - python: 2.7
-      env: TOXENV=py27-func
+      env: TOX_ENV=py27-func
     - python: pypy2.7-5.8.0
-      env: TOXENV=pypy-unit
+      env: TOX_ENV=pypy-unit
     - python: pypy2.7-5.8.0
-      env: TOXENV=pypy-func
+      env: TOX_ENV=pypy-func
     - python: 2.7
-      env: TOXENV=py27-wheel
+      env: TOX_ENV=py27-wheel
     - python: 2.7
-      env: TOXENV=docs
+      env: TOX_ENV=docs
 install:
   - pip install tox
 script:
