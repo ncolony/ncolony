@@ -91,7 +91,7 @@ class TestReceiver(unittest.TestCase):
 
     def test_add_complicated(self):
         """Test a process addition with all the optional arguments"""
-        message = json.dumps(dict(args=['/bin/echo', 'hello'], uid=0, gid=0, env={'world': '616'}))
+        message = json.dumps(dict(args=['/bin/echo', 'hello'], uid=0, gid=0, env={'world': '616'})).encode('utf-8')
         self.receiver.add('hello', message)
         self.assertEquals(len(self.monitor.events), 1)
         (tp, name, args, uid, gid, env), = self.monitor.events
