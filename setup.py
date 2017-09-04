@@ -5,7 +5,6 @@ import subprocess
 import sys
 
 import setuptools
-import versioneer
 
 import ncolony as module
 
