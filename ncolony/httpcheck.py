@@ -48,7 +48,7 @@ class _ScoreCard(object):
 Settings = collections.namedtuple('Settings', 'reactor agent')
 
 _USER_AGENT = ('NColony HTTP Check ('
-               'NColony/' + ncolony.__version__ + ', '
+               'NColony/' + str(ncolony.__version__) + ', '
                'Twisted/' + twisted.__version__ + ', '
                'Python ' + sys.version.replace('\n', '') + ')'
               )

@@ -176,7 +176,7 @@ class TestState(BaseTestHTTPChecker):
         self.assertIsInstance(headers, client.Headers)
         userAgent, = headers.getRawHeaders('user-agent')
         self.assertIn('Twisted/' + twisted.__version__, userAgent)
-        self.assertIn('NColony/' + ncolony.__version__, userAgent)
+        self.assertIn('NColony/' + str(ncolony.__version__), userAgent)
         self.assertIn('Python ' + sys.version.replace('\n', ''), userAgent)
         d, = self.agent.pending[url]
         d.callback(client.Response(('HTTP', 1, 1), 200, 'OK', None, None))
