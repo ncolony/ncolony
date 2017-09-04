@@ -6,7 +6,12 @@ import sys
 
 import setuptools
 
-import ncolony as module
+_long_description = '''\
+ncolony_: A wrapper around Twisted process monitor which allows runtime configur
+ation via file-based communication
+
+.. _ncolony: https://ncolony.rtfd.org
+'''
 
 setuptools.setup(
     url='https://github.com/moshez/ncolony',
