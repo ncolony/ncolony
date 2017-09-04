@@ -3,19 +3,23 @@ python: 2.7
 matrix:
   include:
     - python: 2.7
-      env: TOX_ENV=py27-unit
-    - python: 2.7
       env: TOX_ENV=py27-lint
-    - python: 2.7
-      env: TOX_ENV=py27-func
-    - python: pypy2.7-5.8.0
-      env: TOX_ENV=pypy-unit
-    - python: pypy2.7-5.8.0
-      env: TOX_ENV=pypy-func
     - python: 2.7
       env: TOX_ENV=py27-wheel
     - python: 2.7
       env: TOX_ENV=docs
+    - python: 2.7
+      env: TOX_ENV=py27-unit
+    - python: 2.7
+      env: TOX_ENV=py27-func
+    - python: 3.6
+      env: TOX_ENV=py36-unit
+    - python: 3.6
+      env: TOX_ENV=py36-func
+    - python: pypy2.7-5.8.0
+      env: TOX_ENV=pypy-unit
+    - python: pypy2.7-5.8.0
+      env: TOX_ENV=pypy-func
 install:
   - pip install tox incremental
 script:
