@@ -1,3 +1,5 @@
+# Copyright (c) Moshe Zadka
+# See LICENSE for details.
 """
 Provides ncolony version information.
 """
