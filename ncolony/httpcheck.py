@@ -111,7 +111,7 @@ class State(object):
         return self._maybeCheck()
 
     def _maybeReset(self):
-        content = self.location.getContent()
+        content = self.location.getContent().decode('utf-8')
         if content == self.content:
             return
         self.content = content
