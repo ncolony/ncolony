@@ -2,6 +2,7 @@
 # See LICENSE for details.
 
 """Functional/integration test for ncolony"""
+from __future__ import print_function
 
 import errno
 import os
@@ -21,8 +22,8 @@ def _getHere():
 
 def _killPatiently(pidFile):
     while os.path.exists(pidFile):
-        print 'Old process remains -- shutting it down'
-        fp = file(pidFile)
+        print('Old process remains -- shutting it down')
+        fp = open(pidFile)
         pid = int(fp.read())
         try:
             os.kill(pid, 15)
@@ -54,7 +55,7 @@ def main(argv):
     os.makedirs(CONFIGS)
     os.makedirs(MESSAGES)
     DEFAULTS = ['--messages', MESSAGES, '--config', CONFIGS]
-    SLEEP = "import time, sys;print 'START';sys.stdout.flush();time.sleep(3);print 'STOP'"
+    SLEEP = "import time, sys;print('START');sys.stdout.flush();time.sleep(3);print('STOP')"
     SLEEPER = ['--arg=-c', '--arg', SLEEP]
     subprocess.check_call([sys.executable, '-m', 'ncolony', 'ctl'] + DEFAULTS +
                           ['add', 'sleeper', '--cmd', sys.executable] + SLEEPER)
@@ -63,9 +64,9 @@ def main(argv):
                           DEFAULTS +
                           ['--freq', '1'])
     for dummy in range(10):
-        print 'checking for pid file'
+        print('checking for pid file')
         try:
-            fp = file(PID_FILE)
+            fp = open(PID_FILE)
         except IOError:
             continue
         else:
@@ -74,16 +75,16 @@ def main(argv):
     else:
         sys.exit("PID file does not exist")
     pid = int(fp.read())
-    print "sleeping for 5 seconds"
+    print("sleeping for 5 seconds")
     time.sleep(5)
-    print "waking up, asking for global restart"
+    print("waking up, asking for global restart")
     subprocess.check_call([sys.executable, '-m', 'ncolony', 'ctl'] + DEFAULTS + ['restart-all'])
-    print "sleeping for 5 seconds"
+    print("sleeping for 5 seconds")
     time.sleep(5)
-    print "waking up, killing twistd"
+    print("waking up, killing twistd")
     os.kill(pid, 15)
     for dummy in range(10):
-        print 'waiting for twistd to shutdown'
+        print('waiting for twistd to shutdown')
         if not os.path.exists(PID_FILE):
             break
         time.sleep(1)
@@ -92,7 +93,7 @@ def main(argv):
     _analyzeLogFile(LOG_FILE)
 
 def _analyzeLogFile(log_file):
-    lines = list(file(log_file))
+    lines = list(open(log_file))
     states = [line for line in lines if 'START' in line or 'STOP' in line]
     if 'START' in states[-1]:
         states.pop()
