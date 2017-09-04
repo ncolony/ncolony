@@ -11,7 +11,7 @@ import unittest
 
 from zope.interface import verify
 
-from twisted.python import usage, filepath
+from twisted.python import usage
 from twisted.internet import reactor
 from twisted.application import service as taservice, internet
 from twisted.runner import procmon
