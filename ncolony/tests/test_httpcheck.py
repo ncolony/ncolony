@@ -117,7 +117,6 @@ class TestState(BaseTestHTTPChecker):
         values = values.strip(',')
         name, value = values.split('=', 1)
         self.assertEquals(name, 'content')
-        value = value.decode('utf-8')
         ## pylint: disable=eval-used
         self.assertEquals(eval(value), self.params)
         ## pylint: enable=eval-used

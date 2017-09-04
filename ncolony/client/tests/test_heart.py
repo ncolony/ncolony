@@ -41,6 +41,20 @@ def replaceEnvironment(case, myEnv=None):
     case.addCleanup(_cleanup)
     os.environ = myEnv
 
+def _getSelf(method):
+    if hasattr(method, 'im_self'):
+        return method.im_self
+    if hasattr(method, '__self__'):
+        return method.__self__
+    raise TypeError("no self", method)
+
+def _getFunc(method):
+    if hasattr(method, 'im_func'):
+        return method.im_func
+    if hasattr(method, '__func__'):
+        return method.__func__
+    return method
+
 def checkHeartService(case, service, statusName='my.status'):
     """Check that a heart service is correct
 
@@ -52,8 +66,8 @@ def checkHeartService(case, service, statusName='my.status'):
     func, args, kwargs = service.call
     case.assertFalse(args)
     case.assertFalse(kwargs)
-    myHeart = func.im_self
-    case.assertIs(func.im_func, heart.Heart.beat.im_func)
+    myHeart = _getSelf(func)
+    case.assertIs(_getFunc(func), _getFunc(heart.Heart.beat))
     case.assertIsInstance(myHeart, heart.Heart)
     fp = myHeart.getFile()
     case.assertIsInstance(fp, filepath.FilePath)
