@@ -17,6 +17,6 @@ matrix:
     - python: 2.7
       env: TOX_ENV=docs
 install:
-  - pip install tox
+  - pip install tox incremental
 script:
   - tox -e $TOX_ENV
