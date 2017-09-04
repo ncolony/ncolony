@@ -236,13 +236,7 @@ class TestOptions(unittest.TestCase):
         functions = [subs.call[0] for subs in subservices]
         paths = set()
         for func in functions:
-            for thing in func.func_closure:
-                thing = thing.cell_contents
-                if isinstance(thing, filepath.FilePath):
-                    paths.add(thing.basename())
-                    break
-            else:
-                raise ValueError("Could not find path for", func)
+            paths.add(func.args[0].basename())
         self.assertEquals(paths, set(['message-dir', 'config-dir']))
         protocols = pm.protocols
         self.assertIsInstance(protocols, service.TransportDirectoryDict)
