@@ -16,5 +16,5 @@ master_doc = 'index'
 project = module.__name__
 copyright = ', '.join((module.metadata['copyright'], module.metadata['author']))
 author = module.metadata['author']
-version = str(module.__version__)
-release = str(module.__version__)
+version = module.__version__
+release = module.__version__
