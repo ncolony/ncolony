@@ -4,7 +4,6 @@
 """Tests for ncolony.beatcheck"""
 
 import functools
-import json
 import os
 import shutil
 import time
