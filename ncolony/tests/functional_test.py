@@ -23,8 +23,8 @@ def _getHere():
 def _killPatiently(pidFile):
     while os.path.exists(pidFile):
         print('Old process remains -- shutting it down')
-        fp = open(pidFile)
-        pid = int(fp.read())
+        with open(pidFile) as fp:
+            pid = int(fp.read())
         try:
             os.kill(pid, 15)
         except OSError as e:
@@ -66,7 +66,8 @@ def main(argv):
     for dummy in range(10):
         print('checking for pid file')
         try:
-            fp = open(PID_FILE)
+            with open(PID_FILE) as fp:
+                pid = int(fp.read())
         except IOError:
             continue
         else:
@@ -74,7 +75,6 @@ def main(argv):
         time.sleep(1)
     else:
         sys.exit("PID file does not exist")
-    pid = int(fp.read())
     print("sleeping for 5 seconds")
     time.sleep(5)
     print("waking up, asking for global restart")
@@ -93,7 +93,8 @@ def main(argv):
     _analyzeLogFile(LOG_FILE)
 
 def _analyzeLogFile(log_file):
-    lines = list(open(log_file))
+    with open(log_file) as fp:
+        lines = list(fp)
     states = [line for line in lines if 'START' in line or 'STOP' in line]
     if 'START' in states[-1]:
         states.pop()
