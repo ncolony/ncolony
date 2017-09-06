@@ -47,6 +47,9 @@ NEXT = functools.partial(next, itertools.count(0))
 
 Places = collections.namedtuple('Places', 'config messages')
 
+def _dumps(stuff):
+    return json.dumps(stuff).encode('utf-8')
+
 ## pylint: disable=too-many-arguments
 def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None):
     """Add a process.
@@ -77,7 +80,7 @@ def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None):
         details['gid'] = gid
     if extras is not None:
         details.update(extras)
-    content = json.dumps(details).encode('utf-8')
+    content = _dumps(details)
     fle.setContent(content)
 ## pylint: enable=too-many-arguments
 
@@ -105,7 +108,7 @@ def restart(places, name):
     :params name: string, the logical name of the process
     :returns: None
     """
-    content = json.dumps(dict(type='RESTART', name=name)).encode('utf-8')
+    content = _dumps(dict(type='RESTART', name=name))
     _addMessage(places, content)
 
 def restartAll(places):
@@ -114,7 +117,7 @@ def restartAll(places):
     :params places: a Places instance
     :returns: None
     """
-    content = json.dumps(dict(type='RESTART-ALL')).encode('utf-8')
+    content = _dumps(dict(type='RESTART-ALL'))
     _addMessage(places, content)
 
 def _parseJSON(fname):

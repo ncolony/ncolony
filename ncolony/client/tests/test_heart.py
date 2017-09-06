@@ -41,18 +41,24 @@ def replaceEnvironment(case, myEnv=None):
     case.addCleanup(_cleanup)
     os.environ = myEnv
 
+_MISSING = object()
+
 def _getSelf(method):
-    if hasattr(method, 'im_self'):
-        return method.im_self
-    if hasattr(method, '__self__'):
-        return method.__self__
+    ret = getattr(method, 'im_self', _MISSING)
+    if ret is not _MISSING:
+        return ret
+    ret = getattr(method, '__self__', _MISSING)
+    if ret is not _MISSING:
+        return ret
     raise TypeError("no self", method)
 
 def _getFunc(method):
-    if hasattr(method, 'im_func'):
-        return method.im_func
-    if hasattr(method, '__func__'):
-        return method.__func__
+    ret = getattr(method, 'im_func', _MISSING)
+    if ret is not _MISSING:
+        return ret
+    ret = getattr(method, '__func__', _MISSING)
+    if ret is not _MISSING:
+        return ret
     return method
 
 def checkHeartService(case, service, statusName='my.status'):
