@@ -4,7 +4,6 @@
 """Tests for ncolony.beatcheck"""
 
 import functools
-import json
 import os
 import shutil
 import time
@@ -16,6 +15,7 @@ from twisted.application import internet as tainternet
 
 from ncolony import beatcheck, ctllib
 from ncolony.client.tests import test_heart
+from ncolony.tests import helper
 
 class TestBeatChecker(unittest.TestCase):
 
@@ -44,7 +44,7 @@ class TestBeatChecker(unittest.TestCase):
     def test_no_heart(self):
         """Test checking a config directory with one file that does not beat"""
         check = {}
-        jsonCheck = json.dumps(check)
+        jsonCheck = helper.dumps2utf8(check)
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
         mtime = fooFile.getModificationTime()
@@ -54,7 +54,7 @@ class TestBeatChecker(unittest.TestCase):
         """Test checking a config directory with one file"""
         status = os.path.join(self.status, 'foo')
         check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': status}}
-        jsonCheck = json.dumps(check)
+        jsonCheck = helper.dumps2utf8(check)
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
         mtime = fooFile.getModificationTime()
@@ -62,7 +62,7 @@ class TestBeatChecker(unittest.TestCase):
         self.assertFalse(self.checker(mtime, mtime+9))
         self.assertEquals(self.checker(mtime, mtime+20), ['foo'])
         statusFile = filepath.FilePath(status)
-        statusFile.setContent("111")
+        statusFile.setContent(b"111")
         newMTime = statusFile.getModificationTime()
         newMTime += 100
         ## Back...to the future
@@ -76,12 +76,12 @@ class TestBeatChecker(unittest.TestCase):
         """Test checking a config directory with one file"""
         status = os.path.join(self.status, 'foo')
         check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': self.status}}
-        jsonCheck = json.dumps(check)
+        jsonCheck = helper.dumps2utf8(check)
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
         mtime = fooFile.getModificationTime()
         statusFile = filepath.FilePath(status, 'foo')
-        statusFile.setContent("111")
+        statusFile.setContent(b"111")
         newMTime = statusFile.getModificationTime()
         newMTime += 100
         ## Back...to the future
@@ -93,7 +93,7 @@ class TestBeatChecker(unittest.TestCase):
         """Test checking that grace period is respected"""
         status = os.path.join(self.status, 'foo')
         check = {'ncolony.beatcheck': {'period': 10, 'grace': 3, 'status': status}}
-        jsonCheck = json.dumps(check)
+        jsonCheck = helper.dumps2utf8(check)
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
         mtime = fooFile.getModificationTime()
@@ -105,7 +105,7 @@ class TestBeatChecker(unittest.TestCase):
         """Test that start time is being respected"""
         status = os.path.join(self.status, 'foo')
         check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': status}}
-        jsonCheck = json.dumps(check)
+        jsonCheck = helper.dumps2utf8(check)
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
         mtime = fooFile.getModificationTime()
@@ -119,7 +119,7 @@ class TestBeatChecker(unittest.TestCase):
         for fname in ['foo', 'bar']:
             status = os.path.join(self.status, fname)
             check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': status}}
-            jsonCheck = json.dumps(check)
+            jsonCheck = helper.dumps2utf8(check)
             fileObj = self.filepath.child(fname)
             fileObj.setContent(jsonCheck)
             mtime = max([mtime, fileObj.getModificationTime()])
@@ -132,11 +132,11 @@ class TestBeatChecker(unittest.TestCase):
         for fname in ['foo', 'bar']:
             status = os.path.join(self.status, fname)
             check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': status}}
-            jsonCheck = json.dumps(check)
+            jsonCheck = helper.dumps2utf8(check)
             fileObj = self.filepath.child(fname)
             fileObj.setContent(jsonCheck)
             statusFile = filepath.FilePath(status)
-            statusFile.setContent("111")
+            statusFile.setContent(b"111")
             newMTime = statusFile.getModificationTime()
             mtime = max([mtime, newMTime, fileObj.getModificationTime()])
         self.assertFalse(self.checker(mtime, mtime))

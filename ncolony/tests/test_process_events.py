@@ -1,7 +1,6 @@
 # Copyright (c) Moshe Zadka
 # See LICENSE for details.
 """Test event processing"""
-import json
 import unittest
 
 from zope.interface import verify
@@ -10,6 +9,8 @@ from twisted.python import log
 
 from ncolony import process_events
 from ncolony import interfaces
+
+from ncolony.tests import helper
 
 class DummyProcessMonitor(object):
 
@@ -71,7 +72,7 @@ class TestReceiver(unittest.TestCase):
 
     def test_add_simple(self):
         """Test a simple process addition"""
-        message = json.dumps(dict(args=['/bin/echo', 'hello']))
+        message = helper.dumps2utf8(dict(args=['/bin/echo', 'hello']))
         self.receiver.add('hello', message)
         self.assertEquals(len(self.monitor.events), 1)
         (tp, name, args, uid, gid, env), = self.monitor.events
@@ -91,7 +92,8 @@ class TestReceiver(unittest.TestCase):
 
     def test_add_complicated(self):
         """Test a process addition with all the optional arguments"""
-        message = json.dumps(dict(args=['/bin/echo', 'hello'], uid=0, gid=0, env={'world': '616'}))
+        message = helper.dumps2utf8(dict(args=['/bin/echo', 'hello'],
+                                         uid=0, gid=0, env={'world': '616'}))
         self.receiver.add('hello', message)
         self.assertEquals(len(self.monitor.events), 1)
         (tp, name, args, uid, gid, env), = self.monitor.events
@@ -109,7 +111,7 @@ class TestReceiver(unittest.TestCase):
 
     def test_add_with_junk(self):
         """Test a process addition with all the optional arguments"""
-        message = json.dumps(dict(something=1, args=['/bin/echo', 'hello']))
+        message = helper.dumps2utf8(dict(something=1, args=['/bin/echo', 'hello']))
         self.receiver.add('hello', message)
         self.assertEquals(len(self.monitor.events), 1)
         (tp, name, args, uid, gid, env), = self.monitor.events
@@ -135,7 +137,7 @@ class TestReceiver(unittest.TestCase):
 
     def test_restart(self):
         """Test a process restart"""
-        message = json.dumps(dict(type='RESTART', name='hello'))
+        message = helper.dumps2utf8(dict(type='RESTART', name='hello'))
         self.receiver.message(message)
         self.assertEquals(self.monitor.events,
                           [('RESTART', 'hello')])
@@ -143,13 +145,13 @@ class TestReceiver(unittest.TestCase):
 
     def test_unknown_message(self):
         """Test that we reject unknown messages"""
-        message = json.dumps(dict(type='LALALA', name='goodbye'))
+        message = helper.dumps2utf8(dict(type='LALALA', name='goodbye'))
         with self.assertRaises(ValueError):
             self.receiver.message(message)
 
     def test_restart_all(self):
         """Test a global restart"""
-        message = json.dumps(dict(type='RESTART-ALL'))
+        message = helper.dumps2utf8(dict(type='RESTART-ALL'))
         self.receiver.message(message)
         self.assertEquals(self.monitor.events,
                           [('RESTART-ALL',)])

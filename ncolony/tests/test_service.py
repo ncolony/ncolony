@@ -11,7 +11,7 @@ import unittest
 
 from zope.interface import verify
 
-from twisted.python import usage, filepath
+from twisted.python import usage
 from twisted.internet import reactor
 from twisted.application import service as taservice, internet
 from twisted.runner import procmon
@@ -118,7 +118,7 @@ class TestService(unittest.TestCase):
 
     def _write(self, tp, name, content):
         name = os.path.join(self.testDirs[tp], name)
-        with file(name, 'w') as fp:
+        with open(name, 'w') as fp:
             fp.write(content)
 
     def _remove(self, tp, name):
@@ -236,13 +236,7 @@ class TestOptions(unittest.TestCase):
         functions = [subs.call[0] for subs in subservices]
         paths = set()
         for func in functions:
-            for thing in func.func_closure:
-                thing = thing.cell_contents
-                if isinstance(thing, filepath.FilePath):
-                    paths.add(thing.basename())
-                    break
-            else:
-                raise ValueError("Could not find path for", func)
+            paths.add(func.args[0].basename())
         self.assertEquals(paths, set(['message-dir', 'config-dir']))
         protocols = pm.protocols
         self.assertIsInstance(protocols, service.TransportDirectoryDict)

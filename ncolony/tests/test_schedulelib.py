@@ -7,8 +7,9 @@ from __future__ import division
 
 import os
 import unittest
-import StringIO
 import sys
+
+import six
 
 from zope.interface import verify
 
@@ -31,7 +32,7 @@ class TestProcessProtocol(unittest.TestCase):
     """Test schedulelib.ProcessProtocol"""
 
     def setUp(self):
-        out = StringIO.StringIO()
+        out = six.StringIO()
         oldstdout = sys.stdout
         def _cleanup():
             sys.stdout = oldstdout
@@ -79,7 +80,7 @@ class TestRunProcess(unittest.TestCase):
 
     def setUp(self):
         self.reactor = test_procmon.DummyProcessReactor()
-        out = StringIO.StringIO()
+        out = six.StringIO()
         oldstdout = sys.stdout
         def _cleanup():
             sys.stdout = oldstdout
@@ -203,7 +204,7 @@ class TestService(unittest.TestCase):
     def getArgs(self):
         """Get the arguments as a list of strings"""
         return ' '.join(' '.join('--%s %s' % (key, vpart) for vpart in value.split())
-                        for key, value in self.args.iteritems()).split()
+                        for key, value in six.iteritems(self.args)).split()
 
     def test_normal(self):
         """Test correct parsing of a command line"""

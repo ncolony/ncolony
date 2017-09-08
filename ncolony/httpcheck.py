@@ -8,6 +8,8 @@ import functools
 import json
 import sys
 
+import six
+
 import twisted
 
 from twisted.application import internet as tainternet
@@ -46,7 +48,7 @@ class _ScoreCard(object):
 Settings = collections.namedtuple('Settings', 'reactor agent')
 
 _USER_AGENT = ('NColony HTTP Check ('
-               'NColony/' + ncolony.__version__ + ', '
+               'NColony/' + str(ncolony.__version__) + ', '
                'Twisted/' + twisted.__version__ + ', '
                'Python ' + sys.version.replace('\n', '') + ')'
               )
@@ -109,7 +111,7 @@ class State(object):
         return self._maybeCheck()
 
     def _maybeReset(self):
-        content = self.location.getContent()
+        content = self.location.getContent().decode('utf-8')
         if content == self.content:
             return
         self.content = content
@@ -164,7 +166,7 @@ def check(settings, states, location):
         del states[name]
     for name in added:
         states[name] = State(location=children[name], settings=settings)
-    return [name for name, state in states.iteritems() if state.check()]
+    return [name for name, state in six.iteritems(states) if state.check()]
 
 def run(restarter, checker):
     """Run restarter on the checker's output

@@ -9,6 +9,7 @@ Construct a Twisted service for process scheduling.
 
    $ twistd -n ncolonysched --timeout 2 --grace 1 --frequency 10 --arg /bin/echo --arg hello
 """
+from __future__ import print_function
 
 import os
 
@@ -25,11 +26,10 @@ from twisted.application import internet as tainternet, service
 
 from ncolony.client import heart
 
+@interface.implementer(tiinterfaces.IProcessProtocol)
 class ProcessProtocol(object):
 
     """Process protocol that manages short-lived processes"""
-
-    interface.implements(tiinterfaces.IProcessProtocol)
 
     def __init__(self, deferred):
         self.deferred = deferred
@@ -42,7 +42,7 @@ class ProcessProtocol(object):
         :params data: The bytes the process returned
         """
         for line in data.splitlines():
-            print '[%d]' % fd, line
+            print('[%d]' % fd, line)
     ## pylint: enable=no-self-use
 
     def processEnded(self, reason):
@@ -80,7 +80,7 @@ def runProcess(args, timeout, grace, reactor):
     process = reactor.spawnProcess(protocol, args[0], args, env=os.environ)
     def _logEnded(err):
         err.trap(tierror.ProcessDone, tierror.ProcessTerminated)
-        print err.value
+        print(err.value)
     deferred.addErrback(_logEnded)
     def _cancelTermination(dummy):
         for termination in terminations:

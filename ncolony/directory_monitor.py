@@ -6,6 +6,7 @@
 Monitor directories for configuration and messages
 """
 
+import functools
 import os
 
 from twisted.python import filepath
@@ -24,7 +25,7 @@ def checker(location, receiver):
     path = filepath.FilePath(location)
     files = set()
     filesContents = {}
-    def _check():
+    def _check(path):
         currentFiles = set(fname for fname in os.listdir(location) if not fname.endswith('.new'))
         removed = files - currentFiles
         added = currentFiles - files
@@ -45,7 +46,7 @@ def checker(location, receiver):
             receiver.add(fname, newContents)
         files.clear()
         files.update(currentFiles)
-    return _check
+    return functools.partial(_check, path)
 
 def messages(location, receiver):
     """Construct a function that checks a directory for messages
@@ -59,11 +60,11 @@ def messages(location, receiver):
     :returns: a function with no parameters
     """
     path = filepath.FilePath(location)
-    def _check():
+    def _check(path):
         messageFiles = path.globChildren('*')
         for message in messageFiles:
             if message.basename().endswith('.new'):
                 continue
             receiver.message(message.getContent())
             message.remove()
-    return _check
+    return functools.partial(_check, path)

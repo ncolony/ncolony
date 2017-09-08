@@ -13,11 +13,10 @@ from zope.interface import verify
 from ncolony import directory_monitor
 from ncolony import interfaces
 
+@interface.implementer(interfaces.IMonitorEventReceiver)
 class EventRecorder(object):
 
     """An event receiver that just records the events"""
-
-    interface.implements(interfaces.IMonitorEventReceiver)
 
     def __init__(self):
         """Initialize the event list"""
@@ -36,21 +35,19 @@ class EventRecorder(object):
         self.events.append(('MESSAGE', contents))
 
 ## pylint: disable=too-few-public-methods
+@interface.implementer(interfaces.IMonitorEventReceiver)
 class EventRecorderNoAdd(object):
 
     """Dummy bad implementation of event receiver interface"""
-
-    interface.implements(interfaces.IMonitorEventReceiver)
 
     def remove(self, name):
         """Dummy remove method"""
         pass
 
+@interface.implementer(interfaces.IMonitorEventReceiver)
 class EventRecorderNoRemove(object):
 
     """Dummy bad implementation of event receiver interface"""
-
-    interface.implements(interfaces.IMonitorEventReceiver)
 
     def add(self, name, content):
         """Dummy add method"""
@@ -94,7 +91,7 @@ class DirectoryBasedTest(unittest.TestCase):
     def write(self, name, content):
         """Write a file in the directory"""
         name = os.path.join(self.testDirectory, name)
-        with file(name, 'w') as fp:
+        with open(name, 'wb') as fp:
             fp.write(content)
 
     def remove(self, name):
@@ -120,37 +117,37 @@ class TestMessageSender(DirectoryBasedTest):
 
     def test_ignore_new(self):
         """Test ignoring messages with .new extension"""
-        self.write('00Message.new', 'hello')
+        self.write('00Message.new', b'hello')
         self.message()
         self.assertFalse(self.receiver.events)
 
     def test_one_message(self):
         """Test processing one message"""
-        self.write('00Message', 'hello')
+        self.write('00Message', b'hello')
         self.message()
-        self.assertEquals(self.receiver.events, [('MESSAGE', 'hello')])
+        self.assertEquals(self.receiver.events, [('MESSAGE', b'hello')])
         self.message()
-        self.assertEquals(self.receiver.events, [('MESSAGE', 'hello')])
+        self.assertEquals(self.receiver.events, [('MESSAGE', b'hello')])
 
     def test_repeated_message(self):
         """Test the same message repeated twice"""
-        self.write('00Message', 'hello')
+        self.write('00Message', b'hello')
         self.message()
-        self.assertEquals(self.receiver.events, [('MESSAGE', 'hello')])
-        self.write('00Message', 'hello')
+        self.assertEquals(self.receiver.events, [('MESSAGE', b'hello')])
+        self.write('00Message', b'hello')
         self.message()
-        self.assertEquals(self.receiver.events, [('MESSAGE', 'hello'),
-                                                 ('MESSAGE', 'hello')])
+        self.assertEquals(self.receiver.events, [('MESSAGE', b'hello'),
+                                                 ('MESSAGE', b'hello')])
 
     def test_changed_message(self):
         """Test the same message name with different contents"""
-        self.write('00Message', 'hello')
+        self.write('00Message', b'hello')
         self.message()
-        self.assertEquals(self.receiver.events, [('MESSAGE', 'hello')])
-        self.write('00Message', 'goodbye')
+        self.assertEquals(self.receiver.events, [('MESSAGE', b'hello')])
+        self.write('00Message', b'goodbye')
         self.message()
-        self.assertEquals(self.receiver.events, [('MESSAGE', 'hello'),
-                                                 ('MESSAGE', 'goodbye')])
+        self.assertEquals(self.receiver.events, [('MESSAGE', b'hello'),
+                                                 ('MESSAGE', b'goodbye')])
 
 
 class TestEventSender(DirectoryBasedTest):
@@ -171,47 +168,47 @@ class TestEventSender(DirectoryBasedTest):
 
     def test_ignore_new(self):
         """Test ignoring a file with a .new extension"""
-        self.write('one.new', 'A')
+        self.write('one.new', b'A')
         self.monitor()
         self.assertFalse(self.receiver.events)
 
     def test_one_add(self):
         """Test one file in the configuration"""
-        self.write('one', 'A')
+        self.write('one', b'A')
         self.monitor()
-        self.assertEquals(self.receiver.events, [('ADD', 'one', 'A')])
+        self.assertEquals(self.receiver.events, [('ADD', 'one', b'A')])
 
     def test_redundant_check(self):
         """Test one file in the configuration and no changes"""
-        self.write('one', 'A')
+        self.write('one', b'A')
         self.monitor()
         self.monitor()
-        self.assertEquals(self.receiver.events, [('ADD', 'one', 'A')])
+        self.assertEquals(self.receiver.events, [('ADD', 'one', b'A')])
 
     def test_non_redundant_check(self):
         """Test one file in the configuration and then a change"""
-        self.write('one', 'A')
+        self.write('one', b'A')
         self.monitor()
-        self.write('two', 'B')
+        self.write('two', b'B')
         self.monitor()
-        self.assertEquals(self.receiver.events, [('ADD', 'one', 'A'),
-                                                 ('ADD', 'two', 'B')])
+        self.assertEquals(self.receiver.events, [('ADD', 'one', b'A'),
+                                                 ('ADD', 'two', b'B')])
 
     def test_remove(self):
         """Test one file in the configuration and then removed"""
-        self.write('one', 'A')
+        self.write('one', b'A')
         self.monitor()
         self.remove('one')
         self.monitor()
-        self.assertEquals(self.receiver.events, [('ADD', 'one', 'A'),
+        self.assertEquals(self.receiver.events, [('ADD', 'one', b'A'),
                                                  ('REMOVE', 'one')])
 
     def test_change(self):
         """Test one file in the configuration and then changed"""
-        self.write('one', 'A')
+        self.write('one', b'A')
         self.monitor()
-        self.write('one', 'B')
+        self.write('one', b'B')
         self.monitor()
-        self.assertEquals(self.receiver.events, [('ADD', 'one', 'A'),
+        self.assertEquals(self.receiver.events, [('ADD', 'one', b'A'),
                                                  ('REMOVE', 'one'),
-                                                 ('ADD', 'one', 'B')])
+                                                 ('ADD', 'one', b'B')])

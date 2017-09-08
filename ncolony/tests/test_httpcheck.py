@@ -5,10 +5,11 @@
 
 import collections
 import errno
-import json
 import os
 import shutil
 import sys
+
+import six
 
 import twisted
 from twisted.python import filepath
@@ -20,7 +21,7 @@ from twisted.test import proto_helpers
 
 import ncolony
 from ncolony import httpcheck, ctllib
-from ncolony.tests import test_beatcheck
+from ncolony.tests import test_beatcheck, helper
 
 ## pylint: disable=too-few-public-methods
 
@@ -87,7 +88,7 @@ class TestState(BaseTestHTTPChecker):
 
     def test_repr(self):
         """Repr includes everything"""
-        self.location.setContent(json.dumps(self.params))
+        self.location.setContent(helper.dumps2utf8(self.params))
         self.assertFalse(self.state.check())
         s = repr(self.state)
         cardS = repr(self.state.card)
@@ -121,13 +122,13 @@ class TestState(BaseTestHTTPChecker):
 
     def test_no_check(self):
         """Checking an empty state results in success"""
-        self.location.setContent(json.dumps({}))
+        self.location.setContent(helper.dumps2utf8({}))
         self.reactor.advance(3)
         self.assertFalse(self.state.check())
 
     def test_bad_check(self):
         """Checking unsuccessful HTTP results in failure"""
-        self.location.setContent(json.dumps(self.params))
+        self.location.setContent(helper.dumps2utf8(self.params))
         self.assertFalse(self.state.check())
         self.reactor.advance(3)
         self.assertFalse(self.state.check())
@@ -138,7 +139,7 @@ class TestState(BaseTestHTTPChecker):
 
     def test_close_after_check(self):
         """Closing state"""
-        self.location.setContent(json.dumps(self.params))
+        self.location.setContent(helper.dumps2utf8(self.params))
         self.assertFalse(self.state.check())
         self.reactor.advance(3)
         self.assertFalse(self.state.check())
@@ -149,12 +150,12 @@ class TestState(BaseTestHTTPChecker):
 
     def test_reset_after_check(self):
         """Closing state"""
-        self.location.setContent(json.dumps(self.params))
+        self.location.setContent(helper.dumps2utf8(self.params))
         self.assertFalse(self.state.check())
         self.reactor.advance(3)
         self.assertFalse(self.state.check())
         params = {}
-        self.location.setContent(json.dumps(params))
+        self.location.setContent(helper.dumps2utf8(params))
         self.assertFalse(self.state.check())
         error, = self.flushLoggedErrors()
         error.trap(defer.CancelledError)
@@ -162,19 +163,19 @@ class TestState(BaseTestHTTPChecker):
 
     def test_good_check(self):
         """Checking successful HTTP results in success"""
-        self.location.setContent(json.dumps(self.params))
+        self.location.setContent(helper.dumps2utf8(self.params))
         self.assertFalse(self.state.check())
         self.reactor.advance(3)
         self.assertFalse(self.state.check())
         (method, gotUrl, headers, body), = self.agent.calls
         self.assertIsNone(body)
         self.assertEquals(method, 'GET')
-        url = next(self.params.itervalues())['url']
+        url = next(six.itervalues(self.params))['url']
         self.assertEquals(url, gotUrl)
         self.assertIsInstance(headers, client.Headers)
         userAgent, = headers.getRawHeaders('user-agent')
         self.assertIn('Twisted/' + twisted.__version__, userAgent)
-        self.assertIn('NColony/' + ncolony.__version__, userAgent)
+        self.assertIn('NColony/' + str(ncolony.__version__), userAgent)
         self.assertIn('Python ' + sys.version.replace('\n', ''), userAgent)
         d, = self.agent.pending[url]
         d.callback(client.Response(('HTTP', 1, 1), 200, 'OK', None, None))
@@ -208,10 +209,10 @@ class TestCheck(BaseTestHTTPChecker):
 
     def test_check_simplestate(self):
         """one configuration in directory is checked"""
-        self.location.child('child').setContent(json.dumps(self.params))
+        self.location.child('child').setContent(helper.dumps2utf8(self.params))
         ret = httpcheck.check(self.settings, self.states, self.location)
         self.assertEquals(ret, [])
-        (name, state), = self.states.iteritems()
+        (name, state), = six.iteritems(self.states)
         self.assertEquals(name, 'child')
         httpcheck.check(self.settings, self.states, self.location)
         self.assertEquals(ret, [])
