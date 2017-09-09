@@ -4,16 +4,23 @@
 
 For use as 'python -m ncolony [reaper|ctl] ...'
 """
+import os
 import sys
 
-import mainland
+import gather
+
+import ncolony
+from ncolony import main
 
 if __name__ != '__main__':
     raise ImportError("This module cannot be imported")
 
-mainland.main(
-    root='ncolony',
-    marker='NCOLONY_MAIN_OK',
-    suffix=['lib', ''],
-    argv=sys.argv,
+if os.path.basename(sys.argv[0]) == '__main__.py':
+    sys.argv[0] = 'python -m ' + os.path.basename(os.path.dirname(sys.argv[0]))
+
+gather.run(
+    commands=main.COMMANDS.collect(),
+    version=ncolony.__version__,
+    argv=sys.argv[1:],
+    output=sys.stdout,
 )

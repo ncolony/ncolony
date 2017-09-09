@@ -28,10 +28,6 @@ class TestArgParsing(unittest.TestCase):
         self.parser = ctllib.PARSER
         self.base = ['--messages', 'messages', '--config', 'config']
 
-    def test_main_ok(self):
-        """module is marked as executable by mainland"""
-        self.assertTrue(ctllib.NCOLONY_MAIN_OK)
-
     def test_required_messages(self):
         """Make sure it fails if --messages is missing"""
         with self.assertRaises(SystemExit):
