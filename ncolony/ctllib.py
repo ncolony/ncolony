@@ -5,11 +5,11 @@
 ===================================================================
 
 This module can be used either as a library from Python or as a
-commandline using the wrapper ncolony.ctl via
+commandline using the wrapper :code:`ctl` via
 
 .. code-block:: bash
 
-   $ python -m ncolony.ctl <arguments>
+   $ python -m ncolony ctl <arguments>
 
 Description of the service's interface is in <figure out how
 to do a back-reference>.
@@ -41,7 +41,7 @@ import os
 
 from twisted.python import filepath
 
-NCOLONY_MAIN_OK = True
+from ncolony import main as mainlib
 
 NEXT = functools.partial(next, itertools.count(0))
 
@@ -158,6 +158,7 @@ def call(results):
     func = results.pop('func')
     func(places, **results)
 
+@mainlib.COMMANDS.register(name='ctl')
 def main(argv):
     """command-line entry point
 
