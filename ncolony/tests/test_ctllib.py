@@ -13,6 +13,10 @@ import six
 
 from ncolony import ctllib
 
+def jsonFrom(fname):
+    with open(fname, "rb") as fp:
+        return json.loads(fp.read().decode('utf-8'))
+
 class TestArgParsing(unittest.TestCase):
 
     """Test the argument parser"""
@@ -129,14 +133,14 @@ class TestController(unittest.TestCase):
         ctllib.main(argv)
         fname, = os.listdir(self.places.messages)
         fname = os.path.join(self.places.messages, fname)
-        d = json.loads(open(fname).read())
+        d = jsonFrom(fname)
         self.assertEquals(d, dict(type='RESTART-ALL'))
 
     def test_add_and_remove(self):
         """Test that add/remove work"""
         ctllib.add(self.places, 'hello', cmd='/bin/echo', args=['hello'])
         fname = os.path.join(self.places.config, 'hello')
-        d = json.loads(open(fname).read())
+        d = jsonFrom(fname)
         self.assertEquals(d, dict(args=['/bin/echo', 'hello']))
         ctllib.remove(self.places, 'hello')
         self.assertFalse(os.path.exists(fname))
@@ -147,7 +151,7 @@ class TestController(unittest.TestCase):
         ctllib.add(self.places, 'hello', cmd='/bin/echo',
                    args=['hello'], env=['world=616'], extras=extras)
         fname = os.path.join(self.places.config, 'hello')
-        d = json.loads(open(fname).read())
+        d = jsonFrom(fname)
         self.assertEquals(d, dict(env={'world': '616'},
                                   goodbye=[1, 2, 3],
                                   args=['/bin/echo', 'hello']))
@@ -156,14 +160,14 @@ class TestController(unittest.TestCase):
         """Test that add with optional uid works"""
         ctllib.add(self.places, 'hello', cmd='/bin/echo', args=['hello'], uid=1024)
         fname = os.path.join(self.places.config, 'hello')
-        d = json.loads(open(fname).read())
+        d = jsonFrom(fname)
         self.assertEquals(d, dict(uid=1024, args=['/bin/echo', 'hello']))
 
     def test_add_with_gid(self):
         """Test that add with optional gid works"""
         ctllib.add(self.places, 'hello', cmd='/bin/echo', args=['hello'], gid=1024)
         fname = os.path.join(self.places.config, 'hello')
-        d = json.loads(open(fname).read())
+        d = jsonFrom(fname)
         self.assertEquals(d, dict(gid=1024, args=['/bin/echo', 'hello']))
 
     def test_restart(self):
@@ -171,7 +175,7 @@ class TestController(unittest.TestCase):
         ctllib.restart(self.places, 'hello')
         fname, = os.listdir(self.places.messages)
         fname = os.path.join(self.places.messages, fname)
-        d = json.loads(open(fname).read())
+        d = jsonFrom(fname)
         self.assertEquals(d, dict(type='RESTART', name='hello'))
         ctllib.restart(self.places, 'goodbye')
         things = (json.loads(open(os.path.join(self.places.messages, fname)).read())
@@ -189,7 +193,7 @@ class TestController(unittest.TestCase):
         ctllib.restartAll(self.places)
         fname, = os.listdir(self.places.messages)
         fname = os.path.join(self.places.messages, fname)
-        d = json.loads(open(fname).read())
+        d = jsonFrom(fname)
         self.assertEquals(d, dict(type='RESTART-ALL'))
 
     def test_extra_protection(self):
