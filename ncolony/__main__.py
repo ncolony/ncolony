@@ -4,15 +4,15 @@
 
 For use as 'python -m ncolony ...'
 """
-if __name__ != '__main__':
-    raise ImportError("This module cannot be imported")
-
 import sys
 
 import gather
 
 import ncolony
 from ncolony import main
+
+if __name__ != '__main__':
+    raise ImportError("This module cannot be imported")
 
 gather.run(
     commands=main.COMMANDS.collect(),
