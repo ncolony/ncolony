@@ -14,6 +14,7 @@ import six
 from ncolony import ctllib
 
 def jsonFrom(fname):
+    """Load JSON from a file"""
     with open(fname, "rb") as fp:
         return json.loads(fp.read().decode('utf-8'))
 
