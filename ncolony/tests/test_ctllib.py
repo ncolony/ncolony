@@ -4,6 +4,7 @@
 """Tests for ncolony.ctllib"""
 
 import argparse
+import io
 import json
 import os
 import shutil
@@ -15,8 +16,8 @@ from ncolony import ctllib
 
 def jsonFrom(fname):
     """Load JSON from a file"""
-    with open(fname, "rb") as fp:
-        return json.loads(fp.read().decode('utf-8'))
+    with io.open(fname, "r", encoding='utf-8') as fp:
+        return json.loads(fp.read())
 
 class TestArgParsing(unittest.TestCase):
 
