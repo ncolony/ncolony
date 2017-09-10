@@ -1,6 +1,7 @@
 # Copyright (c) Moshe Zadka
 # See LICENSE for details.
 """Test event processing"""
+import os
 import unittest
 
 from zope.interface import verify
@@ -126,6 +127,26 @@ class TestReceiver(unittest.TestCase):
         env.pop('NCOLONY_CONFIG')
         env.pop('NCOLONY_NAME')
         self.assertEquals(env, {})
+        self.assertEquals(self.logMessages, ['Added monitored process: hello'])
+
+    def test_add_with_inherited_env(self):
+        """Test a process addition with all the optional arguments"""
+        message = helper.dumps2utf8(dict(args=['/bin/echo', 'hello'],
+                                         env={'PATH': None}))
+        self.receiver.add('hello', message)
+        self.assertEquals(len(self.monitor.events), 1)
+        (tp, name, args, uid, gid, env), = self.monitor.events
+        self.assertEquals(tp, 'ADD')
+        self.assertEquals(name, 'hello')
+        self.assertEquals(args, ['/bin/echo', 'hello'])
+        self.assertEquals(uid, None)
+        self.assertEquals(gid, None)
+        self.assertIn('NCOLONY_CONFIG', env)
+        self.assertEquals(env['NCOLONY_CONFIG'], message)
+        self.assertEquals(self.logMessages, ['Added monitored process: hello'])
+        env.pop('NCOLONY_CONFIG')
+        env.pop('NCOLONY_NAME')
+        self.assertEquals(env, dict(PATH=os.environ['PATH']))
         self.assertEquals(self.logMessages, ['Added monitored process: hello'])
 
     def test_remove(self):

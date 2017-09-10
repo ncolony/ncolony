@@ -7,6 +7,7 @@ Convert events into process monitoring actions.
 """
 
 import json
+import os
 
 import six
 
@@ -44,6 +45,10 @@ class Receiver(object):
                           if key in VALID_KEYS}
         parsedContents['name'] = name
         parsedContents['env'] = parsedContents.get('env', {})
+        for key, value in list(parsedContents['env'].items()):
+            if value is not None:
+                continue
+            parsedContents['env'][key] = os.environ.get(key, '')
         parsedContents['env']['NCOLONY_CONFIG'] = contents
         parsedContents['env']['NCOLONY_NAME'] = name
         self.monitor.addProcess(**parsedContents)
