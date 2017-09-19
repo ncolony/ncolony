@@ -11,7 +11,7 @@ import subprocess
 import sys
 import time
 
-NCOLONY_MAIN_OK = True
+from ncolony import main as mainlib
 
 def _getHere():
     here = __file__
@@ -34,6 +34,7 @@ def _killPatiently(pidFile):
                 raise
         time.sleep(5)
 
+@mainlib.COMMANDS.register(name='tests.functional_test')
 def main(argv):
     """Run ncolony with a simple process"""
     argv = argv

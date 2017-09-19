@@ -9,14 +9,14 @@ import difflib
 import os
 import sys
 
+from ncolony import main as mainlib
+
 PROPER_HEADER = """\
 # Copyright (c) Moshe Zadka
 # See LICENSE for details.
 """
 
-NCOLONY_MAIN_OK = True
-
-
+@mainlib.COMMANDS.register(name='tests.nitpicker')
 def main(argv):
     """Pick nits in code"""
     argv = argv
