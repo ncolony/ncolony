@@ -26,6 +26,6 @@ setuptools.setup(
     install_requires=['Twisted', 'gather', 'incremental', 'six'],
     setup_requires=['incremental'],
     use_incremental=True,
-    entry_points={'gather': ["dummy=ncolony:dummy"]},
+    entry_points={'gather': ["plugins=ncolony"]},
     **module.metadata
 )
