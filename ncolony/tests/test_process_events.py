@@ -1,7 +1,6 @@
 # Copyright (c) Moshe Zadka
 # See LICENSE for details.
 """Test event processing"""
-import os
 import unittest
 
 from zope.interface import verify

@@ -27,10 +27,12 @@ class Receiver(object):
     :params monitor: a ProcessMonitor
     """
 
-    def __init__(self, monitor, environ=os.environ):
+    def __init__(self, monitor, environ=None):
         """Initialize from ProcessMonitor"""
-        self.monitor = monitor
+        if environ is None:
+            environ = os.environ
         self.environ = environ
+        self.monitor = monitor
 
     def add(self, name, contents):
         """Add a process
