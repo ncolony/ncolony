@@ -7,6 +7,7 @@ Convert events into process monitoring actions.
 """
 
 import json
+import os
 
 import six
 
@@ -16,7 +17,7 @@ from twisted.python import log
 
 from ncolony import interfaces
 
-VALID_KEYS = frozenset(['args', 'uid', 'gid', 'env'])
+VALID_KEYS = frozenset(['args', 'uid', 'gid', 'env', 'env_inherit'])
 
 @interface.implementer(interfaces.IMonitorEventReceiver)
 class Receiver(object):
@@ -26,8 +27,11 @@ class Receiver(object):
     :params monitor: a ProcessMonitor
     """
 
-    def __init__(self, monitor):
+    def __init__(self, monitor, environ=None):
         """Initialize from ProcessMonitor"""
+        if environ is None:
+            environ = os.environ
+        self.environ = environ
         self.monitor = monitor
 
     def add(self, name, contents):
@@ -44,6 +48,8 @@ class Receiver(object):
                           if key in VALID_KEYS}
         parsedContents['name'] = name
         parsedContents['env'] = parsedContents.get('env', {})
+        for key in parsedContents.pop('env_inherit', []):
+            parsedContents['env'][key] = self.environ.get(key, '')
         parsedContents['env']['NCOLONY_CONFIG'] = contents
         parsedContents['env']['NCOLONY_NAME'] = name
         self.monitor.addProcess(**parsedContents)
