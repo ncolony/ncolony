@@ -131,9 +131,10 @@ class TestReceiver(unittest.TestCase):
 
     def test_add_with_inherited_env(self):
         """Test a process addition with all the optional arguments"""
+        receiver = process_events.Receiver(self.monitor, dict(PATH='123'))
         message = helper.dumps2utf8(dict(args=['/bin/echo', 'hello'],
-                                         env={'PATH': None}))
-        self.receiver.add('hello', message)
+                                         env_inherit=['PATH']))
+        receiver.add('hello', message)
         self.assertEquals(len(self.monitor.events), 1)
         (tp, name, args, uid, gid, env), = self.monitor.events
         self.assertEquals(tp, 'ADD')
@@ -146,7 +147,7 @@ class TestReceiver(unittest.TestCase):
         self.assertEquals(self.logMessages, ['Added monitored process: hello'])
         env.pop('NCOLONY_CONFIG')
         env.pop('NCOLONY_NAME')
-        self.assertEquals(env, dict(PATH=os.environ['PATH']))
+        self.assertEquals(env, dict(PATH='123'))
         self.assertEquals(self.logMessages, ['Added monitored process: hello'])
 
     def test_remove(self):

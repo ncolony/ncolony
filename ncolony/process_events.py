@@ -17,7 +17,7 @@ from twisted.python import log
 
 from ncolony import interfaces
 
-VALID_KEYS = frozenset(['args', 'uid', 'gid', 'env'])
+VALID_KEYS = frozenset(['args', 'uid', 'gid', 'env', 'env_inherit'])
 
 @interface.implementer(interfaces.IMonitorEventReceiver)
 class Receiver(object):
@@ -27,9 +27,10 @@ class Receiver(object):
     :params monitor: a ProcessMonitor
     """
 
-    def __init__(self, monitor):
+    def __init__(self, monitor, environ=os.environ):
         """Initialize from ProcessMonitor"""
         self.monitor = monitor
+        self.environ = environ
 
     def add(self, name, contents):
         """Add a process
@@ -45,10 +46,8 @@ class Receiver(object):
                           if key in VALID_KEYS}
         parsedContents['name'] = name
         parsedContents['env'] = parsedContents.get('env', {})
-        for key, value in list(parsedContents['env'].items()):
-            if value is not None:
-                continue
-            parsedContents['env'][key] = os.environ.get(key, '')
+        for key in parsedContents.pop('env_inherit', []):
+            parsedContents['env'][key] = self.environ.get(key, '')
         parsedContents['env']['NCOLONY_CONFIG'] = contents
         parsedContents['env']['NCOLONY_NAME'] = name
         self.monitor.addProcess(**parsedContents)
