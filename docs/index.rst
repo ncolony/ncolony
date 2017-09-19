@@ -42,7 +42,7 @@ inspired by the `Contributor covenant`_.
 .. _GitHub: https://github.com/moshez/ncolony
 .. _Twisted: https://twistedmatrix.com
 .. _Code of Conduct: https://github.com/moshez/ncolony/blob/master/covenant.rst
-.. _Contributor convenant: https://www.contributor-covenant.org/
+.. _Contributor covenant: https://www.contributor-covenant.org/
 
 
 .. toctree::
