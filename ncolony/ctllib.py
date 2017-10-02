@@ -50,9 +50,9 @@ Places = collections.namedtuple('Places', 'config messages')
 def _dumps(stuff):
     return json.dumps(stuff).encode('utf-8')
 
-## pylint: disable=too-many-arguments
+## pylint: disable=too-many-arguments,too-many-locals
 def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
-                                 env_inherit=None):
+        env_inherit=None):
     """Add a process.
 
     :param places: a Places instance
@@ -87,7 +87,7 @@ def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
         details.update(extras)
     content = _dumps(details)
     fle.setContent(content)
-## pylint: enable=too-many-arguments
+## pylint: enable=too-many-arguments,too-many-locals
 
 def remove(places, name):
     """Remove a process
