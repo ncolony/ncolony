@@ -73,11 +73,14 @@ class TestArgParsing(unittest.TestCase):
                                                 '--arg', 'hello', '--arg', 'world',
                                                 '--env', 'world=616', '--env', 'status=good',
                                                 '--uid', '5', '--gid', '6',
-                                                '--extra', 'extras.json'])
+                                                '--extra', 'extras.json',
+                                                '--env-inherit', 'PATH',
+                                                '--env-inherit', 'PYTHONPATH',])
         self.assertEquals(res.name, 'hello')
         self.assertEquals(res.cmd, '/bin/echo')
         self.assertEquals(res.args, ['hello', 'world'])
         self.assertEquals(res.env, ['world=616', 'status=good'])
+        self.assertEquals(res.env_inherit, ['PATH', 'PYTHONPATH'])
         self.assertEquals(res.uid, 5)
         self.assertEquals(res.gid, 6)
         self.assertEquals(res.extras, extras)
@@ -167,6 +170,14 @@ class TestController(unittest.TestCase):
         fname = os.path.join(self.places.config, 'hello')
         d = jsonFrom(fname)
         self.assertEquals(d, dict(gid=1024, args=['/bin/echo', 'hello']))
+
+    def test_add_with_env_inherit(self):
+        """Test that add with optional gid works"""
+        ctllib.add(self.places, 'hello', cmd='/bin/echo', args=['hello'],
+                   env_inherit=['PATH'])
+        fname = os.path.join(self.places.config, 'hello')
+        d = jsonFrom(fname)
+        self.assertEquals(d['env_inherit'], ['PATH'])
 
     def test_restart(self):
         """Test that restart works"""

@@ -51,7 +51,8 @@ def _dumps(stuff):
     return json.dumps(stuff).encode('utf-8')
 
 ## pylint: disable=too-many-arguments
-def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None):
+def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
+                                 env_inherit=None):
     """Add a process.
 
     :param places: a Places instance
@@ -62,6 +63,8 @@ def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None):
          (will be environment in subprocess)
     :param uid: integer, uid to run the new process as
     :param gid: integer, gid to run the new process as
+    :param extras: a dictionary with additional parameters
+    :param env_inherit: a list of environment variables to inherit
     :returns: None
     """
     args = [cmd]+args
@@ -78,6 +81,8 @@ def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None):
         details['uid'] = uid
     if gid is not None:
         details['gid'] = gid
+    if env_inherit is not None:
+        details['env_inherit'] = env_inherit
     if extras is not None:
         details.update(extras)
     content = _dumps(details)
@@ -145,6 +150,7 @@ _add_parser.add_argument('--env', action='append')
 _add_parser.add_argument('--uid', type=int)
 _add_parser.add_argument('--gid', type=int)
 _add_parser.add_argument('--extras', type=_parseJSON)
+_add_parser.add_argument('--env-inherit', dest='env_inherit', action='append')
 _add_parser.set_defaults(func=add)
 
 def call(results):
@@ -179,6 +185,10 @@ def main(argv):
             --uid -- set uid
 
             --gid -- set gid
+
+            --extras -- a JSON file with more parameters
+
+            --env-inherit -- add an environment variable to inherit
 
         remove:
             name (positional)
