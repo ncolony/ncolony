@@ -1,7 +1,7 @@
 .. Copyright (c) Moshe Zadka
    See LICENSE for details.
 
-Ncolony
+NColony
 -------
 
 Infrastructure for running "colonies" of processes.
@@ -14,9 +14,6 @@ Infrastructure for running "colonies" of processes.
     :scale: 100%
     :target: https://readthedocs.org/projects/ncolony/
 
-Please note that this is still experimental,
-and has not been tested in production.
-
 Hacking
 =======
 
@@ -24,21 +21,28 @@ Hacking
 
 Should DTRT -- if it passes, it means
 unit tests are passing, and 100% coverage.
+Note that Travis-CI will automatically run tests on pull requests.
+
+Please feel free to submit pull requests which are failing.
+However,
+they cannot be merged until the they are green in Travis-CI.
 
 Release
 ========
 
-* admin/release <next version number>
-* gpg --use-agent -u zadka.moshe@gmail.com --detach-sign --armor dist/*.whl
-* gpg --use-agent -u zadka.moshe@gmail.com --detach-sign --armor dist/*.zip
-* admin/upload
-* Manually verify on testpypi
-* admin/upload --prod
+* Checkout a new branch
+* Run :code:`python -m incremental.update ncolony` to rev the number.
+* Create a pull request
+* Merge the pull request
+* Run :code:`tox`
+* Take the wheel and the sdist from build/tox, and use :code:`twine` to upload
+  them
 
 Contributors
 =============
 
 Moshe Zadka <zadka.moshe@gmail.com>
+Mark Williams
 
 License
 =======
