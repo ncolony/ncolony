@@ -140,17 +140,21 @@ class TestBeatChecker(unittest.TestCase):
             newMTime = statusFile.getModificationTime()
             mtime = max([mtime, newMTime, fileObj.getModificationTime()])
         self.assertFalse(self.checker(mtime, mtime))
-        self.assertEquals(set(self.checker(mtime, mtime+11)), set(['foo', 'bar']))
+        self.assertEquals(set(self.checker(mtime, mtime+11)),
+                          set(['foo', 'bar']))
 
     def test_run(self):
         """Test the runner"""
         _checker_args = []
         _restarter_args = []
+
         def _checker(arg):
             _checker_args.append(arg)
             return ['foo', 'bar']
+
         def _timer():
             return 'baz'
+
         def _restarter(thing):
             _restarter_args.append(thing)
         beatcheck.run(_restarter, _checker, _timer)
@@ -188,6 +192,7 @@ class TestBeatChecker(unittest.TestCase):
         """Test beatcheck with heart beater"""
         testWrappedHeart(self, beatcheck.makeService)
 
+
 def testWrappedHeart(utest, serviceMaker):
     """Service has a child heart beater"""
     opt = dict(config='config',
@@ -197,6 +202,7 @@ def testWrappedHeart(utest, serviceMaker):
     masterService = serviceMaker(opt)
     service = masterService.getServiceNamed('heart')
     test_heart.checkHeartService(utest, service)
+
 
 class TestOptions(unittest.TestCase):
 

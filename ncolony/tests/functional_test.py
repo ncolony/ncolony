@@ -13,12 +13,14 @@ import time
 
 from ncolony import main as mainlib
 
+
 def _getHere():
     here = __file__
     while not os.path.exists(os.path.join(here, '.gitignore')):
         here = os.path.dirname(here)
     here = os.path.join(here, 'build')
     return here
+
 
 def _killPatiently(pidFile):
     while os.path.exists(pidFile):
@@ -33,6 +35,7 @@ def _killPatiently(pidFile):
             else:
                 raise
         time.sleep(5)
+
 
 @mainlib.COMMANDS.register(name='tests.functional_test')
 def main(argv):
@@ -56,11 +59,14 @@ def main(argv):
     os.makedirs(CONFIGS)
     os.makedirs(MESSAGES)
     DEFAULTS = ['--messages', MESSAGES, '--config', CONFIGS]
-    SLEEP = "import time, sys;print('START');sys.stdout.flush();time.sleep(3);print('STOP')"
+    SLEEP = ("import time, sys;print('START');sys.stdout.flush();"
+             "time.sleep(3);print('STOP')")
     SLEEPER = ['--arg=-c', '--arg', SLEEP]
     subprocess.check_call([sys.executable, '-m', 'ncolony', 'ctl'] + DEFAULTS +
-                          ['add', 'sleeper', '--cmd', sys.executable] + SLEEPER)
-    subprocess.check_call([os.path.join(binLocation, 'twistd'), '--logfile', LOG_FILE,
+                          ['add', 'sleeper', '--cmd', sys.executable] +
+                          SLEEPER)
+    subprocess.check_call([os.path.join(binLocation, 'twistd'),
+                           '--logfile', LOG_FILE,
                            '--pidfile', PID_FILE, 'ncolony'] +
                           DEFAULTS +
                           ['--freq', '1'])
@@ -79,7 +85,8 @@ def main(argv):
     print("sleeping for 5 seconds")
     time.sleep(5)
     print("waking up, asking for global restart")
-    subprocess.check_call([sys.executable, '-m', 'ncolony', 'ctl'] + DEFAULTS + ['restart-all'])
+    subprocess.check_call([sys.executable, '-m', 'ncolony', 'ctl'] +
+                          DEFAULTS + ['restart-all'])
     print("sleeping for 5 seconds")
     time.sleep(5)
     print("waking up, killing twistd")
@@ -93,13 +100,14 @@ def main(argv):
         sys.exit("twistd did not shutdown")
     _analyzeLogFile(LOG_FILE)
 
+
 def _analyzeLogFile(log_file):
     with open(log_file) as fp:
         lines = list(fp)
     states = [line for line in lines if 'START' in line or 'STOP' in line]
     if 'START' in states[-1]:
         states.pop()
-    ## Consume in pairs
+    # Consume in pairs
     states_iter = enumerate(iter(states))
     for i, el in states_iter:
         if 'START' not in el:

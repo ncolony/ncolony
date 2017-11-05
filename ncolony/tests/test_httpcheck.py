@@ -23,7 +23,8 @@ import ncolony
 from ncolony import httpcheck, ctllib
 from ncolony.tests import test_beatcheck, helper
 
-## pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods
+
 
 class DummyHTTPAgent(object):
 
@@ -40,7 +41,8 @@ class DummyHTTPAgent(object):
         self.pending[url].append(d)
         return d
 
-## pylint: enable=too-few-public-methods
+# pylint: enable=too-few-public-methods
+
 
 def _empty(utest, path):
     def _cleanup():
@@ -53,7 +55,8 @@ def _empty(utest, path):
     utest.addCleanup(_cleanup)
     os.makedirs(path)
 
-## pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes
+
 
 class BaseTestHTTPChecker(unittest.TestCase):
 
@@ -67,15 +70,18 @@ class BaseTestHTTPChecker(unittest.TestCase):
         self.filepath = filepath.FilePath(self.path)
         self.reactor = proto_helpers.MemoryReactorClock()
         self.agent = DummyHTTPAgent()
-        self.settings = httpcheck.Settings(reactor=self.reactor, agent=self.agent)
+        self.settings = httpcheck.Settings(reactor=self.reactor,
+                                           agent=self.agent)
         self.states = {}
-        self.params = {'ncolony.httpcheck': dict(url='http://example.com/status',
-                                                 period=1,
-                                                 grace=1,
-                                                 maxBad=0,
-                                                 timeout=1)}
+        self.params = {'ncolony.httpcheck':
+                       dict(url='http://example.com/status',
+                            period=1,
+                            grace=1,
+                            maxBad=0,
+                            timeout=1)}
 
-## pylint: enable=too-many-instance-attributes
+# pylint: enable=too-many-instance-attributes
+
 
 class TestState(BaseTestHTTPChecker):
 
@@ -109,16 +115,17 @@ class TestState(BaseTestHTTPChecker):
         parts = s.split(':', 2)
         self.assertEquals(len(parts), 3)
         values = parts[2]
-        for portion in ('card=<>', 'call=None', 'closed=False', 'settings='+repr(self.settings),
+        for portion in ('card=<>', 'call=None', 'closed=False',
+                        'settings='+repr(self.settings),
                         'location='+repr(self.location)):
             self.assertIn(portion, values)
             values = values.replace(portion, '')
         values = values.strip(',')
         name, value = values.split('=', 1)
         self.assertEquals(name, 'content')
-        ## pylint: disable=eval-used
+        # pylint: disable=eval-used
         self.assertEquals(eval(value), self.params)
-        ## pylint: enable=eval-used
+        # pylint: enable=eval-used
 
     def test_no_check(self):
         """Checking an empty state results in success"""
@@ -232,11 +239,13 @@ class TestCheck(BaseTestHTTPChecker):
 
     def test_run(self):
         """run restarts each bad thing"""
-        l = []
-        restarter = l.append
-        check = lambda: [1, 2, 3]
-        httpcheck.run(restarter, check)
-        self.assertEquals(l, [1, 2, 3])
+        lst = []
+        restarter = lst.append
+
+        def _check():
+            return [1, 2, 3]
+        httpcheck.run(restarter, _check)
+        self.assertEquals(lst, [1, 2, 3])
 
     def test_make_service(self):
         """Test makeService"""
@@ -254,7 +263,8 @@ class TestCheck(BaseTestHTTPChecker):
         self.assertIs(restarter.func, ctllib.restart)
         self.assertFalse(restarter.keywords)
         places, = restarter.args
-        self.assertEquals(places, ctllib.Places(config='config', messages='messages'))
+        self.assertEquals(places,
+                          ctllib.Places(config='config', messages='messages'))
         self.assertIs(checker.func, httpcheck.check)
         self.assertFalse(checker.keywords)
         settings, states, location = checker.args
@@ -263,9 +273,9 @@ class TestCheck(BaseTestHTTPChecker):
         self.assertIs(settings.reactor, reactor)
         agent = settings.agent
         self.assertIsInstance(agent, client.Agent)
-        ## pylint: disable=protected-access
+        # pylint: disable=protected-access
         self.assertTrue(agent._pool.persistent)
-        ## pylint: enable=protected-access
+        # pylint: enable=protected-access
 
     def test_make_service_with_health(self):
         """Test httpcheck with heart beater"""

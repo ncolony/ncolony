@@ -12,6 +12,7 @@ from ncolony import interfaces
 
 from ncolony.tests import helper
 
+
 class DummyProcessMonitor(object):
 
     """Something that looks like a process monitor"""
@@ -50,6 +51,7 @@ class DummyProcessMonitor(object):
         """
         self.events.append(('RESTART-ALL',))
 
+
 class TestReceiver(unittest.TestCase):
 
     """Test the event receiver"""
@@ -60,6 +62,7 @@ class TestReceiver(unittest.TestCase):
         self.receiver = process_events.Receiver(self.monitor)
         self.assertFalse(self.monitor.events)
         self.logMessages = []
+
         def _observer(msg):
             self.logMessages.append(''.join(msg['message']))
         self.addCleanup(log.removeObserver, _observer)
@@ -68,7 +71,8 @@ class TestReceiver(unittest.TestCase):
 
     def test_recorder_is_good(self):
         """Test that the recorder implements the right interface"""
-        self.assertTrue(verify.verifyObject(interfaces.IMonitorEventReceiver, self.receiver))
+        self.assertTrue(verify.verifyObject(interfaces.IMonitorEventReceiver,
+                                            self.receiver))
 
     def test_add_simple(self):
         """Test a simple process addition"""
@@ -111,7 +115,8 @@ class TestReceiver(unittest.TestCase):
 
     def test_add_with_junk(self):
         """Test a process addition with all the optional arguments"""
-        message = helper.dumps2utf8(dict(something=1, args=['/bin/echo', 'hello']))
+        message = helper.dumps2utf8(dict(something=1,
+                                         args=['/bin/echo', 'hello']))
         self.receiver.add('hello', message)
         self.assertEquals(len(self.monitor.events), 1)
         (tp, name, args, uid, gid, env), = self.monitor.events
@@ -157,7 +162,8 @@ class TestReceiver(unittest.TestCase):
         self.receiver.remove('hello')
         self.assertEquals(self.monitor.events,
                           [('REMOVE', 'hello')])
-        self.assertEquals(self.logMessages, ['Removed monitored process: hello'])
+        self.assertEquals(self.logMessages,
+                          ['Removed monitored process: hello'])
 
     def test_restart(self):
         """Test a process restart"""
@@ -165,7 +171,8 @@ class TestReceiver(unittest.TestCase):
         self.receiver.message(message)
         self.assertEquals(self.monitor.events,
                           [('RESTART', 'hello')])
-        self.assertEquals(self.logMessages, ['Restarting monitored process: hello'])
+        self.assertEquals(self.logMessages,
+                          ['Restarting monitored process: hello'])
 
     def test_unknown_message(self):
         """Test that we reject unknown messages"""
@@ -179,4 +186,5 @@ class TestReceiver(unittest.TestCase):
         self.receiver.message(message)
         self.assertEquals(self.monitor.events,
                           [('RESTART-ALL',)])
-        self.assertEquals(self.logMessages, ['Restarting all monitored processes'])
+        self.assertEquals(self.logMessages,
+                          ['Restarting all monitored processes'])
