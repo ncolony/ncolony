@@ -16,6 +16,7 @@ PROPER_HEADER = """\
 # See LICENSE for details.
 """
 
+
 @mainlib.COMMANDS.register(name='tests.nitpicker')
 def main(argv):
     """Pick nits in code"""
@@ -27,9 +28,10 @@ def main(argv):
     errors = 0
     differ = difflib.Differ()
 
-    ## Check .pyc files
+    # Check .pyc files
     for dirpath, dirnames, filenames in os.walk(here, topdown=True):
-        if 'build' in dirpath or '__pycache__' in dirpath or '.eggs' in dirpath:
+        if ('build' in dirpath or '__pycache__' in dirpath or
+                '.eggs' in dirpath):
             dirnames[:] = []
             continue
         for filename in filenames:
@@ -38,14 +40,18 @@ def main(argv):
                 pyFile = fullname[:-1]
                 if not os.path.isfile(pyFile):
                     errors += 1
-                    print("Byte code file with no source:", fullname, file=sys.stderr)
-            if fullname.endswith('.py') and not fullname.endswith('versioneer.py'):
+                    print("Byte code file with no source:", fullname,
+                          file=sys.stderr)
+            if (fullname.endswith('.py') and
+                    not fullname.endswith('versioneer.py')):
                 with open(fullname) as fp:
-                    header = fp.readline()+ fp.readline()
+                    header = fp.readline() + fp.readline()
                     if header != PROPER_HEADER:
                         errors += 1
-                        print("Python file with no header:", fullname, file=sys.stderr)
-                        for line in differ.compare(header.splitlines(), PROPER_HEADER.splitlines()):
+                        print("Python file with no header:", fullname,
+                              file=sys.stderr)
+                        for line in differ.compare(header.splitlines(),
+                                                   PROPER_HEADER.splitlines()):
                             print(line.rstrip(), file=sys.stderr)
 
     if errors:

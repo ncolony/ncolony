@@ -260,11 +260,11 @@ class TestCheck(BaseTestHTTPChecker):
         self.assertIs(callableThing, httpcheck.run)
         self.assertFalse(kwargs)
         restarter, checker = args
-        self.assertIs(restarter.func, ctllib.restart)
         self.assertFalse(restarter.keywords)
         places, = restarter.args
         self.assertEquals(places,
                           ctllib.Places(config='config', messages='messages'))
+        self.assertIs(restarter.func, ctllib.restart)
         self.assertIs(checker.func, httpcheck.check)
         self.assertFalse(checker.keywords)
         settings, states, location = checker.args

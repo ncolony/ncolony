@@ -27,6 +27,7 @@ from ncolony import schedulelib
 
 from ncolony.client.tests import test_heart
 
+
 class TestProcessProtocol(unittest.TestCase):
 
     """Test schedulelib.ProcessProtocol"""
@@ -34,6 +35,7 @@ class TestProcessProtocol(unittest.TestCase):
     def setUp(self):
         out = six.StringIO()
         oldstdout = sys.stdout
+
         def _cleanup():
             sys.stdout = oldstdout
         self.addCleanup(_cleanup)
@@ -66,13 +68,15 @@ class TestProcessProtocol(unittest.TestCase):
 
     def test_implements(self):
         """Test object implements the right interface"""
-        self.assertTrue(verify.verifyObject(tiinterfaces.IProcessProtocol, self.pp))
+        self.assertTrue(verify.verifyObject(tiinterfaces.IProcessProtocol,
+                                            self.pp))
 
     def test_doesnt_break(self):
         """Test required methods do not fail"""
         self.pp.processExited(None)
         self.pp.childConnectionLost(None)
         self.pp.makeConnection(None)
+
 
 class TestRunProcess(unittest.TestCase):
 
@@ -82,6 +86,7 @@ class TestRunProcess(unittest.TestCase):
         self.reactor = test_procmon.DummyProcessReactor()
         out = six.StringIO()
         oldstdout = sys.stdout
+
         def _cleanup():
             sys.stdout = oldstdout
         self.addCleanup(_cleanup)
@@ -97,12 +102,12 @@ class TestRunProcess(unittest.TestCase):
         deferred.addCallback(results.append)
         process, = self.reactor.spawnedProcesses
         self.assertIsInstance(process.proto, schedulelib.ProcessProtocol)
-        ## pylint: disable=protected-access
+        # pylint: disable=protected-access
         self.assertIs(process._reactor, self.reactor)
         self.assertIs(process._executable, args[0])
         self.assertIs(process._args, args)
         self.assertIs(process._environment, os.environ)
-        ## pylint: enable=protected-access
+        # pylint: enable=protected-access
         terminate, kill = self.reactor.getDelayedCalls()
         self.assertTrue(terminate.active())
         self.assertEquals(terminate.getTime(), timeout)
@@ -189,6 +194,7 @@ class TestRunProcess(unittest.TestCase):
         deferred.errback(failure.Failure(ValueError("HAHA")))
         dummy, = results
 
+
 class TestService(unittest.TestCase):
 
     """Test the service"""
@@ -198,12 +204,12 @@ class TestService(unittest.TestCase):
         self.args = dict(arg='/bin/echo hello',
                          timeout='10',
                          grace='2',
-                         frequency='30',
-                        )
+                         frequency='30')
 
     def getArgs(self):
         """Get the arguments as a list of strings"""
-        return ' '.join(' '.join('--%s %s' % (key, vpart) for vpart in value.split())
+        return ' '.join(' '.join('--%s %s' % (key, vpart)
+                                 for vpart in value.split())
                         for key, value in six.iteritems(self.args)).split()
 
     def test_normal(self):
@@ -250,7 +256,8 @@ class TestService(unittest.TestCase):
         func, args, kwargs = service.call
         self.assertFalse(kwargs)
         self.assertIs(func, schedulelib.runProcess)
-        self.assertEquals(args, (opts['args'], opts['timeout'], opts['grace'], reactor))
+        self.assertEquals(args, (opts['args'], opts['timeout'],
+                                 opts['grace'], reactor))
         self.assertEquals(service.step, opts['frequency'])
 
     def test_make_service_with_health(self):
