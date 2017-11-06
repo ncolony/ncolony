@@ -20,6 +20,7 @@ import ncolony
 from ncolony import beatcheck
 from ncolony.client import heart
 
+
 class _ScoreCard(object):
 
     def __init__(self, maxBad=0):
@@ -45,17 +46,18 @@ class _ScoreCard(object):
                      maxBad=self.maxBad,
                      bad=self.bad))
 
+
 Settings = collections.namedtuple('Settings', 'reactor agent')
 
 _USER_AGENT = ('NColony HTTP Check ('
                'NColony/' + str(ncolony.__version__) + ', '
                'Twisted/' + twisted.__version__ + ', '
-               'Python ' + sys.version.replace('\n', '') + ')'
-              )
+               'Python ' + sys.version.replace('\n', '') + ')')
 
 _standardHeaders = client.Headers({'User-Agent': [_USER_AGENT]})
 
-## pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes
+
 
 class State(object):
 
@@ -76,8 +78,10 @@ class State(object):
         self.timeout = None
 
     def __repr__(self):
-        return ('<%(klass)s:%(id)s:location=%(location)s,settings=%(settings)s,'
-                'closed=%(closed)s,content=%(content)s,call=%(call)s,card=%(card)s>' %
+        return ('<%(klass)s:%(id)s:location=%(location)s,'
+                'settings=%(settings)s,'
+                'closed=%(closed)s,content=%(content)s,call=%(call)s,'
+                'card=%(card)s>' %
                 dict(klass=self.__class__.__name__, id=hex(id(self)),
                      location=self.location,
                      settings=self.settings,
@@ -128,7 +132,8 @@ class State(object):
         self.period = config['period']
         self.card = _ScoreCard(config['maxBad'])
         self.timeout = min(self.period, config['timeout'])
-        self.nextCheck = self.settings.reactor.seconds() + config['grace'] * self.period
+        self.nextCheck = (self.settings.reactor.seconds() +
+                          config['grace'] * self.period)
 
     def _maybeCheck(self):
         if self.settings.reactor.seconds() <= self.nextCheck:
@@ -138,25 +143,31 @@ class State(object):
             self._reset()
             return True
         self.nextCheck = self.settings.reactor.seconds() + self.period
-        self.call = self.settings.agent.request('GET', self.url, _standardHeaders, None)
-        delayedCall = self.settings.reactor.callLater(self.timeout, self.call.cancel)
+        self.call = self.settings.agent.request('GET', self.url,
+                                                _standardHeaders, None)
+        delayedCall = self.settings.reactor.callLater(self.timeout,
+                                                      self.call.cancel)
+
         def _gotResult(result):
             if delayedCall.active():
                 delayedCall.cancel()
             return result
         self.call.addBoth(_gotResult)
         self.call.addErrback(defer.logError)
-        self.call.addCallbacks(callback=self.card.markGood, errback=self.card.markBad)
+        self.call.addCallbacks(callback=self.card.markGood,
+                               errback=self.card.markBad)
+
         def _removeCall(dummy):
             self.call = None
         self.call.addCallback(_removeCall)
         return False
 
-## pylint: enable=too-many-instance-attributes
+# pylint: enable=too-many-instance-attributes
+
 
 def check(settings, states, location):
     """Check all processes"""
-    children = {child.basename() : child for child in location.children()}
+    children = {child.basename(): child for child in location.children()}
     last = set(states)
     current = set(children)
     gone = last - current
@@ -168,17 +179,20 @@ def check(settings, states, location):
         states[name] = State(location=children[name], settings=settings)
     return [name for name, state in six.iteritems(states) if state.check()]
 
+
 def run(restarter, checker):
     """Run restarter on the checker's output
 
     :params restarter: something to run on the output of the checker
     :params checker: a function expected to get one argument (current time)
                      and return a list of stale names
-    :params timer: a function of zero arguments, intended to return current time
+    :params timer: a function of zero arguments, intended to return current
+                   time
     :returns: None
     """
     for bad in checker():
         restarter(bad)
+
 
 def makeService(opt):
     """Make a service
@@ -197,5 +211,6 @@ def makeService(opt):
     httpcheck = tainternet.TimerService(opt['freq'], run, restarter, checker)
     httpcheck.setName('httpcheck')
     return heart.wrapHeart(httpcheck)
+
 
 Options = beatcheck.Options

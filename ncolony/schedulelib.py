@@ -7,7 +7,8 @@ Construct a Twisted service for process scheduling.
 
 .. code-block:: bash
 
-   $ twistd -n ncolonysched --timeout 2 --grace 1 --frequency 10 --arg /bin/echo --arg hello
+   $ twistd -n ncolonysched --timeout 2 --grace 1 --frequency 10
+            --arg /bin/echo --arg hello
 """
 from __future__ import print_function
 
@@ -26,6 +27,7 @@ from twisted.application import internet as tainternet, service
 
 from ncolony.client import heart
 
+
 @interface.implementer(tiinterfaces.IProcessProtocol)
 class ProcessProtocol(object):
 
@@ -34,7 +36,7 @@ class ProcessProtocol(object):
     def __init__(self, deferred):
         self.deferred = deferred
 
-    ## pylint: disable=no-self-use
+    # pylint: disable=no-self-use
     def childDataReceived(self, fd, data):
         """Log data from process
 
@@ -43,7 +45,7 @@ class ProcessProtocol(object):
         """
         for line in data.splitlines():
             print('[%d]' % fd, line)
-    ## pylint: enable=no-self-use
+    # pylint: enable=no-self-use
 
     def processEnded(self, reason):
         """Report process end to deferred
@@ -64,6 +66,7 @@ class ProcessProtocol(object):
         """Ignore makeConnection"""
         pass
 
+
 def runProcess(args, timeout, grace, reactor):
     """Run a process, return a deferred that fires when it is done
 
@@ -78,19 +81,24 @@ def runProcess(args, timeout, grace, reactor):
     deferred = defer.Deferred()
     protocol = ProcessProtocol(deferred)
     process = reactor.spawnProcess(protocol, args[0], args, env=os.environ)
+
     def _logEnded(err):
         err.trap(tierror.ProcessDone, tierror.ProcessTerminated)
         print(err.value)
     deferred.addErrback(_logEnded)
+
     def _cancelTermination(dummy):
         for termination in terminations:
             if termination.active():
                 termination.cancel()
     deferred.addCallback(_cancelTermination)
     terminations = []
-    terminations.append(reactor.callLater(timeout, process.signalProcess, "TERM"))
-    terminations.append(reactor.callLater(timeout+grace, process.signalProcess, "KILL"))
+    terminations.append(reactor.callLater(timeout, process.signalProcess,
+                                          "TERM"))
+    terminations.append(reactor.callLater(timeout+grace,
+                                          process.signalProcess, "KILL"))
     return deferred
+
 
 class Options(usage.Options):
 
@@ -99,7 +107,8 @@ class Options(usage.Options):
     optParameters = [
         ['timeout', None, None, 'Time before terminating the command', int],
         ['grace', None, None,
-         'Time between terminating the command and sending an umaskable kill', int],
+         'Time between terminating the command and sending an umaskable kill',
+         int],
         ['frequency', None, None, 'How often to run the command', int],
     ]
 
@@ -115,6 +124,7 @@ class Options(usage.Options):
         for elem in ['args', 'timeout', 'grace', 'frequency']:
             if not self[elem]:
                 raise ValueError(elem)
+
 
 def makeService(opts):
     """Make scheduler service

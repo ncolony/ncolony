@@ -14,6 +14,7 @@ import os
 from twisted.python import filepath
 from twisted.application import internet as tainternet, service as taservice
 
+
 class Heart(object):
 
     """A Heart.
@@ -30,6 +31,7 @@ class Heart(object):
     def beat(self):
         """Touch the file"""
         self.path.touch()
+
 
 def makeService():
     """Make a service
@@ -51,6 +53,7 @@ def makeService():
     ret = tainternet.TimerService(params['period']/3, heart.beat)
     return ret
 
+
 def maybeAddHeart(master):
     """Add a heart to a service collection
 
@@ -64,6 +67,7 @@ def maybeAddHeart(master):
         return
     heartSer.setName('heart')
     heartSer.setServiceParent(master)
+
 
 def wrapHeart(service):
     """Wrap a service in a MultiService with a heart"""
