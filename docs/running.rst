@@ -157,13 +157,13 @@ the ncolony monitor, and start it again, it will start the
 same programs again.
 
 :command:`python -m twisted` Command-Line Options
---------------------------------------
+===========--------------------------------------
 
 A full set of twistd command-line options can be found in the
 :code:`python -m twisted` help (available via :command:`python -m twisted --help`).
 
 :command:`python -m twisted ncolony` Command-Line Options
-----------------------------------------------
+---------------------------------------------------------
 
 Option: --config DIR
     Directory for configuration
@@ -198,8 +198,8 @@ Option: -M SECONDS, --maxrestartdelay SECONDS
     The maximum time (in seconds) to wait before
     attempting to restart a process [default: 3600]
 
-:command:`python -m ctl` Command-Line Options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:command:`python -m ncolony ctl` Command-Line Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following must be given before the subcommand:
 
@@ -216,8 +216,8 @@ restart-all
 restart, remove
     Only one positional argument -- name of program
 
-:command:`python -m ctl add` Command-Line Options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:command:`python -m ncolony ctl add` Command-Line Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Option: --cmd CMD
     Name of executable
