@@ -27,7 +27,7 @@ def checker(location, receiver):
     files = set()
     filesContents = {}
 
-    def _check(path):
+    def _check():
         currentFiles = set(fname for fname in os.listdir(location)
                            if not fname.endswith('.new'))
         removed = files - currentFiles
@@ -49,7 +49,7 @@ def checker(location, receiver):
             receiver.add(fname, newContents)
         files.clear()
         files.update(currentFiles)
-    return functools.partial(_check, path)
+    return _check
 
 
 def messages(location, receiver):
@@ -65,11 +65,11 @@ def messages(location, receiver):
     """
     path = filepath.FilePath(location)
 
-    def _check(path):
+    def _check():
         messageFiles = path.globChildren('*')
         for message in messageFiles:
             if message.basename().endswith('.new'):
                 continue
             receiver.message(message.getContent())
             message.remove()
-    return functools.partial(_check, path)
+    return _check

@@ -7,6 +7,7 @@ import collections
 import json
 import os
 import shutil
+import tempfile
 import unittest
 
 from zope.interface import verify
@@ -244,7 +245,12 @@ class TestOptions(unittest.TestCase):
         functions = [subs.call[0] for subs in subservices]
         paths = set()
         for func in functions:
-            paths.add(func.args[0].basename())
+            try:
+                func()
+            except OSError as err:
+                paths.add(err.filename)
+            else:
+                raise ValueError("no failure", os.getcwd(), os.listdir(os.getcwd()))
         self.assertEquals(paths, set(['message-dir', 'config-dir']))
         protocols = pm.protocols
         self.assertIsInstance(protocols, service.TransportDirectoryDict)
