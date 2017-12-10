@@ -6,9 +6,6 @@
 Monitor directories for configuration and messages
 """
 
-import functools
-import os
-
 from twisted.python import filepath
 
 

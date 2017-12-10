@@ -7,7 +7,6 @@ import collections
 import json
 import os
 import shutil
-import tempfile
 import unittest
 
 from zope.interface import verify
