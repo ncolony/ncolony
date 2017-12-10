@@ -27,29 +27,29 @@ def checker(location, receiver):
     files = set()
     filesContents = {}
 
-    def _check():
-        currentFiles = set(fname for fname in os.listdir(location)
-                           if not fname.endswith('.new'))
+    def _checkConf():
+        currentFiles = set(confFile for confFile in path.globChildren('*')
+                           if not confFile.basename().endswith('.new'))
         removed = files - currentFiles
         added = currentFiles - files
-        for fname in added:
-            contents = path.child(fname).getContent()
-            filesContents[fname] = contents
-            receiver.add(fname, contents)
-        for fname in removed:
-            receiver.remove(fname)
+        for confFile in added:
+            contents = confFile.getContent()
+            filesContents[confFile] = contents
+            receiver.add(confFile.basename(), contents)
+        for confFile in removed:
+            receiver.remove(confFile.basename())
         same = currentFiles & files
-        for fname in same:
-            newContents = path.child(fname).getContent()
-            oldContents = filesContents[fname]
+        for confFile in same:
+            newContents = confFile.getContent()
+            oldContents = filesContents[confFile]
             if newContents == oldContents:
                 continue
-            receiver.remove(fname)
-            filesContents[fname] = newContents
-            receiver.add(fname, newContents)
+            receiver.remove(confFile.basename())
+            filesContents[confFile] = newContents
+            receiver.add(confFile.basename(), newContents)
         files.clear()
         files.update(currentFiles)
-    return _check
+    return _checkConf
 
 
 def messages(location, receiver):
@@ -65,11 +65,11 @@ def messages(location, receiver):
     """
     path = filepath.FilePath(location)
 
-    def _check():
+    def _checkMessages():
         messageFiles = path.globChildren('*')
         for message in messageFiles:
             if message.basename().endswith('.new'):
                 continue
             receiver.message(message.getContent())
             message.remove()
-    return _check
+    return _checkMessages

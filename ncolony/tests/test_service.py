@@ -250,7 +250,7 @@ class TestOptions(unittest.TestCase):
             except OSError as err:
                 paths.add(err.filename)
             else:
-                raise ValueError("no failure", os.getcwd(), os.listdir(os.getcwd()))
+                raise ValueError("no failure", os.getcwd(), os.listdir(os.getcwd()), func)
         self.assertEquals(paths, set(['message-dir', 'config-dir']))
         protocols = pm.protocols
         self.assertIsInstance(protocols, service.TransportDirectoryDict)
