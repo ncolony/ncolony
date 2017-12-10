@@ -243,15 +243,17 @@ class TestOptions(unittest.TestCase):
         subservices = list(s)
         subservices.remove(pm)
         functions = [subs.call[0] for subs in subservices]
-        paths = set()
+        os.mkdir(self.opt['messages'])
+        os.mkdir(self.opt['config'])
         for func in functions:
-            try:
+            func()
+        with open(os.path.join(self.opt['messages'], 'dummy'), 'wb') as fp:
+            fp.write(b"not a valid json")
+        with open(os.path.join(self.opt['config'], 'dummy'), 'wb') as fp:
+            fp.write(b"not a valid json")
+        for func in functions:
+            with self.assertRaises(ValueError):
                 func()
-            except OSError as err:
-                paths.add(err.filename)
-            else:
-                raise ValueError("no failure", os.getcwd(), os.listdir(os.getcwd()), func)
-        self.assertEquals(paths, set(['message-dir', 'config-dir']))
         protocols = pm.protocols
         self.assertIsInstance(protocols, service.TransportDirectoryDict)
         self.assertIs(protocols.output, 'pid-dir')
