@@ -19,6 +19,7 @@ from ncolony import interfaces
 
 VALID_KEYS = frozenset(['args', 'uid', 'gid', 'env', 'env_inherit'])
 
+
 @interface.implementer(interfaces.IMonitorEventReceiver)
 class Receiver(object):
 

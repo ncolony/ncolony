@@ -13,7 +13,8 @@ from twisted.application import internet as tainternet
 
 from ncolony.client import heart
 
-## pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods
+
 
 class DummyFile(object):
 
@@ -26,22 +27,26 @@ class DummyFile(object):
         """Note how many times this method was called"""
         self.touched += 1
 
-## pylint: enable=too-few-public-methods
+# pylint: enable=too-few-public-methods
+
 
 def replaceEnvironment(case, myEnv=None):
     """Replace environment temporarily, restoring it at end of test
 
     :params myEnv: a dict-like object
     """
-    if myEnv == None:
+    if myEnv is None:
         myEnv = buildEnv()
     oldEnviron = os.environ
+
     def _cleanup():
         os.environ = oldEnviron
     case.addCleanup(_cleanup)
     os.environ = myEnv
 
+
 _MISSING = object()
+
 
 def _getSelf(method):
     ret = getattr(method, 'im_self', _MISSING)
@@ -52,6 +57,7 @@ def _getSelf(method):
         return ret
     raise TypeError("no self", method)
 
+
 def _getFunc(method):
     ret = getattr(method, 'im_func', _MISSING)
     if ret is not _MISSING:
@@ -60,6 +66,7 @@ def _getFunc(method):
     if ret is not _MISSING:
         return ret
     return method
+
 
 def checkHeartService(case, service, statusName='my.status'):
     """Check that a heart service is correct
@@ -79,6 +86,7 @@ def checkHeartService(case, service, statusName='my.status'):
     case.assertIsInstance(fp, filepath.FilePath)
     case.assertEquals(fp.basename(), statusName)
 
+
 def buildEnv(params=None):
     """Build an environment with NCOLONY_CONFIG
 
@@ -91,6 +99,7 @@ def buildEnv(params=None):
     myEnv = dict(os.environ)
     myEnv['NCOLONY_CONFIG'] = configJSON
     return myEnv
+
 
 class TestHeart(unittest.TestCase):
 
@@ -126,7 +135,7 @@ class TestHeart(unittest.TestCase):
     def test_make_service_no_env(self):
         """Test make service builds the service based on os.environ"""
         myEnv = dict(os.environ)
-        ## Simplest way to make sure this doesn't exist
+        # Simplest way to make sure this doesn't exist
         myEnv['NCOLONY_CONFIG'] = None
         del myEnv['NCOLONY_CONFIG']
         replaceEnvironment(self, myEnv)

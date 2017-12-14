@@ -17,6 +17,7 @@ from ncolony import beatcheck, ctllib
 from ncolony.client.tests import test_heart
 from ncolony.tests import helper
 
+
 class TestBeatChecker(unittest.TestCase):
 
     """Test the beat checker"""
@@ -26,6 +27,7 @@ class TestBeatChecker(unittest.TestCase):
         self.messages = os.path.abspath('dummy-messages')
         self.status = os.path.abspath('dummy-status')
         paths = (self.path, self.status, self.messages)
+
         def _cleanup():
             for path in paths:
                 if os.path.exists(path):
@@ -53,7 +55,8 @@ class TestBeatChecker(unittest.TestCase):
     def test_one_check(self):
         """Test checking a config directory with one file"""
         status = os.path.join(self.status, 'foo')
-        check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': status}}
+        check = {'ncolony.beatcheck':
+                 {'period': 10, 'grace': 1, 'status': status}}
         jsonCheck = helper.dumps2utf8(check)
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
@@ -65,7 +68,7 @@ class TestBeatChecker(unittest.TestCase):
         statusFile.setContent(b"111")
         newMTime = statusFile.getModificationTime()
         newMTime += 100
-        ## Back...to the future
+        # Back...to the future
         statusFile.changed()
         os.utime(status, (newMTime, newMTime))
         self.assertFalse(self.checker(mtime, newMTime))
@@ -75,7 +78,8 @@ class TestBeatChecker(unittest.TestCase):
     def test_one_default_check(self):
         """Test checking a config directory with one file"""
         status = os.path.join(self.status, 'foo')
-        check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': self.status}}
+        check = {'ncolony.beatcheck':
+                 {'period': 10, 'grace': 1, 'status': self.status}}
         jsonCheck = helper.dumps2utf8(check)
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
@@ -84,7 +88,7 @@ class TestBeatChecker(unittest.TestCase):
         statusFile.setContent(b"111")
         newMTime = statusFile.getModificationTime()
         newMTime += 100
-        ## Back...to the future
+        # Back...to the future
         statusFile.changed()
         os.utime(status, (newMTime, newMTime))
         self.assertFalse(self.checker(mtime, newMTime))
@@ -92,7 +96,8 @@ class TestBeatChecker(unittest.TestCase):
     def test_grace(self):
         """Test checking that grace period is respected"""
         status = os.path.join(self.status, 'foo')
-        check = {'ncolony.beatcheck': {'period': 10, 'grace': 3, 'status': status}}
+        check = {'ncolony.beatcheck':
+                 {'period': 10, 'grace': 3, 'status': status}}
         jsonCheck = helper.dumps2utf8(check)
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
@@ -104,7 +109,8 @@ class TestBeatChecker(unittest.TestCase):
     def test_epoch(self):
         """Test that start time is being respected"""
         status = os.path.join(self.status, 'foo')
-        check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': status}}
+        check = {'ncolony.beatcheck':
+                 {'period': 10, 'grace': 1, 'status': status}}
         jsonCheck = helper.dumps2utf8(check)
         fooFile = self.filepath.child('foo')
         fooFile.setContent(jsonCheck)
@@ -118,20 +124,23 @@ class TestBeatChecker(unittest.TestCase):
         mtime = 0
         for fname in ['foo', 'bar']:
             status = os.path.join(self.status, fname)
-            check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': status}}
+            check = {'ncolony.beatcheck':
+                     {'period': 10, 'grace': 1, 'status': status}}
             jsonCheck = helper.dumps2utf8(check)
             fileObj = self.filepath.child(fname)
             fileObj.setContent(jsonCheck)
             mtime = max([mtime, fileObj.getModificationTime()])
         self.assertFalse(self.checker(mtime, mtime))
-        self.assertEquals(set(self.checker(mtime, mtime+11)), set(['foo', 'bar']))
+        self.assertEquals(set(self.checker(mtime, mtime+11)),
+                          set(['foo', 'bar']))
 
     def test_two_old(self):
         """Test two configuration files with old status"""
         mtime = 0
         for fname in ['foo', 'bar']:
             status = os.path.join(self.status, fname)
-            check = {'ncolony.beatcheck': {'period': 10, 'grace': 1, 'status': status}}
+            check = {'ncolony.beatcheck':
+                     {'period': 10, 'grace': 1, 'status': status}}
             jsonCheck = helper.dumps2utf8(check)
             fileObj = self.filepath.child(fname)
             fileObj.setContent(jsonCheck)
@@ -140,17 +149,21 @@ class TestBeatChecker(unittest.TestCase):
             newMTime = statusFile.getModificationTime()
             mtime = max([mtime, newMTime, fileObj.getModificationTime()])
         self.assertFalse(self.checker(mtime, mtime))
-        self.assertEquals(set(self.checker(mtime, mtime+11)), set(['foo', 'bar']))
+        self.assertEquals(set(self.checker(mtime, mtime+11)),
+                          set(['foo', 'bar']))
 
     def test_run(self):
         """Test the runner"""
         _checker_args = []
         _restarter_args = []
+
         def _checker(arg):
             _checker_args.append(arg)
             return ['foo', 'bar']
+
         def _timer():
             return 'baz'
+
         def _restarter(thing):
             _restarter_args.append(thing)
         beatcheck.run(_restarter, _checker, _timer)
@@ -176,7 +189,8 @@ class TestBeatChecker(unittest.TestCase):
         self.assertIs(restarter.func, ctllib.restart)
         self.assertFalse(restarter.keywords)
         places, = restarter.args
-        self.assertEquals(places, ctllib.Places(config='config', messages='messages'))
+        self.assertEquals(places,
+                          ctllib.Places(config='config', messages='messages'))
         self.assertIs(checker.func, beatcheck.check)
         self.assertFalse(checker.keywords)
         path, start = checker.args
@@ -188,6 +202,7 @@ class TestBeatChecker(unittest.TestCase):
         """Test beatcheck with heart beater"""
         testWrappedHeart(self, beatcheck.makeService)
 
+
 def testWrappedHeart(utest, serviceMaker):
     """Service has a child heart beater"""
     opt = dict(config='config',
@@ -197,6 +212,7 @@ def testWrappedHeart(utest, serviceMaker):
     masterService = serviceMaker(opt)
     service = masterService.getServiceNamed('heart')
     test_heart.checkHeartService(utest, service)
+
 
 class TestOptions(unittest.TestCase):
 

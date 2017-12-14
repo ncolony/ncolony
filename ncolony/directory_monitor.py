@@ -11,6 +11,7 @@ import os
 
 from twisted.python import filepath
 
+
 def checker(location, receiver):
     """Construct a function that checks a directory for process configuration
 
@@ -25,8 +26,10 @@ def checker(location, receiver):
     path = filepath.FilePath(location)
     files = set()
     filesContents = {}
+
     def _check(path):
-        currentFiles = set(fname for fname in os.listdir(location) if not fname.endswith('.new'))
+        currentFiles = set(fname for fname in os.listdir(location)
+                           if not fname.endswith('.new'))
         removed = files - currentFiles
         added = currentFiles - files
         for fname in added:
@@ -48,6 +51,7 @@ def checker(location, receiver):
         files.update(currentFiles)
     return functools.partial(_check, path)
 
+
 def messages(location, receiver):
     """Construct a function that checks a directory for messages
 
@@ -60,6 +64,7 @@ def messages(location, receiver):
     :returns: a function with no parameters
     """
     path = filepath.FilePath(location)
+
     def _check(path):
         messageFiles = path.globChildren('*')
         for message in messageFiles:

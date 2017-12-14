@@ -29,6 +29,7 @@ from twisted.application import internet as tainternet
 from ncolony import ctllib
 from ncolony.client import heart
 
+
 def check(path, start, now):
     """check which processes need to be restarted
 
@@ -39,6 +40,7 @@ def check(path, start, now):
     """
     return [child.basename() for child in path.children()
             if _isbad(child, start, now)]
+
 
 def _isbad(child, start, now):
     content = child.getContent()
@@ -60,17 +62,20 @@ def _isbad(child, start, now):
     statusMtime = statusPath.getModificationTime()
     return (statusMtime + period) < now
 
+
 def run(restarter, checker, timer):
     """Run restarter on the checker's output
 
     :params restarter: something to run on the output of the checker
     :params checker: a function expected to get one argument (current time)
                      and return a list of stale names
-    :params timer: a function of zero arguments, intended to return current time
+    :params timer: a function of zero arguments, intended to return current
+                   time
     :returns: None
     """
     for bad in checker(timer()):
         restarter(bad)
+
 
 def parseConfig(opt):
     """Parse configuration
@@ -83,6 +88,7 @@ def parseConfig(opt):
     path = filepath.FilePath(opt['config'])
     return restarter, path
 
+
 def makeService(opt):
     """Make a service
 
@@ -94,11 +100,13 @@ def makeService(opt):
     restarter, path = parseConfig(opt)
     now = time.time()
     checker = functools.partial(check, path, now)
-    beatcheck = tainternet.TimerService(opt['freq'], run, restarter, checker, time.time)
+    beatcheck = tainternet.TimerService(opt['freq'], run, restarter,
+                                        checker, time.time)
     beatcheck.setName('beatcheck')
     return heart.wrapHeart(beatcheck)
 
-## pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods
+
 
 class Options(usage.Options):
 
@@ -116,4 +124,4 @@ class Options(usage.Options):
             if self[param] is None:
                 raise usage.UsageError("Missing required", param)
 
-## pylint: enable=too-few-public-methods
+# pylint: enable=too-few-public-methods

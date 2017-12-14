@@ -13,6 +13,7 @@ from zope.interface import verify
 from ncolony import directory_monitor
 from ncolony import interfaces
 
+
 @interface.implementer(interfaces.IMonitorEventReceiver)
 class EventRecorder(object):
 
@@ -34,7 +35,8 @@ class EventRecorder(object):
         """Get a new message event"""
         self.events.append(('MESSAGE', contents))
 
-## pylint: disable=too-few-public-methods
+
+# pylint: disable=too-few-public-methods
 @interface.implementer(interfaces.IMonitorEventReceiver)
 class EventRecorderNoAdd(object):
 
@@ -44,6 +46,7 @@ class EventRecorderNoAdd(object):
         """Dummy remove method"""
         pass
 
+
 @interface.implementer(interfaces.IMonitorEventReceiver)
 class EventRecorderNoRemove(object):
 
@@ -52,7 +55,7 @@ class EventRecorderNoRemove(object):
     def add(self, name, content):
         """Dummy add method"""
         pass
-## pylint: enable=too-few-public-methods
+# pylint: enable=too-few-public-methods
 
 
 class TestReceiverIface(unittest.TestCase):
@@ -61,17 +64,20 @@ class TestReceiverIface(unittest.TestCase):
 
     def test_recorder_is_good(self):
         """Test our recorder implements the interface"""
-        self.assertTrue(verify.verifyObject(interfaces.IMonitorEventReceiver, EventRecorder()))
+        self.assertTrue(verify.verifyObject(interfaces.IMonitorEventReceiver,
+                                            EventRecorder()))
 
     def test_no_add_bad(self):
         """Test you need 'add' to implement the interface"""
         with self.assertRaises(verify.BrokenImplementation):
-            verify.verifyObject(interfaces.IMonitorEventReceiver, EventRecorderNoAdd())
+            verify.verifyObject(interfaces.IMonitorEventReceiver,
+                                EventRecorderNoAdd())
 
     def test_no_remove_bad(self):
         """Test you need 'remove' to implement the interface"""
         with self.assertRaises(verify.BrokenImplementation):
-            verify.verifyObject(interfaces.IMonitorEventReceiver, EventRecorderNoRemove())
+            verify.verifyObject(interfaces.IMonitorEventReceiver,
+                                EventRecorderNoRemove())
 
 
 class DirectoryBasedTest(unittest.TestCase):
@@ -81,6 +87,7 @@ class DirectoryBasedTest(unittest.TestCase):
     def setUp(self):
         """Initialize/cleanup the directory"""
         self.testDirectory = os.path.join(os.getcwd(), 'stuff')
+
         def _cleanup():
             if os.path.exists(self.testDirectory):
                 shutil.rmtree(self.testDirectory)
@@ -99,6 +106,7 @@ class DirectoryBasedTest(unittest.TestCase):
         name = os.path.join(self.testDirectory, name)
         os.remove(name)
 
+
 class TestMessageSender(DirectoryBasedTest):
 
     """Test monitoring the messages directory"""
@@ -107,7 +115,8 @@ class TestMessageSender(DirectoryBasedTest):
         """Set up test"""
         DirectoryBasedTest.setUp(self)
         self.receiver = EventRecorder()
-        self.message = directory_monitor.messages(self.testDirectory, self.receiver)
+        self.message = directory_monitor.messages(self.testDirectory,
+                                                  self.receiver)
         self.assertFalse(self.receiver.events)
 
     def test_nada(self):
@@ -158,7 +167,8 @@ class TestEventSender(DirectoryBasedTest):
         """Set up the test"""
         DirectoryBasedTest.setUp(self)
         self.receiver = EventRecorder()
-        self.monitor = directory_monitor.checker(self.testDirectory, self.receiver)
+        self.monitor = directory_monitor.checker(self.testDirectory,
+                                                 self.receiver)
         self.assertFalse(self.receiver.events)
 
     def test_nada(self):

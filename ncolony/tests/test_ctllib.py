@@ -14,10 +14,12 @@ import six
 
 from ncolony import ctllib
 
+
 def jsonFrom(fname):
     """Load JSON from a file"""
     with io.open(fname, "r", encoding='utf-8') as fp:
         return json.loads(fp.read())
+
 
 class TestArgParsing(unittest.TestCase):
 
@@ -58,24 +60,27 @@ class TestArgParsing(unittest.TestCase):
 
     def test_add(self):
         """Check add subcommand parsing"""
-        res = self.parser.parse_args(self.base+['add', 'hello', '--cmd', '/bin/echo'])
+        res = self.parser.parse_args(self.base+['add', 'hello',
+                                                '--cmd', '/bin/echo'])
         self.assertEquals(res.name, 'hello')
         self.assertEquals(res.cmd, '/bin/echo')
         self.assertIs(res.func, ctllib.add)
 
     def test_add_full(self):
-        """Check add subcommand parsing when all optional arguments are given"""
-        extras = {'ncolony.beatcheck': {'period': 10, 'grace': 3, 'status': 'foo.status'}}
+        """Add subcommand parsing when all optional arguments are given"""
+        extras = {'ncolony.beatcheck': {'period': 10, 'grace': 3,
+                                        'status': 'foo.status'}}
         extrasJSON = json.dumps(extras)
         with open('extras.json', 'w') as fp:
             fp.write(extrasJSON)
-        res = self.parser.parse_args(self.base+['add', 'hello', '--cmd', '/bin/echo',
-                                                '--arg', 'hello', '--arg', 'world',
-                                                '--env', 'world=616', '--env', 'status=good',
-                                                '--uid', '5', '--gid', '6',
-                                                '--extra', 'extras.json',
-                                                '--env-inherit', 'PATH',
-                                                '--env-inherit', 'PYTHONPATH',])
+        args = self.base+['add', 'hello', '--cmd', '/bin/echo',
+                          '--arg', 'hello', '--arg', 'world',
+                          '--env', 'world=616', '--env', 'status=good',
+                          '--uid', '5', '--gid', '6',
+                          '--extra', 'extras.json',
+                          '--env-inherit', 'PATH',
+                          '--env-inherit', 'PYTHONPATH']
+        res = self.parser.parse_args(args)
         self.assertEquals(res.name, 'hello')
         self.assertEquals(res.cmd, '/bin/echo')
         self.assertEquals(res.args, ['hello', 'world'])
@@ -96,6 +101,7 @@ class TestArgParsing(unittest.TestCase):
         """Check the 'call' function"""
         ns = argparse.Namespace()
         results = []
+
         def _func(places, **kwargs):
             results.append((places, kwargs))
         ns.func = _func
@@ -105,8 +111,10 @@ class TestArgParsing(unittest.TestCase):
         ns.baz = 'quux'
         ctllib.call(ns)
         self.assertEquals(results,
-                          [(ctllib.Places(config='config1', messages='messages1'),
+                          [(ctllib.Places(config='config1',
+                                          messages='messages1'),
                             dict(foo='bar', baz='quux'))])
+
 
 class TestController(unittest.TestCase):
 
@@ -115,6 +123,7 @@ class TestController(unittest.TestCase):
     def setUp(self):
         """Set up configuration and build/cleanup directories"""
         self.places = ctllib.Places(config='config', messages='messages')
+
         def _cleanup():
             for d in self.places:
                 if os.path.exists(d):
@@ -129,8 +138,7 @@ class TestController(unittest.TestCase):
         argv = ['ctl',
                 '--messages', self.places.messages,
                 '--config', self.places.config,
-                'restart-all',
-               ]
+                'restart-all']
         ctllib.main(argv)
         fname, = os.listdir(self.places.messages)
         fname = os.path.join(self.places.messages, fname)
@@ -159,14 +167,16 @@ class TestController(unittest.TestCase):
 
     def test_add_with_uid(self):
         """Test that add with optional uid works"""
-        ctllib.add(self.places, 'hello', cmd='/bin/echo', args=['hello'], uid=1024)
+        ctllib.add(self.places, 'hello', cmd='/bin/echo', args=['hello'],
+                   uid=1024)
         fname = os.path.join(self.places.config, 'hello')
         d = jsonFrom(fname)
         self.assertEquals(d, dict(uid=1024, args=['/bin/echo', 'hello']))
 
     def test_add_with_gid(self):
         """Test that add with optional gid works"""
-        ctllib.add(self.places, 'hello', cmd='/bin/echo', args=['hello'], gid=1024)
+        ctllib.add(self.places, 'hello', cmd='/bin/echo', args=['hello'],
+                   gid=1024)
         fname = os.path.join(self.places.config, 'hello')
         d = jsonFrom(fname)
         self.assertEquals(d, dict(gid=1024, args=['/bin/echo', 'hello']))
@@ -187,7 +197,7 @@ class TestController(unittest.TestCase):
         d = jsonFrom(fname)
         self.assertEquals(d, dict(type='RESTART', name='hello'))
         ctllib.restart(self.places, 'goodbye')
-        things = (json.loads(open(os.path.join(self.places.messages, fname)).read())
+        things = (jsonFrom(os.path.join(self.places.messages, fname))
                   for fname in os.listdir(self.places.messages))
         names = set()
         for thing in things:

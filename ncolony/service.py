@@ -20,7 +20,8 @@ from twisted.runner import procmon as procmonlib, procmontap
 
 from ncolony import directory_monitor, process_events
 
-## pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods
+
 
 class TransportDirectoryDict(dict):
 
@@ -47,7 +48,7 @@ class TransportDirectoryDict(dict):
         super(TransportDirectoryDict, self).__delitem__(name)
         self.output.child(name).remove()
 
-## pylint: enable=too-few-public-methods
+# pylint: enable=too-few-public-methods
 
 
 def get(config, messages, freq, pidDir=None, reactor=None):
@@ -62,8 +63,10 @@ def get(config, messages, freq, pidDir=None, reactor=None):
 
     :param config: string, location of configuration directory
     :param messages: string, location of messages directory
-    :param freq: number, frequency to check for new messages and configuration updates
-    :param pidDir: {twisted.python.filepath.FilePath} or None, location to keep pid files
+    :param freq: number, frequency to check for new messages and configuration
+                 updates
+    :param pidDir: {twisted.python.filepath.FilePath} or None,
+                   location to keep pid files
     :param reactor: something implementing the interfaces
                        {twisted.internet.interfaces.IReactorTime} and
                        {twisted.internet.interfaces.IReactorProcess} and
@@ -88,7 +91,8 @@ def get(config, messages, freq, pidDir=None, reactor=None):
     procmon.setServiceParent(ret)
     return ret
 
-## pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods
+
 
 class Options(usage.Options):
 
@@ -107,7 +111,8 @@ class Options(usage.Options):
             if self[param] is None:
                 raise usage.UsageError("Missing required", param)
 
-## pylint: enable=too-few-public-methods
+# pylint: enable=too-few-public-methods
+
 
 def makeService(opt):
     """Return a service based on parsed command-line options

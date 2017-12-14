@@ -47,10 +47,12 @@ NEXT = functools.partial(next, itertools.count(0))
 
 Places = collections.namedtuple('Places', 'config messages')
 
+
 def _dumps(stuff):
     return json.dumps(stuff).encode('utf-8')
 
-## pylint: disable=too-many-arguments,too-many-locals
+
+# pylint: disable=too-many-arguments,too-many-locals
 def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
         env_inherit=None):
     """Add a process.
@@ -87,7 +89,8 @@ def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
         details.update(extras)
     content = _dumps(details)
     fle.setContent(content)
-## pylint: enable=too-many-arguments,too-many-locals
+# pylint: enable=too-many-arguments,too-many-locals
+
 
 def remove(places, name):
     """Remove a process
@@ -100,11 +103,13 @@ def remove(places, name):
     fle = config.child(name)
     fle.remove()
 
+
 def _addMessage(places, content):
     messages = filepath.FilePath(places.messages)
     name = '%03dMessage.%s' % (NEXT(), os.getpid())
     message = messages.child(name)
     message.setContent(content)
+
 
 def restart(places, name):
     """Restart a process
@@ -116,6 +121,7 @@ def restart(places, name):
     content = _dumps(dict(type='RESTART', name=name))
     _addMessage(places, content)
 
+
 def restartAll(places):
     """Restart all processes
 
@@ -125,10 +131,12 @@ def restartAll(places):
     content = _dumps(dict(type='RESTART-ALL'))
     _addMessage(places, content)
 
+
 def _parseJSON(fname):
     with open(fname) as fp:
         data = fp.read()
     return json.loads(data)
+
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument('--messages', required=True)
@@ -153,6 +161,7 @@ _add_parser.add_argument('--extras', type=_parseJSON)
 _add_parser.add_argument('--env-inherit', dest='env_inherit', action='append')
 _add_parser.set_defaults(func=add)
 
+
 def call(results):
     """Call results.func on the attributes of results
 
@@ -160,9 +169,11 @@ def call(results):
     :returns: None
     """
     results = vars(results)
-    places = Places(config=results.pop('config'), messages=results.pop('messages'))
+    places = Places(config=results.pop('config'),
+                    messages=results.pop('messages'))
     func = results.pop('func')
     func(places, **results)
+
 
 @mainlib.COMMANDS.register(name='ctl')
 def main(argv):

@@ -19,6 +19,7 @@ from twisted.runner.test import test_procmon
 
 from ncolony import service
 
+
 class DummyFile(object):
 
     """filepath.FilePath clone"""
@@ -45,7 +46,9 @@ class DummyFile(object):
         """Remove file"""
         self.removed = True
 
+
 DummyTransport = collections.namedtuple('DummyTransport', 'pid')
+
 
 class TestTransportDirectoryDict(unittest.TestCase):
 
@@ -66,7 +69,8 @@ class TestTransportDirectoryDict(unittest.TestCase):
         self.assertNotIn('foo', self.tdd)
         self.assertEquals(thing.removed, True)
 
-## pylint: disable=protected-access
+# pylint: disable=protected-access
+
 
 class TestService(unittest.TestCase):
 
@@ -74,6 +78,7 @@ class TestService(unittest.TestCase):
 
     def setUp(self):
         """Set up the test"""
+
         def _cleanup(testDir):
             if os.path.exists(testDir):
                 shutil.rmtree(testDir)
@@ -84,7 +89,8 @@ class TestService(unittest.TestCase):
             _cleanup(testDir)
             os.makedirs(testDir)
         self.my_reactor = test_procmon.DummyProcessReactor()
-        self.service = service.get(self.testDirs['config'], self.testDirs['messages'],
+        self.service = service.get(self.testDirs['config'],
+                                   self.testDirs['messages'],
                                    5, reactor=self.my_reactor)
         self._finishSetUp()
 
@@ -99,7 +105,8 @@ class TestService(unittest.TestCase):
     def test_with_piddir(self):
         """Test service with piddir"""
         pidDir = DummyFile('')
-        self.service = service.get(self.testDirs['config'], self.testDirs['messages'],
+        self.service = service.get(self.testDirs['config'],
+                                   self.testDirs['messages'],
                                    5, pidDir=pidDir, reactor=self.my_reactor)
         self._finishSetUp()
         protocols = self.pm.protocols
@@ -162,6 +169,7 @@ class TestService(unittest.TestCase):
         process, _ = self.my_reactor.spawnedProcesses
         self.assertFalse(process.pid)
 
+
 class TestOptions(unittest.TestCase):
 
     """Test option parsing"""
@@ -221,12 +229,12 @@ class TestOptions(unittest.TestCase):
 
     def test_makeservice(self):
         """Test makeService"""
-        self.opt.parseOptions(self.basic+
-                              ['--threshold', '0.5']+
-                              ['--killtime', '1.5']+
-                              ['--minrestartdelay', '2.5']+
-                              ['--maxrestartdelay', '3.5']+
-                              ['--frequency', '4.5']+
+        self.opt.parseOptions(self.basic +
+                              ['--threshold', '0.5'] +
+                              ['--killtime', '1.5'] +
+                              ['--minrestartdelay', '2.5'] +
+                              ['--maxrestartdelay', '3.5'] +
+                              ['--frequency', '4.5'] +
                               ['--pid', 'pid-dir'])
         s = service.makeService(self.opt)
         pm = s.getServiceNamed('procmon')

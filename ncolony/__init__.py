@@ -8,7 +8,8 @@ from ncolony._version import __version__ as _abstract_version
 __version__ = str(_abstract_version)
 
 _long_description = '''\
-ncolony_: A wrapper around Twisted process monitor which allows runtime configuration via file-based communication
+ncolony_: A wrapper around Twisted process monitor which allows runtime
+          configuration via file-based communication
 
 .. _ncolony: https://ncolony.rtfd.org
 '''

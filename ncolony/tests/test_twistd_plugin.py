@@ -10,7 +10,9 @@ import unittest
 
 from ncolony import service, beatcheck, schedulelib
 
-from twisted.plugins import ncolony_service, ncolony_beatcheck, ncolony_schedulelib
+from twisted.plugins import (ncolony_service, ncolony_beatcheck,
+                             ncolony_schedulelib)
+
 
 class TestServices(unittest.TestCase):
 
@@ -44,7 +46,8 @@ class TestServices(unittest.TestCase):
         self.assertEquals(sm.tapname, 'ncolony-scheduler')
         self.assertNotEquals(sm.description, '')
         options = sm.options()
-        options.parseOptions(['--frequency', '5', '--timeout', '1', '--grace', '1',
+        options.parseOptions(['--frequency', '5', '--timeout', '1',
+                              '--grace', '1',
                               '--arg', 'cat'])
         self.assertEquals(options['frequency'], 5)
         self.assertEquals(options['args'], ['cat'])
