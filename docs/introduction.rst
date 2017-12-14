@@ -70,13 +70,6 @@ reactor selection and more.
 
   Control program -- add, remove and restart processes.
 
-:program:`python -m ncolony reaper`
-
-  "PID 1". Designed to work with the ncolony monitor
-  as a root process in a container environment.
-  It is designed to run only one program, and then reap
-  any children it adopts.
-
 .. _Twisted: https://twistedmatrix.com/trac/
 
 .. _twistd: http://twistedmatrix.com/documents/current/core/howto/basics.html
