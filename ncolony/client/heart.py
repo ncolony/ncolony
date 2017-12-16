@@ -40,11 +40,11 @@ def makeService():
     """
     configJSON = os.environ.get('NCOLONY_CONFIG')
     if configJSON is None:
-        return
+        return None
     config = json.loads(configJSON)
     params = config.get('ncolony.beatcheck')
     if params is None:
-        return
+        return None
     myFilePath = filepath.FilePath(params['status'])
     if myFilePath.isdir():
         name = os.environ['NCOLONY_NAME']
