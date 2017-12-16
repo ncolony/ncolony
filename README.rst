@@ -31,7 +31,7 @@ Release
 ========
 
 * Checkout a new branch
-* Run :code:`python -m incremental.update ncolony` to rev the number.
+* Run :code:`python -m incremental.update ncolony` to update the version number.
 * Create a pull request
 * Merge the pull request
 * Run :code:`tox`
