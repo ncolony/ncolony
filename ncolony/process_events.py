@@ -6,6 +6,7 @@
 Convert events into process monitoring actions.
 """
 
+import collections
 import json
 import os
 
@@ -17,7 +18,7 @@ from twisted.python import log
 
 from ncolony import interfaces
 
-VALID_KEYS = frozenset(['args', 'uid', 'gid', 'env', 'env_inherit'])
+VALID_KEYS = frozenset(['args', 'uid', 'gid', 'env', 'env_inherit', 'group'])
 
 
 @interface.implementer(interfaces.IMonitorEventReceiver)
@@ -34,6 +35,8 @@ class Receiver(object):
             environ = os.environ
         self.environ = environ
         self.monitor = monitor
+        self._groupToProcess = collections.defaultdict(set)
+        self._processToGroups = {}
 
     def add(self, name, contents):
         """Add a process
@@ -51,6 +54,10 @@ class Receiver(object):
         parsedContents['env'] = parsedContents.get('env', {})
         for key in parsedContents.pop('env_inherit', []):
             parsedContents['env'][key] = self.environ.get(key, '')
+        groups = parsedContents.pop('group', [])
+        for key in groups:
+            self._groupToProcess[key].add(name)
+        self._processToGroups[name] = groups
         parsedContents['env']['NCOLONY_CONFIG'] = contents
         parsedContents['env']['NCOLONY_NAME'] = name
         self.monitor.addProcess(**parsedContents)
@@ -63,6 +70,8 @@ class Receiver(object):
         """
         self.monitor.removeProcess(name)
         log.msg("Removed monitored process: ", name)
+        for group in self._processToGroups.pop(name):
+            self._groupToProcess[group].remove(name)
 
     def message(self, contents):
         """Respond to a restart or a restart-all message
@@ -82,5 +91,10 @@ class Receiver(object):
         elif tp == 'RESTART-ALL':
             self.monitor.restartAll()
             log.msg("Restarting all monitored processes")
+        elif tp == 'RESTART-GROUP':
+            log.msg("Restarting group", contents['group'])
+            for name in self._groupToProcess[contents['group']]:
+                log.msg("Restarting monitored process: ", name)
+                self.monitor.stopProcess(name)
         else:
             raise ValueError('unknown type', contents)
