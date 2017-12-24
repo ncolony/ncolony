@@ -51,11 +51,42 @@ Places = collections.namedtuple('Places', 'config messages')
 def _dumps(stuff):
     return json.dumps(stuff).encode('utf-8')
 
+PARSING = object()
+
+def attrib(type=str, default_factory=None, positional=False):
+    
+
+@attr.s(frozen=True)
+class Process(object):
+
+    name = attr.ib()
+    cmd = attr.ib()
+    args = attr.ib(default=attr.Factory(list))
+    env = attr.ib(default=attr.Factory(list))
+    uid = attr.ib(default=None)
+    gid = attr.ib(default=None)
+    extras = attr.ib(default=attr.Factory(dict))
+    env_inherit = attr.ib(default=attr.Factory(list))
+    group = attr.ib(default=attr.Factory(list))
+
+_add_parser.add_argument('--cmd', required=True)
+_add_parser.add_argument('--arg', dest='args', action='append')
+_add_parser.add_argument('--env', action='append')
+_add_parser.add_argument('--uid', type=int)
+_add_parser.add_argument('--gid', type=int)
+_add_parser.add_argument('--extras', type=_parseJSON)
+_add_parser.add_argument('--env-inherit', dest='env_inherit', action='append')
+
+    
+
 
 # pylint: disable=too-many-arguments,too-many-locals
 def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
         env_inherit=None):
-    """Add a process.
+    """
+    (Deprecated) Add a process.
+
+    Use addProcess instead.
 
     :param places: a Places instance
     :param name: string, the logical name of the process
@@ -65,6 +96,7 @@ def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
          (will be environment in subprocess)
     :param uid: integer, uid to run the new process as
     :param gid: integer, gid to run the new process as
+    :param group: list of strings, groups to put the process in
     :param extras: a dictionary with additional parameters
     :param env_inherit: a list of environment variables to inherit
     :returns: None
@@ -85,6 +117,8 @@ def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
         details['gid'] = gid
     if env_inherit is not None:
         details['env_inherit'] = env_inherit
+    if group is not None:
+        details['group'] = group
     if extras is not None:
         details.update(extras)
     content = _dumps(details)
@@ -151,6 +185,7 @@ _remove_parser = _subparsers.add_parser('remove')
 _remove_parser.add_argument('name')
 _remove_parser.set_defaults(func=remove)
 _add_parser = _subparsers.add_parser('add')
+Process.setParser(_add_parser)
 _add_parser.add_argument('name')
 _add_parser.add_argument('--cmd', required=True)
 _add_parser.add_argument('--arg', dest='args', action='append')
