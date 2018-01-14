@@ -192,6 +192,7 @@ class TestReceiver(unittest.TestCase):
                           ['Restarting all monitored processes'])
 
     def test_restart_group(self):
+        """Restarting group of one restarts the process in group"""
         message = helper.dumps2utf8(dict(args=['/bin/echo', 'hello'],
                                          group=['things']))
         self.receiver.add('hello', message)
@@ -201,6 +202,7 @@ class TestReceiver(unittest.TestCase):
                           ('RESTART', 'hello'))
 
     def test_restart_empty_group(self):
+        """Restarting empty group restarts no processes"""
         message = helper.dumps2utf8(dict(args=['/bin/echo', 'hello'],
                                          group=['things']))
         self.receiver.add('hello', message)
