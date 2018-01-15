@@ -159,11 +159,13 @@ class TestReceiver(unittest.TestCase):
 
     def test_remove(self):
         """Test a process removal"""
+        message = helper.dumps2utf8(dict(args=['/bin/echo', 'hello']))
+        self.receiver.add('hello', message)
         self.receiver.remove('hello')
-        self.assertEquals(self.monitor.events,
-                          [('REMOVE', 'hello')])
-        self.assertEquals(self.logMessages,
-                          ['Removed monitored process: hello'])
+        self.assertEquals(self.monitor.events[-1],
+                          ('REMOVE', 'hello'))
+        self.assertEquals(self.logMessages[-1],
+                          'Removed monitored process: hello')
 
     def test_restart(self):
         """Test a process restart"""
@@ -188,3 +190,23 @@ class TestReceiver(unittest.TestCase):
                           [('RESTART-ALL',)])
         self.assertEquals(self.logMessages,
                           ['Restarting all monitored processes'])
+
+    def test_restart_group(self):
+        """Restarting group of one restarts the process in group"""
+        message = helper.dumps2utf8(dict(args=['/bin/echo', 'hello'],
+                                         group=['things']))
+        self.receiver.add('hello', message)
+        message = helper.dumps2utf8(dict(type='RESTART-GROUP', group='things'))
+        self.receiver.message(message)
+        self.assertEquals(self.monitor.events[-1],
+                          ('RESTART', 'hello'))
+
+    def test_restart_empty_group(self):
+        """Restarting empty group restarts no processes"""
+        message = helper.dumps2utf8(dict(args=['/bin/echo', 'hello'],
+                                         group=['things']))
+        self.receiver.add('hello', message)
+        self.receiver.remove('hello')
+        message = helper.dumps2utf8(dict(type='RESTART-GROUP', group='things'))
+        self.receiver.message(message)
+        self.assertNotEquals(self.monitor.events[-1][0], 'RESTART')
