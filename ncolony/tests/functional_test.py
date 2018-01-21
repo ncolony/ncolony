@@ -69,7 +69,8 @@ def main(argv):
     print('STOP')
     """)
     SLEEPER = ['--arg=-c', '--arg', SLEEP]
-    subprocess.check_call([sys.executable, '-m', 'ncolony', 'ctl'] + locations +
+    subprocess.check_call([sys.executable, '-m', 'ncolony', 'ctl'] +
+                          locations +
                           ['add', 'sleeper', '--cmd', sys.executable] +
                           SLEEPER)
     proc = subprocess.Popen([sys.executable, '-m', 'twisted',
@@ -100,7 +101,7 @@ def main(argv):
     proc.terminate()
     for dummy in range(10):
         print('waiting for twist to shutdown')
-        if proc.poll() != None:
+        if proc.poll() is not None:
             break
         time.sleep(1)
     else:
