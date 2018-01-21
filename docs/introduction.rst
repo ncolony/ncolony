@@ -33,13 +33,13 @@ NColony components
 ~~~~~~~~~~~~~~~~~~
 
 NColony is built on the Twisted_ framework.
-Most of its parts are implemented as twistd_ plugins,
+Most of its parts are implemented as twist_ plugins,
 allowing the end-user to control features like logging,
 reactor selection and more.
 
-:program:`twistd ncolony`
+:program:`twist ncolony`
 
-  The process monitor is called as the "ncolony" twistd plugin.
+  The process monitor is called as the "ncolony" twist plugin.
   It starts processes, and continuously monitors both process state
   and configuration, and makes sure they are in sync.
 
@@ -47,7 +47,7 @@ reactor selection and more.
   It also monitors a messages directory with "ephemeral" configuration:
   mostly restart requests.
 
-:program:`twistd ncolony-beatcheck`
+:program:`twist ncolony-beatcheck`
 
   This plugin, intended to be run under the ncolony monitor,
   will look at other processes' configuration,
@@ -56,7 +56,7 @@ reactor selection and more.
   and message ncolony with a restart request if the heart does
   not beat for too long.
 
-:program:`twistd ncolony-scheduler`
+:program:`twist ncolony-scheduler`
 
   This plugin, intended to be run under the ncolony monitor,
   will periodically run a short-lived process.
@@ -72,4 +72,4 @@ reactor selection and more.
 
 .. _Twisted: https://twistedmatrix.com/trac/
 
-.. _twistd: http://twistedmatrix.com/documents/current/core/howto/basics.html
+.. _twist: http://twistedmatrix.com/documents/current/core/howto/basics.html

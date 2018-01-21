@@ -7,8 +7,8 @@ Construct a Twisted service for process scheduling.
 
 .. code-block:: bash
 
-   $ twistd -n ncolonysched --timeout 2 --grace 1 --frequency 10
-            --arg /bin/echo --arg hello
+   $ twist ncolonysched --timeout 2 --grace 1 --frequency 10
+           --arg /bin/echo --arg hello
 """
 from __future__ import print_function
 

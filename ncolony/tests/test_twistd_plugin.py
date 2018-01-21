@@ -1,9 +1,8 @@
 # Copyright (c) Moshe Zadka
 # See LICENSE for details.
 
-"""ncolony.tests.test_twistd_plugins
-
-See if the plugins are registered correctly.
+"""
+Plugins are registered correctly.
 """
 
 import unittest
