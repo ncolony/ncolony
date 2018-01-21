@@ -76,11 +76,11 @@ def main(argv):
                              '--log-file', LOG_FILE,
                              'ncolony',
                              '--freq', '1'] +
-                             locations)
+                            locations)
     for dummy in range(10):
         print('checking for log file')
         try:
-            with open(LOG_FILE) as fp:
+            with open(LOG_FILE):
                 pass
         except IOError:
             pass
