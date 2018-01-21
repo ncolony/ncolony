@@ -50,7 +50,7 @@ def main(argv):
 
     here = _getHere()
     FUNC_TEMP = os.path.join(here, '_func_temp')
-    LOG_FILE = os.path.join(FUNC_TEMP, 'twistd.log')
+    LOG_FILE = os.path.join(FUNC_TEMP, 'twisted.log')
     if os.path.exists(FUNC_TEMP):
         shutil.rmtree(FUNC_TEMP)
     CONFIGS = os.path.join(FUNC_TEMP, 'configs')
