@@ -35,14 +35,13 @@ Release
 * Create a pull request
 * Merge the pull request
 * Run :code:`tox`
-* Take the wheel and the sdist from build/tox, and use :code:`twine` to upload
-  them
+* Run :code:`twine upload build/tox/py27-wheel/tmp/dist/*`
 
 Contributors
 =============
 
 Moshe Zadka <zadka.moshe@gmail.com>
-Mark Williams
+Mark Williams <mrw@enotuniq.org>
 
 License
 =======
