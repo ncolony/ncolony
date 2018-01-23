@@ -45,29 +45,50 @@ from ncolony import main as mainlib
 
 NEXT = functools.partial(next, itertools.count(0))
 
-Places = collections.namedtuple('Places', 'config messages')
-
+@attr.s(frozen=True)
+class Places(object):
+    config = attr.ib()
+    messages = attr.ib()
 
 def _dumps(stuff):
     return json.dumps(stuff).encode('utf-8')
 
-PARSING = object()
+_COMMAND_LINE = object()
 
-def attrib(type=str, default_factory=None, positional=False):
-    
+def attrib(tp=str, convert=None, required=False, positional=False):
+    metadata = {_COMMAND_LINE: (tp, positional, convert)}
+    default = attr.NOTHING()
+    if not required:
+        if type == dict:
+            default = attr.Factory(dict)
+        elif type == list:
+            default = attr.Factory(list)
+        else:
+            default = None
+    return attr.ib(default=default, metadata=metadata)
+
+def _set_parser(cls, parser):
+    for attribute in cls.__attrs_attrs__:
+        tp, positional, convert = attribute.metadata[_COMMAND_LINE]
+        required = (attribute.default == attr.NOTHING())
+        name = attribute.name.replace('-', '_')
+        if convert != None:
+            tp = convert
+            
+
 
 @attr.s(frozen=True)
 class Process(object):
 
-    name = attr.ib()
-    cmd = attr.ib()
-    args = attr.ib(default=attr.Factory(list))
-    env = attr.ib(default=attr.Factory(list))
-    uid = attr.ib(default=None)
-    gid = attr.ib(default=None)
-    extras = attr.ib(default=attr.Factory(dict))
-    env_inherit = attr.ib(default=attr.Factory(list))
-    group = attr.ib(default=attr.Factory(list))
+    name = attrib(positional=True, required=True)
+    cmd = attrib(required=True)
+    args = attr.ib(type=list)
+    env = attr.ib(type=dict)
+    uid = attr.ib(type=int)
+    gid = attr.ib(type=int)
+    extras = attr.ib(type=str, convert=_parseJSON)
+    env_inherit = attr.ib(type=list)
+    group = attr.ib(type=list)
 
 _add_parser.add_argument('--cmd', required=True)
 _add_parser.add_argument('--arg', dest='args', action='append')
