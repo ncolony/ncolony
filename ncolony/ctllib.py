@@ -39,6 +39,7 @@ import itertools
 import json
 import os
 
+import attr
 from twisted.python import filepath
 
 from ncolony import main as mainlib
@@ -57,7 +58,7 @@ _COMMAND_LINE = object()
 
 def attrib(tp=str, convert=None, required=False, positional=False):
     metadata = {_COMMAND_LINE: (tp, positional, convert)}
-    default = attr.NOTHING()
+    default = attr.NOTHING
     if not required:
         if type == dict:
             default = attr.Factory(dict)
@@ -74,7 +75,12 @@ def _set_parser(cls, parser):
         name = attribute.name.replace('-', '_')
         if convert != None:
             tp = convert
-            
+
+
+def _parseJSON(fname):
+    with open(fname) as fp:
+        data = fp.read()
+    return json.loads(data)
 
 
 @attr.s(frozen=True)
@@ -187,10 +193,6 @@ def restartAll(places):
     _addMessage(places, content)
 
 
-def _parseJSON(fname):
-    with open(fname) as fp:
-        data = fp.read()
-    return json.loads(data)
 
 
 PARSER = argparse.ArgumentParser()
