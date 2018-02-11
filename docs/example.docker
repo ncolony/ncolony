@@ -1,0 +1,21 @@
+FROM python:stretch
+RUN mkdir /wheels
+RUN pip install incremental 
+RUN mkdir /ncolony
+COPY setup.py setup.cfg /ncolony/
+COPY ncolony /ncolony/ncolony
+COPY twisted /ncolony/twisted
+RUN pip wheel /ncolony --wheel-dir /wheels
+
+FROM python:slim-stretch
+COPY --from=0 /wheels/*.whl /wheels/
+RUN pip install --find-links /wheels/ --no-index ncolony && \
+    mkdir /var/lib/ncolony/ && \
+    mkdir /var/lib/ncolony/config && \
+    mkdir /var/lib/ncolony/messages && \
+    mkdir /foo/ && \
+    echo hello > foo/index.html && \
+    python -m ncolony ctl --messages /var/lib/ncolony/messages --config /var/lib/ncolony/config \
+               add web --cmd=/usr/local/bin/python --arg=-m --arg=twisted --arg=web \
+               --arg=--path --arg=/foo
+ENTRYPOINT ["/usr/local/bin/python", "-m", "twisted", "ncolony", "--config", "/var/lib/ncolony/config/", "--messages", "/var/lib/ncolony/messages/"]
