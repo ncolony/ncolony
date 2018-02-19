@@ -53,3 +53,4 @@ inspired by the `Contributor covenant`_.
    configuration
    process
    api
+   docker
