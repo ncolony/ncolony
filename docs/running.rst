@@ -18,24 +18,24 @@ The following commands will do that:
 
 .. code::
 
-    $ mkdir /messages /conf
-    $ python -m ncolony ctl --messages /messages --config /conf add \
+    $ mkdir messages conf
+    $ python -m ncolony ctl --messages messages --config conf add \
                 --name=web \
                 --cmd=python --arg=-m --arg=twisted --arg=web
-    $ python -m ncolony ctl --messages /messages --config /conf add \
+    $ python -m ncolony ctl --messages messages --config conf add \
                 --name=echo \
                 --cmd=python --arg=-m --arg=twisted --arg=ncolony-scheduler \
                 --arg=--arg=echo --arg=--arg=hello \
                 --arg=--frequency=10 --arg=--timeout=5 --arg=--grace=10
-    $ python -m twisted ncolony --messages /messages --config /conf
+    $ python -m twisted ncolony --messages messages --config conf
 
 This is pretty dense, but it can be broken down into parts.
-We will not go in order,
+We will not go in the order are written,
 but rather in pedagogical order.
 
 .. code::
 
-    $ mkdir /messages /conf
+    $ mkdir messages conf
 
 This is the easiest -- it makes sure the directories that will
 hold the configuration of ncolony.
@@ -44,7 +44,7 @@ We end with
 
 .. code::
 
-    $ python -m twisted ncolony --messages /messages --config /conf
+    $ python -m twisted ncolony --messages messages --config conf
 
 which runs the ncolony supervisor.
 
@@ -54,7 +54,7 @@ There are three ways to change ncolony configuration:
 
 * Command-line using :code:`python -m ncolony ctl`.
 * API using :code:`ncolony.ctllib`.
-* Direct JSON-format file manipulation in :code:`/conf' or :code:`/messages`.
+* Direct JSON-format file manipulation in :code:`conf' or :code:`messages`.
 
 Note that all three ways are equivalent,
 and should be used in different situations.
@@ -67,7 +67,7 @@ for the Twisted demo web server:
 
 .. code::
 
-    $ python -m ncolony ctl --messages /messages --config /conf add\
+    $ python -m ncolony ctl --messages messages --config conf add\
                 --name=web \
                 --cmd=python --arg=-m --arg=twisted --arg=web
 
@@ -110,7 +110,7 @@ The periodic process is more complicated:
 
 .. code::
 
-    $ python -m ncolony ctl --messages /messages --config /conf add\
+    $ python -m ncolony ctl --messages messages --config conf add\
                 --name=echo \
                 --cmd=python --arg=-m --arg=twisted --arg=ncolony-scheduler \
                 --arg=--arg=echo --arg=--arg=hello \
@@ -119,7 +119,7 @@ The periodic process is more complicated:
 
 NColony is designed to run long-lived processes --
 not a short-lived process that,
-says,
+say,
 writes something to standard output and then exits.
 The service :code:`ncolony-scheduler` is designed to bridge that gap:
 it will manage the short-lived process,
@@ -135,18 +135,18 @@ If we need to restart the web process, we can run
 
 .. code::
 
-    $ python -m ncolony ctl --messages /messages --config /conf restart \
-                --name=echo
+    $ python -m ncolony ctl --messages messages --config conf restart \
+                --name=web
 
 We can also restart everything with 
 
-    $ python -m ncolony ctl --messages /messages --config /conf restart-all
+    $ python -m ncolony ctl --messages messages --config conf restart-all
 
 
-The :code:`/conf` directory holds the configuration --
+The :code:`conf` directory holds the configuration --
 which processes need to be run,
 and some metadata about them.
-The :code:`/messages` directory is where messages to the ncolony
+The :code:`messages` directory is where messages to the ncolony
 process are kept, until they are handled --
 for example, a request to restart a process will be there
 until it is handled.
@@ -157,7 +157,7 @@ the ncolony monitor, and start it again, it will start the
 same programs again.
 
 :command:`python -m twisted` Command-Line Options
-===========--------------------------------------
+-------------------------------------------------
 
 A full set of twistd command-line options can be found in the
 :code:`python -m twisted` help (available via :command:`python -m twisted --help`).
