@@ -145,6 +145,13 @@ class TestController(unittest.TestCase):
         d = jsonFrom(fname)
         self.assertEquals(d, dict(type='RESTART-ALL'))
 
+    def test_add_without_arg(self):
+        """A command does not require an argument."""
+        ctllib.add(self.places, 'hello', cmd='/bin/date', args=None)
+        fname = os.path.join(self.places.config, 'hello')
+        d = jsonFrom(fname)
+        self.assertEquals(d, dict(args=['/bin/date']))
+
     def test_add_and_remove(self):
         """Test that add/remove work"""
         ctllib.add(self.places, 'hello', cmd='/bin/echo', args=['hello'])
