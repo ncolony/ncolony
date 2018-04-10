@@ -53,23 +53,31 @@ def _dumps(stuff):
 
 
 # pylint: disable=too-many-arguments,too-many-locals
-def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
-        env_inherit=None):
+def add(places, name, cmd, args,
+        env=None, uid=None, gid=None, extras=None,
+        env_inherit=None, _cmd_and_args=None):
     """Add a process.
 
     :param places: a Places instance
     :param name: string, the logical name of the process
     :param cmd: string, executable
     :param args: list of strings, command-line arguments
-    :param env: dictionary mapping strings to strings
-         (will be environment in subprocess)
+    :param env: dictionary mapping strings to strings (will be
+        environment in subprocess)
     :param uid: integer, uid to run the new process as
     :param gid: integer, gid to run the new process as
     :param extras: a dictionary with additional parameters
     :param env_inherit: a list of environment variables to inherit
+
     :returns: None
     """
-    args = [cmd] + ([] if args is None else args)
+    if not (cmd or _cmd_and_args):
+        PARSER.error(
+            'Must provide either --cmd or positional cmd_and_args')
+    elif not _cmd_and_args:
+        args = [cmd] + ([] if args is None else args)
+    else:
+        args = _cmd_and_args
     config = filepath.FilePath(places.config)
     fle = config.child(name)
     details = dict(args=args)
@@ -151,14 +159,36 @@ _remove_parser = _subparsers.add_parser('remove')
 _remove_parser.add_argument('name')
 _remove_parser.set_defaults(func=remove)
 _add_parser = _subparsers.add_parser('add')
-_add_parser.add_argument('name')
-_add_parser.add_argument('--cmd', required=True)
-_add_parser.add_argument('--arg', dest='args', action='append')
-_add_parser.add_argument('--env', action='append')
-_add_parser.add_argument('--uid', type=int)
-_add_parser.add_argument('--gid', type=int)
-_add_parser.add_argument('--extras', type=_parseJSON)
-_add_parser.add_argument('--env-inherit', dest='env_inherit', action='append')
+_add_parser.add_argument('name', help='The name of this command.')
+_add_parser.add_argument('--cmd',
+                         help='The path of the command to run.'
+                         ' This is mutually exclusive with cmd_and_args,'
+                         ' but one must be present.')
+_add_parser.add_argument('--arg', dest='args', action='append',
+                         help='An argument to the command.'
+                         ' Can be specified multiple times.'
+                         ' This is mutually exclusive with cmd_and_args.')
+_add_parser.add_argument('--env', action='append',
+                         help='A environment variable of the form'
+                         '`NAME=VALUE`.'
+                         ' Can be specified multiple times.')
+_add_parser.add_argument('--uid', type=int,
+                         help='The numeric user ID under which this command'
+                         ' will run.')
+_add_parser.add_argument('--gid', type=int,
+                         help='The numeric group ID under which this command'
+                         ' will run.')
+_add_parser.add_argument('--extras', type=_parseJSON,
+                         help='Additional data to store with this command.')
+_add_parser.add_argument('--env-inherit', dest='env_inherit', action='append',
+                         help='The name of environment variable that will be'
+                         ' inherited from the monitor process.'
+                         ' Can be specified multiple times.')
+_add_parser.add_argument("_cmd_and_args", nargs="*", metavar="cmd_and_args",
+                         help='The command to run and any arguments it takes.'
+                         ' This is mutually exclusive with --cmd and --arg,'
+                         ' but the command must be specified here'
+                         ' or with --cmd.')
 _add_parser.set_defaults(func=add)
 
 
