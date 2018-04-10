@@ -20,7 +20,7 @@ Running Sentry_:
 
 .. code::
 
-    $ python -m ncolony ctl add sentry --cmd /myvenv/sentry \
+    $ python -m ncolony ctl add sentry --cmd /myvenv/bin/sentry \
         --arg start --arg --config=/etc/sentry.conf
 
 or
@@ -29,23 +29,30 @@ or
 
     from ncolony import ctllib
 
-    ctllib.add(name='sentry', cmd='/myenv/sentry',
+    ctllib.add(name='sentry', cmd='/myvenv/bin/sentry',
                args=['start', '--config=/etc/sentry.conf'])
 
 Running a Twisted demo server:
 
 .. code::
 
-    $ python -m ncolony ctl add demo-server --cmd /myvenv/twistd \
+    $ python -m ncolony ctl add demo-server --cmd /myvenv/bin/twistd \
         --arg --nodaemon --arg web
 
 or
 
 .. code::
 
+   $ python -m ncolony ctl add demo-server -- /myvenv/bin/twistd \
+        --nodaemon web
+
+or, with the Python API,
+
+.. code::
+
     from ncolony import ctllib
 
-    ctllib.add(name='demo-server', cmd='/myenv/twistd',
+    ctllib.add(name='demo-server', cmd='/myvenv/bin/twistd',
                args=['--nodaemon', 'web'])
 
 Note the :code:`--nodaemon`: programs run by ncolony should not daemonize,

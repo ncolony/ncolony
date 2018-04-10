@@ -91,10 +91,14 @@ restart, remove
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Option: --cmd CMD
-    Name of executable
+    Name of executable.
+    This can alternatively be specified as a positional argument
+    after the name.
 
 Option: --arg ARGS
-    Add an argument to the command
+    Add an argument to the command.
+    These can alternatively be specified as positional argument
+    after a positional command argument.
 
 Option: --env NAME=VALUE
    Add an environment variable
