@@ -69,7 +69,7 @@ def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
     :param env_inherit: a list of environment variables to inherit
     :returns: None
     """
-    args = [cmd]+args
+    args = [cmd] + ([] if args is None else args)
     config = filepath.FilePath(places.config)
     fle = config.child(name)
     details = dict(args=args)
