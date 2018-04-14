@@ -62,8 +62,8 @@ def add(places, name, cmd, args,
     :param name: string, the logical name of the process
     :param cmd: string, executable
     :param args: list of strings, command-line arguments
-    :param env: dictionary mapping strings to strings (will be
-        environment in subprocess)
+    :param env: dictionary mapping strings to strings
+         (will be environment in subprocess)
     :param uid: integer, uid to run the new process as
     :param gid: integer, gid to run the new process as
     :param extras: a dictionary with additional parameters
