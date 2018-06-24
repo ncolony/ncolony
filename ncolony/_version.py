@@ -9,5 +9,5 @@ Provides ncolony version information.
 
 from incremental import Version
 
-__version__ = Version('ncolony', 17, 9, 0)
+__version__ = Version('ncolony', 18, 6, 0)
 __all__ = ["__version__"]
