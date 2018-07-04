@@ -14,7 +14,7 @@ For simplicity, we will assume that they live in the root directory,
 
 .. code::
 
-    twistd -n ncolony --messages /messages --config /conf
+    twist -n ncolony --messages /messages --config /conf
 
 Of course, it is useless to run a monitor without any processes
 to monitor:
@@ -31,13 +31,13 @@ we run these in. In fact, if we now shut down (via CTRL-C)
 the ncolony monitor, and start it again, it will start the
 :code:`cat` program again.
 
-:command:`twistd` Command-Line Options
+:command:`twist` Command-Line Options
 --------------------------------------
 
 A full set of twistd command-line options can be found in the
-twistd help (available via :command:`twistd --help`).
+twist help (available via :command:`twist --help`).
 
-:command:`twistd ncolony` Command-Line Options
+:command:`twist ncolony` Command-Line Options
 ----------------------------------------------
 
 Option: --config DIR
@@ -126,7 +126,7 @@ Logging
 ~~~~~~~
 
 The log of :code:`ncolony` itself is configured by using
-the :code:`twistd` log configuration.
+the :code:`twist` log configuration.
 While :code:`ncolony` will log processes' stdout/err,
 it is highly encouraged to set logs for these.
 Ideally, :code:`ncolony` logs should also show either

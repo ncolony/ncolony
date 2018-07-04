@@ -9,6 +9,7 @@ import os
 import shutil
 import subprocess
 import sys
+import textwrap
 import time
 
 from ncolony import main as mainlib
@@ -49,55 +50,62 @@ def main(argv):
 
     here = _getHere()
     FUNC_TEMP = os.path.join(here, '_func_temp')
-    PID_FILE = os.path.join(FUNC_TEMP, 'twistd.pid')
-    LOG_FILE = os.path.join(FUNC_TEMP, 'twistd.log')
+    LOG_FILE = os.path.join(FUNC_TEMP, 'twisted.log')
     if os.path.exists(FUNC_TEMP):
-        _killPatiently(PID_FILE)
         shutil.rmtree(FUNC_TEMP)
     CONFIGS = os.path.join(FUNC_TEMP, 'configs')
     MESSAGES = os.path.join(FUNC_TEMP, 'messages')
     os.makedirs(CONFIGS)
     os.makedirs(MESSAGES)
-    DEFAULTS = ['--messages', MESSAGES, '--config', CONFIGS]
-    SLEEP = ("import time, sys;print('START');sys.stdout.flush();"
-             "time.sleep(3);print('STOP')")
+    locations = ['--messages', MESSAGES,
+                 '--config', CONFIGS]
+    SLEEP = textwrap.dedent("""
+    import time
+    import sys
+
+    print('START')
+    sys.stdout.flush()
+    time.sleep(3)
+    print('STOP')
+    """)
     SLEEPER = ['--arg=-c', '--arg', SLEEP]
-    subprocess.check_call([sys.executable, '-m', 'ncolony', 'ctl'] + DEFAULTS +
+    subprocess.check_call([sys.executable, '-m', 'ncolony', 'ctl'] +
+                          locations +
                           ['add', 'sleeper', '--cmd', sys.executable] +
                           SLEEPER)
-    subprocess.check_call([os.path.join(binLocation, 'twistd'),
-                           '--logfile', LOG_FILE,
-                           '--pidfile', PID_FILE, 'ncolony'] +
-                          DEFAULTS +
-                          ['--freq', '1'])
+    proc = subprocess.Popen([sys.executable, '-m', 'twisted',
+                             '--log-file', LOG_FILE,
+                             'ncolony',
+                             '--freq', '1'] +
+                            locations)
     for dummy in range(10):
-        print('checking for pid file')
+        print('checking for log file')
         try:
-            with open(PID_FILE) as fp:
-                pid = int(fp.read())
+            with open(LOG_FILE):
+                pass
         except IOError:
-            continue
+            pass
         else:
             break
         time.sleep(1)
     else:
-        sys.exit("PID file does not exist")
+        sys.exit("log file does not exist")
     print("sleeping for 5 seconds")
     time.sleep(5)
     print("waking up, asking for global restart")
     subprocess.check_call([sys.executable, '-m', 'ncolony', 'ctl'] +
-                          DEFAULTS + ['restart-all'])
+                          locations + ['restart-all'])
     print("sleeping for 5 seconds")
     time.sleep(5)
-    print("waking up, killing twistd")
-    os.kill(pid, 15)
+    print("waking up, killing twist")
+    proc.terminate()
     for dummy in range(10):
-        print('waiting for twistd to shutdown')
-        if not os.path.exists(PID_FILE):
+        print('waiting for twist to shutdown')
+        if proc.poll() is not None:
             break
         time.sleep(1)
     else:
-        sys.exit("twistd did not shutdown")
+        sys.exit("twist did not shutdown")
     _analyzeLogFile(LOG_FILE)
 
 

@@ -8,7 +8,7 @@ Check heartbeats of processes that should beat.
 
 Usually used as
 
-$ twistd -n ncolony_beatcheck --config config --messages messages
+$ twist ncolony_beatcheck --config config --messages messages
 
 It will watch the configurations, and send a restart message
 for any process that does not beat within its heartbeat.

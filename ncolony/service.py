@@ -3,11 +3,11 @@
 """ncolony.service
 ==========================================================================
 
-Implement the 'ncolony' twistd plugin.
+Implement the 'ncolony' twist plugin.
 
 .. code-block:: bash
 
-  $ twistd ncolony --config <dir> --messages <dir>
+  $ twist ncolony --config <dir> --messages <dir>
 
 Will run a service that brings up all processes described in files
 in the configuration directory (and shuts them down if the files

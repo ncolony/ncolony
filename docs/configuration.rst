@@ -36,8 +36,8 @@ Running a Twisted demo server:
 
 .. code::
 
-    $ python -m ncolony ctl add demo-server --cmd /myvenv/twistd \
-        --arg --nodaemon --arg web
+    $ python -m ncolony ctl add demo-server --cmd /myvenv/twist \
+        --arg web
 
 or
 
@@ -45,10 +45,7 @@ or
 
     from ncolony import ctllib
 
-    ctllib.add(name='demo-server', cmd='/myenv/twistd',
-               args=['--nodaemon', 'web'])
-
-Note the :code:`--nodaemon`: programs run by ncolony should not daemonize,
-so that ncolony can properly monitor them.
+    ctllib.add(name='demo-server', cmd='/myenv/twist',
+               args=['web'])
 
 .. _Sentry: https://getsentry.com/welcome/
