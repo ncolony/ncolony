@@ -6,8 +6,8 @@ NColony
 
 Infrastructure for running "colonies" of processes.
 
-.. image:: https://travis-ci.org/moshez/ncolony.svg?branch=master
-    :target: https://travis-ci.org/moshez/ncolony
+.. image:: https://travis-ci.org/ncolony/ncolony.svg?branch=master
+    :target: https://travis-ci.org/ncolony/ncolony
 
 .. image:: https://readthedocs.org/projects/ncolony/badge/?version=latest
     :alt: Documentation Status
