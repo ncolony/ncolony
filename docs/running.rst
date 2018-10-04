@@ -21,7 +21,8 @@ to monitor:
 
 .. code::
 
-    python -m ncolony ctl add my-cat-program --cmd cat
+    python -m ncolony ctl --messages /messages --config /conf add \
+                      my-cat-program --cmd cat
 
 This will add the cat program as a monitored program.
 Because :code:`cat` hangs forever reading from stdin,
