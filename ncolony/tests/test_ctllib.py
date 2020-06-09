@@ -53,17 +53,21 @@ class TestArgParsing(unittest.TestCase):
         self.assertEquals(res.name, 'hello')
         self.assertIs(res.func, ctllib.restart)
 
-    def test_add_needs_cmd(self):
-        """Check add subcommand fails without required --cmd"""
-        with self.assertRaises(SystemExit):
-            self.parser.parse_args(self.base+['add', 'hello'])
-
-    def test_add(self):
-        """Check add subcommand parsing"""
+    def test_add_cmd(self):
+        """Check add subcommand parsing with --cmd"""
         res = self.parser.parse_args(self.base+['add', 'hello',
                                                 '--cmd', '/bin/echo'])
         self.assertEquals(res.name, 'hello')
         self.assertEquals(res.cmd, '/bin/echo')
+        self.assertIs(res.func, ctllib.add)
+
+    def test_add_positional(self):
+        """Check add subcommand parsing with positional arguments"""
+        res = self.parser.parse_args(self.base+['add', 'hello',
+                                                '--',
+                                                '/bin/echo', '--arg', 'pos'])
+        self.assertEquals(res.name, 'hello')
+        self.assertEquals(res._cmd_and_args, ['/bin/echo', '--arg', 'pos'])
         self.assertIs(res.func, ctllib.add)
 
     def test_add_full(self):
@@ -145,9 +149,31 @@ class TestController(unittest.TestCase):
         d = jsonFrom(fname)
         self.assertEquals(d, dict(type='RESTART-ALL'))
 
+    def test_add_without_command(self):
+        """Add requires --cmd or a positional command."""
+        with self.assertRaises(SystemExit):
+            ctllib.add(self.places, 'hello', cmd=None, args=None)
+
+    def test_add_without_arg(self):
+        """A command does not require an argument."""
+        ctllib.add(self.places, 'hello', cmd='/bin/date', args=None)
+        fname = os.path.join(self.places.config, 'hello')
+        d = jsonFrom(fname)
+        self.assertEquals(d, dict(args=['/bin/date']))
+
     def test_add_and_remove(self):
         """Test that add/remove work"""
         ctllib.add(self.places, 'hello', cmd='/bin/echo', args=['hello'])
+        fname = os.path.join(self.places.config, 'hello')
+        d = jsonFrom(fname)
+        self.assertEquals(d, dict(args=['/bin/echo', 'hello']))
+        ctllib.remove(self.places, 'hello')
+        self.assertFalse(os.path.exists(fname))
+
+    def test_add_and_remove_positional(self):
+        """Test that add/remove work"""
+        ctllib.add(self.places, 'hello', cmd=None, args=None,
+                   _cmd_and_args=['/bin/echo', 'hello'])
         fname = os.path.join(self.places.config, 'hello')
         d = jsonFrom(fname)
         self.assertEquals(d, dict(args=['/bin/echo', 'hello']))
