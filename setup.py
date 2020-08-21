@@ -23,7 +23,7 @@ setuptools.setup(
     ],
     keywords='process monitoring supervisor daemon',
     packages=setuptools.find_packages() + ['twisted.plugins'],
-    install_requires=['Twisted', 'gather', 'incremental', 'six'],
+    install_requires=['Twisted', 'attrs', 'gather', 'incremental', 'six'],
     setup_requires=['incremental'],
     use_incremental=True,
     entry_points={'gather': ["plugins=ncolony"]},
