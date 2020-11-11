@@ -7,6 +7,7 @@ import collections
 import json
 import os
 import shutil
+import tempfile
 import unittest
 
 from zope.interface import verify
@@ -72,22 +73,26 @@ class TestTransportDirectoryDict(unittest.TestCase):
 # pylint: disable=protected-access
 
 
+def _makeTestDirs(testCase):
+    def _cleanup():
+        if os.path.exists(rootDir):
+            shutil.rmtree(rootDir)
+    testCase.addCleanup(_cleanup)
+    rootDir = tempfile.mkdtemp()
+    testDirs = {name: os.path.join(rootDir, name)
+                for name in ['config', 'messages']}
+    for dname in testDirs.values():
+        os.mkdir(dname)
+    return testDirs
+
+
 class TestService(unittest.TestCase):
 
     """Test the service"""
 
     def setUp(self):
         """Set up the test"""
-
-        def _cleanup(testDir):
-            if os.path.exists(testDir):
-                shutil.rmtree(testDir)
-        self.testDirs = {}
-        for subd in ['config', 'messages']:
-            testDir = self.testDirs[subd] = os.path.join(os.getcwd(), subd)
-            self.addCleanup(_cleanup, testDir)
-            _cleanup(testDir)
-            os.makedirs(testDir)
+        self.testDirs = _makeTestDirs(self)
         self.my_reactor = test_procmon.DummyProcessReactor()
         self.service = service.get(self.testDirs['config'],
                                    self.testDirs['messages'],
@@ -176,8 +181,10 @@ class TestOptions(unittest.TestCase):
 
     def setUp(self):
         """Set up the test"""
+        self.testDirs = _makeTestDirs(self)
+        self.basic = ['--message', self.testDirs['messages'],
+                      '--config', self.testDirs['config']]
         self.opt = service.Options()
-        self.basic = ['--message', 'message-dir', '--config', 'config-dir']
 
     def test_commandLineRequired(self):
         """Test failure on missing command line"""
@@ -187,8 +194,8 @@ class TestOptions(unittest.TestCase):
     def test_basic(self):
         """Test basic command line parsing"""
         self.opt.parseOptions(self.basic)
-        self.assertEqual(self.opt['messages'], 'message-dir')
-        self.assertEqual(self.opt['config'], 'config-dir')
+        self.assertEqual(self.opt['messages'], self.testDirs['messages'])
+        self.assertEqual(self.opt['config'], self.testDirs['config'])
         self.assertEqual(self.opt['threshold'], 1)
         self.assertEqual(self.opt['killtime'], 5)
         self.assertEqual(self.opt['minrestartdelay'], 1)
@@ -242,10 +249,15 @@ class TestOptions(unittest.TestCase):
         subservices = list(s)
         subservices.remove(pm)
         functions = [subs.call[0] for subs in subservices]
-        paths = set()
         for func in functions:
-            paths.add(func.args[0].basename())
-        self.assertEquals(paths, set(['message-dir', 'config-dir']))
+            func()
+        with open(os.path.join(self.opt['messages'], 'dummy'), 'wb') as fp:
+            fp.write(b"not a valid json")
+        with open(os.path.join(self.opt['config'], 'dummy'), 'wb') as fp:
+            fp.write(b"not a valid json")
+        for func in functions:
+            with self.assertRaises(ValueError):
+                func()
         protocols = pm.protocols
         self.assertIsInstance(protocols, service.TransportDirectoryDict)
         self.assertIs(protocols.output, 'pid-dir')
