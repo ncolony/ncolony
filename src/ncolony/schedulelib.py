@@ -44,7 +44,8 @@ class ProcessProtocol(object):
         :params data: The bytes the process returned
         """
         for line in data.splitlines():
-            print('[%d]' % fd, line)
+            print("[%d]" % fd, line)
+
     # pylint: enable=no-self-use
 
     def processEnded(self, reason):
@@ -85,18 +86,20 @@ def runProcess(args, timeout, grace, reactor):
     def _logEnded(err):
         err.trap(tierror.ProcessDone, tierror.ProcessTerminated)
         print(err.value)
+
     deferred.addErrback(_logEnded)
 
     def _cancelTermination(dummy):
         for termination in terminations:
             if termination.active():
                 termination.cancel()
+
     deferred.addCallback(_cancelTermination)
     terminations = []
-    terminations.append(reactor.callLater(timeout, process.signalProcess,
-                                          "TERM"))
-    terminations.append(reactor.callLater(timeout+grace,
-                                          process.signalProcess, "KILL"))
+    terminations.append(reactor.callLater(timeout, process.signalProcess, "TERM"))
+    terminations.append(
+        reactor.callLater(timeout + grace, process.signalProcess, "KILL")
+    )
     return deferred
 
 
@@ -105,23 +108,27 @@ class Options(usage.Options):
     """Options for scheduler service"""
 
     optParameters = [
-        ['timeout', None, None, 'Time before terminating the command', int],
-        ['grace', None, None,
-         'Time between terminating the command and sending an umaskable kill',
-         int],
-        ['frequency', None, None, 'How often to run the command', int],
+        ["timeout", None, None, "Time before terminating the command", int],
+        [
+            "grace",
+            None,
+            None,
+            "Time between terminating the command and sending an umaskable kill",
+            int,
+        ],
+        ["frequency", None, None, "How often to run the command", int],
     ]
 
     def __init__(self):
         usage.Options.__init__(self)
-        self['args'] = []
+        self["args"] = []
 
     def opt_arg(self, arg):
         """Argument"""
-        self['args'].append(arg)
+        self["args"].append(arg)
 
     def postOptions(self):
-        for elem in ['args', 'timeout', 'grace', 'frequency']:
+        for elem in ["args", "timeout", "grace", "frequency"]:
             if not self[elem]:
                 raise ValueError(elem)
 
@@ -132,10 +139,16 @@ def makeService(opts):
     :params opts: dict-like object.
        keys: frequency, args, timeout, grace
     """
-    ser = tainternet.TimerService(opts['frequency'], runProcess, opts['args'],
-                                  opts['timeout'], opts['grace'], tireactor)
+    ser = tainternet.TimerService(
+        opts["frequency"],
+        runProcess,
+        opts["args"],
+        opts["timeout"],
+        opts["grace"],
+        tireactor,
+    )
     ret = service.MultiService()
-    ser.setName('scheduler')
+    ser.setName("scheduler")
     ser.setServiceParent(ret)
     heart.maybeAddHeart(ret)
     return ret

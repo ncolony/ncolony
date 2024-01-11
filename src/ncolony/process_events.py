@@ -18,7 +18,7 @@ from twisted.python import log
 
 from ncolony import interfaces
 
-VALID_KEYS = frozenset(['args', 'uid', 'gid', 'env', 'env_inherit', 'group'])
+VALID_KEYS = frozenset(["args", "uid", "gid", "env", "env_inherit", "group"])
 
 
 @interface.implementer(interfaces.IMonitorEventReceiver)
@@ -46,20 +46,22 @@ class Receiver(object):
            parsed as JSON for process params
         :returns: None
         """
-        parsedContents = json.loads(contents.decode('utf-8'))
-        parsedContents = {key: value
-                          for key, value in six.iteritems(parsedContents)
-                          if key in VALID_KEYS}
-        parsedContents['name'] = name
-        parsedContents['env'] = parsedContents.get('env', {})
-        for key in parsedContents.pop('env_inherit', []):
-            parsedContents['env'][key] = self.environ.get(key, '')
-        groups = parsedContents.pop('group', [])
+        parsedContents = json.loads(contents.decode("utf-8"))
+        parsedContents = {
+            key: value
+            for key, value in six.iteritems(parsedContents)
+            if key in VALID_KEYS
+        }
+        parsedContents["name"] = name
+        parsedContents["env"] = parsedContents.get("env", {})
+        for key in parsedContents.pop("env_inherit", []):
+            parsedContents["env"][key] = self.environ.get(key, "")
+        groups = parsedContents.pop("group", [])
         for key in groups:
             self._groupToProcess[key].add(name)
         self._processToGroups[name] = groups
-        parsedContents['env']['NCOLONY_CONFIG'] = contents
-        parsedContents['env']['NCOLONY_NAME'] = name
+        parsedContents["env"]["NCOLONY_CONFIG"] = contents
+        parsedContents["env"]["NCOLONY_NAME"] = name
         self.monitor.addProcess(**parsedContents)
         log.msg("Added monitored process: ", name)
 
@@ -83,18 +85,18 @@ class Receiver(object):
            ('value') should exist with a logical process
            name.
         """
-        contents = json.loads(contents.decode('utf-8'))
-        tp = contents['type']
-        if tp == 'RESTART':
-            self.monitor.stopProcess(contents['name'])
-            log.msg("Restarting monitored process: ", contents['name'])
-        elif tp == 'RESTART-ALL':
+        contents = json.loads(contents.decode("utf-8"))
+        tp = contents["type"]
+        if tp == "RESTART":
+            self.monitor.stopProcess(contents["name"])
+            log.msg("Restarting monitored process: ", contents["name"])
+        elif tp == "RESTART-ALL":
             self.monitor.restartAll()
             log.msg("Restarting all monitored processes")
-        elif tp == 'RESTART-GROUP':
-            log.msg("Restarting group", contents['group'])
-            for name in self._groupToProcess[contents['group']]:
+        elif tp == "RESTART-GROUP":
+            log.msg("Restarting group", contents["group"])
+            for name in self._groupToProcess[contents["group"]]:
                 log.msg("Restarting monitored process: ", name)
                 self.monitor.stopProcess(name)
         else:
-            raise ValueError('unknown type', contents)
+            raise ValueError("unknown type", contents)

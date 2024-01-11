@@ -43,17 +43,17 @@ from twisted.python import filepath
 
 NEXT = functools.partial(next, itertools.count(0))
 
-Places = collections.namedtuple('Places', 'config messages')
+Places = collections.namedtuple("Places", "config messages")
 
 
 def _dumps(stuff):
-    return json.dumps(stuff).encode('utf-8')
-
+    return json.dumps(stuff).encode("utf-8")
 
 
 # pylint: disable=too-many-arguments,too-many-locals
-def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
-        env_inherit=None):
+def add(
+    places, name, cmd, args, env=None, uid=None, gid=None, extras=None, env_inherit=None
+):
     """Add a process.
 
     :param places: a Places instance
@@ -68,26 +68,28 @@ def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
     :param env_inherit: a list of environment variables to inherit
     :returns: None
     """
-    args = [cmd]+(args or [])
+    args = [cmd] + (args or [])
     config = filepath.FilePath(places.config)
     fle = config.child(name)
     details = dict(args=args)
     if env is not None:
         newEnv = {}
         for thing in env:
-            name, value = thing.split('=', 1)
+            name, value = thing.split("=", 1)
             newEnv[name] = value
-        details['env'] = newEnv
+        details["env"] = newEnv
     if uid is not None:
-        details['uid'] = uid
+        details["uid"] = uid
     if gid is not None:
-        details['gid'] = gid
+        details["gid"] = gid
     if env_inherit is not None:
-        details['env_inherit'] = env_inherit
+        details["env_inherit"] = env_inherit
     if extras is not None:
         details.update(extras)
     content = _dumps(details)
     fle.setContent(content)
+
+
 # pylint: enable=too-many-arguments,too-many-locals
 
 
@@ -105,7 +107,7 @@ def remove(places, name):
 
 def _addMessage(places, content):
     messages = filepath.FilePath(places.messages)
-    name = '%03dMessage.%s' % (NEXT(), os.getpid())
+    name = "%03dMessage.%s" % (NEXT(), os.getpid())
     message = messages.child(name)
     message.setContent(content)
 
@@ -117,7 +119,7 @@ def restart(places, name):
     :params name: string, the logical name of the process
     :returns: None
     """
-    content = _dumps(dict(type='RESTART', name=name))
+    content = _dumps(dict(type="RESTART", name=name))
     _addMessage(places, content)
 
 
@@ -127,7 +129,7 @@ def restartAll(places):
     :params places: a Places instance
     :returns: None
     """
-    content = _dumps(dict(type='RESTART-ALL'))
+    content = _dumps(dict(type="RESTART-ALL"))
     _addMessage(places, content)
 
 
@@ -138,26 +140,26 @@ def _parseJSON(fname):
 
 
 PARSER = argparse.ArgumentParser()
-PARSER.add_argument('--messages', required=True)
-PARSER.add_argument('--config', required=True)
+PARSER.add_argument("--messages", required=True)
+PARSER.add_argument("--config", required=True)
 _subparsers = PARSER.add_subparsers()
-_restart_all_parser = _subparsers.add_parser('restart-all')
+_restart_all_parser = _subparsers.add_parser("restart-all")
 _restart_all_parser.set_defaults(func=restartAll)
-_restart_parser = _subparsers.add_parser('restart')
-_restart_parser.add_argument('name')
+_restart_parser = _subparsers.add_parser("restart")
+_restart_parser.add_argument("name")
 _restart_parser.set_defaults(func=restart)
-_remove_parser = _subparsers.add_parser('remove')
-_remove_parser.add_argument('name')
+_remove_parser = _subparsers.add_parser("remove")
+_remove_parser.add_argument("name")
 _remove_parser.set_defaults(func=remove)
-_add_parser = _subparsers.add_parser('add')
-_add_parser.add_argument('name')
-_add_parser.add_argument('--cmd', required=True)
-_add_parser.add_argument('--arg', dest='args', action='append')
-_add_parser.add_argument('--env', action='append')
-_add_parser.add_argument('--uid', type=int)
-_add_parser.add_argument('--gid', type=int)
-_add_parser.add_argument('--extras', type=_parseJSON)
-_add_parser.add_argument('--env-inherit', dest='env_inherit', action='append')
+_add_parser = _subparsers.add_parser("add")
+_add_parser.add_argument("name")
+_add_parser.add_argument("--cmd", required=True)
+_add_parser.add_argument("--arg", dest="args", action="append")
+_add_parser.add_argument("--env", action="append")
+_add_parser.add_argument("--uid", type=int)
+_add_parser.add_argument("--gid", type=int)
+_add_parser.add_argument("--extras", type=_parseJSON)
+_add_parser.add_argument("--env-inherit", dest="env_inherit", action="append")
 _add_parser.set_defaults(func=add)
 
 
@@ -168,9 +170,8 @@ def call(results):
     :returns: None
     """
     results = vars(results)
-    places = Places(config=results.pop('config'),
-                    messages=results.pop('messages'))
-    func = results.pop('func')
+    places = Places(config=results.pop("config"), messages=results.pop("messages"))
+    func = results.pop("func")
     func(places, **results)
 
 

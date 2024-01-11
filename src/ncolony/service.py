@@ -48,6 +48,7 @@ class TransportDirectoryDict(dict):
         super(TransportDirectoryDict, self).__delitem__(name)
         self.output.child(name).remove()
 
+
 # pylint: enable=too-few-public-methods
 
 
@@ -75,12 +76,12 @@ def get(config, messages, freq, pidDir=None, reactor=None):
     ret = taservice.MultiService()
     args = ()
     if reactor is not None:
-        args = reactor,
+        args = (reactor,)
     procmon = procmonlib.ProcessMonitor(*args)
     if pidDir is not None:
         protocols = TransportDirectoryDict(pidDir)
         procmon.protocols = protocols
-    procmon.setName('procmon')
+    procmon.setName("procmon")
     receiver = process_events.Receiver(procmon)
     confcheck = directory_monitor.checker(config, receiver)
     confserv = internet.TimerService(freq, confcheck)
@@ -90,6 +91,7 @@ def get(config, messages, freq, pidDir=None, reactor=None):
     messageserv.setServiceParent(ret)
     procmon.setServiceParent(ret)
     return ret
+
 
 # pylint: disable=too-few-public-methods
 
@@ -107,9 +109,10 @@ class Options(usage.Options):
 
     def postOptions(self):
         """Checks that required messages/config directories are present"""
-        for param in ('messages', 'config'):
+        for param in ("messages", "config"):
             if self[param] is None:
                 raise usage.UsageError("Missing required", param)
+
 
 # pylint: enable=too-few-public-methods
 
@@ -122,8 +125,12 @@ def makeService(opt):
                 and maxrestartdelay
     :returns: service, {twisted.application.interfaces.IService}
     """
-    ret = get(config=opt['config'], messages=opt['messages'],
-              pidDir=opt['pid'], freq=opt['frequency'])
+    ret = get(
+        config=opt["config"],
+        messages=opt["messages"],
+        pidDir=opt["pid"],
+        freq=opt["frequency"],
+    )
     pm = ret.getServiceNamed("procmon")
     pm.threshold = opt["threshold"]
     pm.killTime = opt["killtime"]

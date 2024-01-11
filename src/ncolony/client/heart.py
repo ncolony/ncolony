@@ -21,6 +21,7 @@ class Heart(object):
 
     Each beat touches a file.
     """
+
     def __init__(self, path):
         self.path = path
 
@@ -38,19 +39,19 @@ def makeService():
 
     :returns: an IService
     """
-    configJSON = os.environ.get('NCOLONY_CONFIG')
+    configJSON = os.environ.get("NCOLONY_CONFIG")
     if configJSON is None:
         return None
     config = json.loads(configJSON)
-    params = config.get('ncolony.beatcheck')
+    params = config.get("ncolony.beatcheck")
     if params is None:
         return None
-    myFilePath = filepath.FilePath(params['status'])
+    myFilePath = filepath.FilePath(params["status"])
     if myFilePath.isdir():
-        name = os.environ['NCOLONY_NAME']
+        name = os.environ["NCOLONY_NAME"]
         myFilePath = myFilePath.child(name)
     heart = Heart(myFilePath)
-    ret = tainternet.TimerService(params['period']/3, heart.beat)
+    ret = tainternet.TimerService(params["period"] / 3, heart.beat)
     return ret
 
 
@@ -65,7 +66,7 @@ def maybeAddHeart(master):
     heartSer = makeService()
     if heartSer is None:
         return
-    heartSer.setName('heart')
+    heartSer.setName("heart")
     heartSer.setServiceParent(master)
 
 

@@ -17,12 +17,12 @@ PROPER_HEADER = """\
 """
 
 
-@mainlib.COMMANDS.register(name='tests.nitpicker')
+@mainlib.COMMANDS.register(name="tests.nitpicker")
 def main(argv):
     """Pick nits in code"""
     argv = argv
     here = os.path.abspath(__file__)
-    while not os.path.exists(os.path.join(here, '.gitignore')):
+    while not os.path.exists(os.path.join(here, ".gitignore")):
         here = os.path.dirname(here)
 
     errors = 0
@@ -30,28 +30,25 @@ def main(argv):
 
     # Check .pyc files
     for dirpath, dirnames, filenames in os.walk(here, topdown=True):
-        if ('build' in dirpath or '__pycache__' in dirpath or
-                '.eggs' in dirpath):
+        if "build" in dirpath or "__pycache__" in dirpath or ".eggs" in dirpath:
             dirnames[:] = []
             continue
         for filename in filenames:
             fullname = os.path.join(dirpath, filename)
-            if fullname.endswith('.pyc'):
+            if fullname.endswith(".pyc"):
                 pyFile = fullname[:-1]
                 if not os.path.isfile(pyFile):
                     errors += 1
-                    print("Byte code file with no source:", fullname,
-                          file=sys.stderr)
-            if (fullname.endswith('.py') and
-                    not fullname.endswith('versioneer.py')):
+                    print("Byte code file with no source:", fullname, file=sys.stderr)
+            if fullname.endswith(".py") and not fullname.endswith("versioneer.py"):
                 with open(fullname) as fp:
                     header = fp.readline() + fp.readline()
                     if header != PROPER_HEADER:
                         errors += 1
-                        print("Python file with no header:", fullname,
-                              file=sys.stderr)
-                        for line in differ.compare(header.splitlines(),
-                                                   PROPER_HEADER.splitlines()):
+                        print("Python file with no header:", fullname, file=sys.stderr)
+                        for line in differ.compare(
+                            header.splitlines(), PROPER_HEADER.splitlines()
+                        ):
                             print(line.rstrip(), file=sys.stderr)
 
     if errors:

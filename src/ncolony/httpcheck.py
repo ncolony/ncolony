@@ -22,7 +22,6 @@ from ncolony.client import heart
 
 
 class _ScoreCard(object):
-
     def __init__(self, maxBad=0):
         self.maxBad = maxBad
         self.bad = 0
@@ -40,21 +39,24 @@ class _ScoreCard(object):
         self.bad = 0
 
     def __repr__(self):
-        return ('<%(klass)s:%(id)s:maxBad=%(maxBad)s,bad=%(bad)s>' %
-                dict(klass=self.__class__.__name__,
-                     id=hex(id(self)),
-                     maxBad=self.maxBad,
-                     bad=self.bad))
+        return "<%(klass)s:%(id)s:maxBad=%(maxBad)s,bad=%(bad)s>" % dict(
+            klass=self.__class__.__name__,
+            id=hex(id(self)),
+            maxBad=self.maxBad,
+            bad=self.bad,
+        )
 
 
-Settings = collections.namedtuple('Settings', 'reactor agent')
+Settings = collections.namedtuple("Settings", "reactor agent")
 
-_USER_AGENT = ('NColony HTTP Check ('
-               'NColony/' + str(ncolony.__version__) + ', '
-               'Twisted/' + twisted.__version__ + ', '
-               'Python ' + sys.version.replace('\n', '') + ')')
+_USER_AGENT = (
+    "NColony HTTP Check ("
+    "NColony/" + str(ncolony.__version__) + ", "
+    "Twisted/" + twisted.__version__ + ", "
+    "Python " + sys.version.replace("\n", "") + ")"
+)
 
-_standardHeaders = client.Headers({'User-Agent': [_USER_AGENT]})
+_standardHeaders = client.Headers({"User-Agent": [_USER_AGENT]})
 
 # pylint: disable=too-many-instance-attributes
 
@@ -63,7 +65,7 @@ class State(object):
 
     """State of an HTTP check"""
 
-    KEY = 'ncolony.httpcheck'
+    KEY = "ncolony.httpcheck"
 
     def __init__(self, location, settings):
         self.location = location
@@ -78,17 +80,22 @@ class State(object):
         self.timeout = None
 
     def __repr__(self):
-        return ('<%(klass)s:%(id)s:location=%(location)s,'
-                'settings=%(settings)s,'
-                'closed=%(closed)s,content=%(content)s,call=%(call)s,'
-                'card=%(card)s>' %
-                dict(klass=self.__class__.__name__, id=hex(id(self)),
-                     location=self.location,
-                     settings=self.settings,
-                     closed=self.closed,
-                     content=self.content,
-                     call=self.call,
-                     card=self.card))
+        return (
+            "<%(klass)s:%(id)s:location=%(location)s,"
+            "settings=%(settings)s,"
+            "closed=%(closed)s,content=%(content)s,call=%(call)s,"
+            "card=%(card)s>"
+            % dict(
+                klass=self.__class__.__name__,
+                id=hex(id(self)),
+                location=self.location,
+                settings=self.settings,
+                closed=self.closed,
+                content=self.content,
+                call=self.call,
+                card=self.card,
+            )
+        )
 
     def _reset(self):
         self.content = None
@@ -115,7 +122,7 @@ class State(object):
         return self._maybeCheck()
 
     def _maybeReset(self):
-        content = self.location.getContent().decode('utf-8')
+        content = self.location.getContent().decode("utf-8")
         if content == self.content:
             return
         self.content = content
@@ -128,39 +135,38 @@ class State(object):
             self.url = None
             self.card = _ScoreCard()
             return
-        self.url = config['url']
-        self.period = config['period']
-        self.card = _ScoreCard(config['maxBad'])
-        self.timeout = min(self.period, config['timeout'])
-        self.nextCheck = (self.settings.reactor.seconds() +
-                          config['grace'] * self.period)
+        self.url = config["url"]
+        self.period = config["period"]
+        self.card = _ScoreCard(config["maxBad"])
+        self.timeout = min(self.period, config["timeout"])
+        self.nextCheck = self.settings.reactor.seconds() + config["grace"] * self.period
 
     def _maybeCheck(self):
         if self.settings.reactor.seconds() <= self.nextCheck:
             return False
-        assert self.call is None, 'Timeout reached, call still outstanding'
+        assert self.call is None, "Timeout reached, call still outstanding"
         if self.card.isBad():
             self._reset()
             return True
         self.nextCheck = self.settings.reactor.seconds() + self.period
-        self.call = self.settings.agent.request('GET', self.url,
-                                                _standardHeaders, None)
-        delayedCall = self.settings.reactor.callLater(self.timeout,
-                                                      self.call.cancel)
+        self.call = self.settings.agent.request("GET", self.url, _standardHeaders, None)
+        delayedCall = self.settings.reactor.callLater(self.timeout, self.call.cancel)
 
         def _gotResult(result):
             if delayedCall.active():
                 delayedCall.cancel()
             return result
+
         self.call.addBoth(_gotResult)
         self.call.addErrback(defer.logError)
-        self.call.addCallbacks(callback=self.card.markGood,
-                               errback=self.card.markBad)
+        self.call.addCallbacks(callback=self.card.markGood, errback=self.card.markBad)
 
         def _removeCall(dummy):
             self.call = None
+
         self.call.addCallback(_removeCall)
         return False
+
 
 # pylint: enable=too-many-instance-attributes
 
@@ -208,8 +214,8 @@ def makeService(opt):
     settings = Settings(reactor=reactor, agent=agent)
     states = {}
     checker = functools.partial(check, settings, states, path)
-    httpcheck = tainternet.TimerService(opt['freq'], run, restarter, checker)
-    httpcheck.setName('httpcheck')
+    httpcheck = tainternet.TimerService(opt["freq"], run, restarter, checker)
+    httpcheck.setName("httpcheck")
     return heart.wrapHeart(httpcheck)
 
 

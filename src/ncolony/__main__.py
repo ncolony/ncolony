@@ -10,7 +10,7 @@ import gather
 
 from ncolony import ctllib
 
-if __name__ != '__main__':
+if __name__ != "__main__":
     raise ImportError("This module cannot be imported")
 
 ctllib.main(sys.argv[1:])

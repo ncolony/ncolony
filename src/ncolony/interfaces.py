@@ -33,7 +33,7 @@ Interface definitions
 
 from zope import interface
 
-__all__ = ['IMonitorEventReceiver']
+__all__ = ["IMonitorEventReceiver"]
 
 # pylint: disable=no-self-argument,no-init
 

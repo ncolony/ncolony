@@ -27,6 +27,7 @@ class DummyFile(object):
         """Note how many times this method was called"""
         self.touched += 1
 
+
 # pylint: enable=too-few-public-methods
 
 
@@ -41,6 +42,7 @@ def replaceEnvironment(case, myEnv=None):
 
     def _cleanup():
         os.environ = oldEnviron
+
     case.addCleanup(_cleanup)
     os.environ = myEnv
 
@@ -49,33 +51,33 @@ _MISSING = object()
 
 
 def _getSelf(method):
-    ret = getattr(method, 'im_self', _MISSING)
+    ret = getattr(method, "im_self", _MISSING)
     if ret is not _MISSING:
         return ret
-    ret = getattr(method, '__self__', _MISSING)
+    ret = getattr(method, "__self__", _MISSING)
     if ret is not _MISSING:
         return ret
     raise TypeError("no self", method)
 
 
 def _getFunc(method):
-    ret = getattr(method, 'im_func', _MISSING)
+    ret = getattr(method, "im_func", _MISSING)
     if ret is not _MISSING:
         return ret
-    ret = getattr(method, '__func__', _MISSING)
+    ret = getattr(method, "__func__", _MISSING)
     if ret is not _MISSING:
         return ret
     return method
 
 
-def checkHeartService(case, service, statusName='my.status'):
+def checkHeartService(case, service, statusName="my.status"):
     """Check that a heart service is correct
 
     :params case: a unittest.TestCase
     :params service: a heart timer service
     """
     case.assertIsInstance(service, tainternet.TimerService)
-    case.assertEquals(service.step, 10/3)
+    case.assertEquals(service.step, 10 / 3)
     func, args, kwargs = service.call
     case.assertFalse(args)
     case.assertFalse(kwargs)
@@ -93,11 +95,11 @@ def buildEnv(params=None):
     :returns: copy of the environment dict and NCOLONY_CONFIG
     """
     if params is None:
-        params = dict(status='my.status', period=10, grace=3)
-    config = {'ncolony.beatcheck': params}
+        params = dict(status="my.status", period=10, grace=3)
+    config = {"ncolony.beatcheck": params}
     configJSON = json.dumps(config)
     myEnv = dict(os.environ)
-    myEnv['NCOLONY_CONFIG'] = configJSON
+    myEnv["NCOLONY_CONFIG"] = configJSON
     return myEnv
 
 
@@ -125,19 +127,19 @@ class TestHeart(unittest.TestCase):
 
     def test_make_service_default_name(self):
         """Test make service builds the service based on os.environ"""
-        params = dict(status='.', period=10, grace=3)
+        params = dict(status=".", period=10, grace=3)
         myEnv = buildEnv(params=params)
-        myEnv['NCOLONY_NAME'] = 'hello'
+        myEnv["NCOLONY_NAME"] = "hello"
         replaceEnvironment(self, myEnv)
         service = heart.makeService()
-        checkHeartService(self, service, 'hello')
+        checkHeartService(self, service, "hello")
 
     def test_make_service_no_env(self):
         """Test make service builds the service based on os.environ"""
         myEnv = dict(os.environ)
         # Simplest way to make sure this doesn't exist
-        myEnv['NCOLONY_CONFIG'] = None
-        del myEnv['NCOLONY_CONFIG']
+        myEnv["NCOLONY_CONFIG"] = None
+        del myEnv["NCOLONY_CONFIG"]
         replaceEnvironment(self, myEnv)
         self.assertIsNone(heart.makeService())
 
@@ -147,6 +149,6 @@ class TestHeart(unittest.TestCase):
         config = {}
         configJSON = json.dumps(config)
         myEnv = dict(os.environ)
-        myEnv['NCOLONY_CONFIG'] = configJSON
+        myEnv["NCOLONY_CONFIG"] = configJSON
         replaceEnvironment(self, myEnv)
         self.assertIsNone(heart.makeService())

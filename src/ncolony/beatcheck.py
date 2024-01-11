@@ -38,22 +38,21 @@ def check(path, start, now):
     :params now: current time
     :returns: list of strings
     """
-    return [child.basename() for child in path.children()
-            if _isbad(child, start, now)]
+    return [child.basename() for child in path.children() if _isbad(child, start, now)]
 
 
 def _isbad(child, start, now):
     content = child.getContent()
     parsed = json.loads(content)
-    params = parsed.get('ncolony.beatcheck')
+    params = parsed.get("ncolony.beatcheck")
     if params is None:
         return False
-    period = params['period']
-    grace = params['grace']
+    period = params["period"]
+    grace = params["grace"]
     mtime = max(child.getModificationTime(), start)
-    if mtime + period*grace >= now:
+    if mtime + period * grace >= now:
         return False
-    status = params['status']
+    status = params["status"]
     statusPath = child.clonePath(status)
     if not statusPath.exists():
         return True
@@ -83,9 +82,9 @@ def parseConfig(opt):
     :params opt: dict-like object with config and messages keys
     :returns: restarter, path
     """
-    places = ctllib.Places(config=opt['config'], messages=opt['messages'])
+    places = ctllib.Places(config=opt["config"], messages=opt["messages"])
     restarter = functools.partial(ctllib.restart, places)
-    path = filepath.FilePath(opt['config'])
+    path = filepath.FilePath(opt["config"])
     return restarter, path
 
 
@@ -100,10 +99,10 @@ def makeService(opt):
     restarter, path = parseConfig(opt)
     now = time.time()
     checker = functools.partial(check, path, now)
-    beatcheck = tainternet.TimerService(opt['freq'], run, restarter,
-                                        checker, time.time)
-    beatcheck.setName('beatcheck')
+    beatcheck = tainternet.TimerService(opt["freq"], run, restarter, checker, time.time)
+    beatcheck.setName("beatcheck")
     return heart.wrapHeart(beatcheck)
+
 
 # pylint: disable=too-few-public-methods
 
@@ -120,8 +119,9 @@ class Options(usage.Options):
 
     def postOptions(self):
         """Checks that required messages/config directories are present"""
-        for param in ('messages', 'config'):
+        for param in ("messages", "config"):
             if self[param] is None:
                 raise usage.UsageError("Missing required", param)
+
 
 # pylint: enable=too-few-public-methods
