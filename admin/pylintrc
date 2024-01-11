@@ -1,5 +1,5 @@
 [MESSAGES CONTROL]
-disable=invalid-name,unbalanced-tuple-unpacking,unused-argument,ungrouped-imports,singleton-comparison,inherit-non-class,relative-import
+disable=invalid-name,unbalanced-tuple-unpacking,unused-argument,ungrouped-imports,singleton-comparison,inherit-non-class,relative-import,use-dict-literal
 
 [REPORTS]
 reports=no
