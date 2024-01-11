@@ -37,15 +37,15 @@ class TransportDirectoryDict(dict):
 
         :param output: a {twisted.python.filepath.FilePath} object
         """
-        super(TransportDirectoryDict, self).__init__()
+        super().__init__()
         self.output = output
 
     def __setitem__(self, name, value):
-        super(TransportDirectoryDict, self).__setitem__(name, value)
+        super().__setitem__(name, value)
         self.output.child(name).setContent(str(value.pid))
 
     def __delitem__(self, name):
-        super(TransportDirectoryDict, self).__delitem__(name)
+        super().__delitem__(name)
         self.output.child(name).remove()
 
 

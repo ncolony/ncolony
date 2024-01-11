@@ -36,7 +36,6 @@ class ProcessProtocol:
     def __init__(self, deferred):
         self.deferred = deferred
 
-    # pylint: disable=no-self-use
     def childDataReceived(self, fd, data):
         """Log data from process
 
@@ -45,8 +44,6 @@ class ProcessProtocol:
         """
         for line in data.splitlines():
             print("[%d]" % fd, line)
-
-    # pylint: enable=no-self-use
 
     def processEnded(self, reason):
         """Report process end to deferred
@@ -57,15 +54,12 @@ class ProcessProtocol:
 
     def processExited(self, reason):
         """Ignore processExited"""
-        pass
 
     def childConnectionLost(self, reason):
         """Ignore childConnectionLoss"""
-        pass
 
     def makeConnection(self, transport):
         """Ignore makeConnection"""
-        pass
 
 
 def runProcess(args, timeout, grace, reactor):

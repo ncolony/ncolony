@@ -35,7 +35,7 @@ from zope import interface
 
 __all__ = ["IMonitorEventReceiver"]
 
-# pylint: disable=no-self-argument,no-init
+# pylint: disable=no-self-argument
 
 
 class IMonitorEventReceiver(interface.Interface):

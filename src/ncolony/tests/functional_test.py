@@ -28,16 +28,13 @@ def _killPatiently(pidFile):
         try:
             os.kill(pid, 15)
         except OSError as e:
-            if e.errno == errno.ESRCH:
-                break
-            else:
+            if e.errno != errno.ESRCH:
                 raise
         time.sleep(5)
 
 
 def main(argv):
     """Run ncolony with a simple process"""
-    argv = argv
     envLocation = os.environ["VIRTUAL_ENV"]
     binLocation = os.path.join(envLocation, "bin")
 
