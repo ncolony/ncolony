@@ -20,7 +20,7 @@ def tests(session):
     tmpdir = session.create_tmp()
     session.install("-r", "requirements-tests.txt")
     session.install("-e", ".")    
-    tests = session.posargs or ["ncolony.tests"]
+    tests = session.posargs or ["ncolony"]
     session.run(
         "python",
         "-Wall",
