@@ -41,8 +41,6 @@ import os
 
 from twisted.python import filepath
 
-from ncolony import main as mainlib
-
 NEXT = functools.partial(next, itertools.count(0))
 
 Places = collections.namedtuple('Places', 'config messages')
