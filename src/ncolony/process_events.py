@@ -10,8 +10,6 @@ import collections
 import json
 import os
 
-import six
-
 from zope import interface
 
 from twisted.python import log
@@ -49,7 +47,7 @@ class Receiver:
         parsedContents = json.loads(contents.decode("utf-8"))
         parsedContents = {
             key: value
-            for key, value in six.iteritems(parsedContents)
+            for key, value in sparsedContents.items()
             if key in VALID_KEYS
         }
         parsedContents["name"] = name

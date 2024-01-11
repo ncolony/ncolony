@@ -9,8 +9,6 @@ import os
 import shutil
 import sys
 
-import six
-
 import twisted
 from twisted.python import filepath
 from twisted.internet import defer, reactor
@@ -183,7 +181,7 @@ class TestState(BaseTestHTTPChecker):
         ((method, gotUrl, headers, body),) = self.agent.calls
         self.assertIsNone(body)
         self.assertEqual(method, "GET")
-        url = next(six.itervalues(self.params))["url"]
+        url = next(iter(self.params.values()))["url"]
         self.assertEqual(url, gotUrl)
         self.assertIsInstance(headers, client.Headers)
         (userAgent,) = headers.getRawHeaders("user-agent")
@@ -225,7 +223,7 @@ class TestCheck(BaseTestHTTPChecker):
         self.location.child("child").setContent(helper.dumps2utf8(self.params))
         ret = httpcheck.check(self.settings, self.states, self.location)
         self.assertEqual(ret, [])
-        ((name, state),) = six.iteritems(self.states)
+        ((name, state),) = self.states.items()
         self.assertEqual(name, "child")
         httpcheck.check(self.settings, self.states, self.location)
         self.assertEqual(ret, [])

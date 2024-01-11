@@ -76,7 +76,7 @@ def mypy(session):
         "mypy",
         "--warn-unused-ignores",
         "--ignore-missing-imports",
-        "src/",
+        "src/ncolony/",
     )
 
 
