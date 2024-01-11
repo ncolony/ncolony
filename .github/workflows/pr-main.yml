@@ -1,0 +1,39 @@
+
+
+on: [push, pull_request]
+jobs:
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { python: "3.11", os: ubuntu-latest, check: "tests-3.11" }
+          - { python: "3.11", os: ubuntu-latest, check: "func-3.11" }
+          - { python: "3.11", os: ubuntu-latest, check: "lint" }
+          - { python: "3.11", os: ubuntu-latest, check: "mypy" }
+          - { python: "3.11", os: ubuntu-latest, check: "build" }
+    name: ${{ matrix.check }} on Python ${{ matrix.python }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3.0.2
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v4.0.0
+        with:
+          python-version: "${{ matrix.python }}"
+
+      - name: Upgrade pip
+        run: |
+          pip install --upgrade pip
+          pip --version
+
+      - name: Install Nox
+        run: |
+          pip install nox
+          nox --version
+      - name: Run Nox
+        run: |
+          nox --force-color --python=${{ matrix.python }} --session=${{ matrix.check }}
+
