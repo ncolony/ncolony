@@ -3,6 +3,3 @@
 """
 Subcommand registry.
 """
-import gather
-
-COMMANDS = gather.Collector()

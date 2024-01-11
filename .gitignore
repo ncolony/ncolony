@@ -6,3 +6,4 @@ dist/
 ncolony.egg-info/
 /.eggs
 /.python-version
+/git-log-head

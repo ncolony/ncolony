@@ -8,15 +8,9 @@ import sys
 
 import gather
 
-import ncolony
-from ncolony import main
+from ncolony import ctllib
 
 if __name__ != '__main__':
     raise ImportError("This module cannot be imported")
 
-gather.run(
-    commands=main.COMMANDS.collect(),
-    version=ncolony.__version__,
-    argv=sys.argv[1:],
-    output=sys.stdout
-)
+ctllib.main(sys.argv[1:])

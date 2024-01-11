@@ -52,6 +52,7 @@ def _dumps(stuff):
     return json.dumps(stuff).encode('utf-8')
 
 
+
 # pylint: disable=too-many-arguments,too-many-locals
 def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
         env_inherit=None):
@@ -69,7 +70,7 @@ def add(places, name, cmd, args, env=None, uid=None, gid=None, extras=None,
     :param env_inherit: a list of environment variables to inherit
     :returns: None
     """
-    args = [cmd]+args
+    args = [cmd]+(args or [])
     config = filepath.FilePath(places.config)
     fle = config.child(name)
     details = dict(args=args)
@@ -175,7 +176,6 @@ def call(results):
     func(places, **results)
 
 
-@mainlib.COMMANDS.register(name='ctl')
 def main(argv):
     """command-line entry point
 
@@ -208,5 +208,8 @@ def main(argv):
         restart-all:
             no arguments
     """
-    ns = PARSER.parse_args(argv[1:])
+    argv = list(argv)
+    if argv[0:1] == ["ctl"]:
+        del argv[0:1]
+    ns = PARSER.parse_args(argv)
     call(ns)
