@@ -77,7 +77,7 @@ def checkHeartService(case, service, statusName="my.status"):
     :params service: a heart timer service
     """
     case.assertIsInstance(service, tainternet.TimerService)
-    case.assertEquals(service.step, 10 / 3)
+    case.assertEqual(service.step, 10 / 3)
     func, args, kwargs = service.call
     case.assertFalse(args)
     case.assertFalse(kwargs)
@@ -86,7 +86,7 @@ def checkHeartService(case, service, statusName="my.status"):
     case.assertIsInstance(myHeart, heart.Heart)
     fp = myHeart.getFile()
     case.assertIsInstance(fp, filepath.FilePath)
-    case.assertEquals(fp.basename(), statusName)
+    case.assertEqual(fp.basename(), statusName)
 
 
 def buildEnv(params=None):
@@ -112,11 +112,11 @@ class TestHeart(unittest.TestCase):
         fake = DummyFile()
         myHeart = heart.Heart(path=fake)
         self.assertIs(myHeart.getFile(), fake)
-        self.assertEquals(fake.touched, 0)
+        self.assertEqual(fake.touched, 0)
         myHeart.beat()
-        self.assertEquals(fake.touched, 1)
+        self.assertEqual(fake.touched, 1)
         myHeart.beat()
-        self.assertEquals(fake.touched, 2)
+        self.assertEqual(fake.touched, 2)
 
     def test_make_service(self):
         """Test make service builds the service based on os.environ"""

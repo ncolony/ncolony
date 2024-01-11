@@ -63,7 +63,7 @@ class TestBeatChecker(unittest.TestCase):
         mtime = fooFile.getModificationTime()
         self.assertFalse(self.checker(mtime, mtime))
         self.assertFalse(self.checker(mtime, mtime + 9))
-        self.assertEquals(self.checker(mtime, mtime + 20), ["foo"])
+        self.assertEqual(self.checker(mtime, mtime + 20), ["foo"])
         statusFile = filepath.FilePath(status)
         statusFile.setContent(b"111")
         newMTime = statusFile.getModificationTime()
@@ -73,7 +73,7 @@ class TestBeatChecker(unittest.TestCase):
         os.utime(status, (newMTime, newMTime))
         self.assertFalse(self.checker(mtime, newMTime))
         self.assertFalse(self.checker(mtime, newMTime + 9))
-        self.assertEquals(self.checker(mtime, newMTime + 11), ["foo"])
+        self.assertEqual(self.checker(mtime, newMTime + 11), ["foo"])
 
     def test_one_default_check(self):
         """Test checking a config directory with one file"""
@@ -102,7 +102,7 @@ class TestBeatChecker(unittest.TestCase):
         mtime = fooFile.getModificationTime()
         self.assertFalse(self.checker(mtime, mtime))
         self.assertFalse(self.checker(mtime, mtime + 29))
-        self.assertEquals(self.checker(mtime, mtime + 31), ["foo"])
+        self.assertEqual(self.checker(mtime, mtime + 31), ["foo"])
 
     def test_epoch(self):
         """Test that start time is being respected"""
@@ -114,7 +114,7 @@ class TestBeatChecker(unittest.TestCase):
         mtime = fooFile.getModificationTime()
         self.assertFalse(self.checker(mtime + 100, mtime + 100))
         self.assertFalse(self.checker(mtime + 100, mtime + 101))
-        self.assertEquals(self.checker(mtime + 100, mtime + 111), ["foo"])
+        self.assertEqual(self.checker(mtime + 100, mtime + 111), ["foo"])
 
     def test_two_gone(self):
         """Test two configuration files with no status"""
@@ -127,7 +127,7 @@ class TestBeatChecker(unittest.TestCase):
             fileObj.setContent(jsonCheck)
             mtime = max([mtime, fileObj.getModificationTime()])
         self.assertFalse(self.checker(mtime, mtime))
-        self.assertEquals(set(self.checker(mtime, mtime + 11)), set(["foo", "bar"]))
+        self.assertEqual(set(self.checker(mtime, mtime + 11)), set(["foo", "bar"]))
 
     def test_two_old(self):
         """Test two configuration files with old status"""
@@ -143,7 +143,7 @@ class TestBeatChecker(unittest.TestCase):
             newMTime = statusFile.getModificationTime()
             mtime = max([mtime, newMTime, fileObj.getModificationTime()])
         self.assertFalse(self.checker(mtime, mtime))
-        self.assertEquals(set(self.checker(mtime, mtime + 11)), set(["foo", "bar"]))
+        self.assertEqual(set(self.checker(mtime, mtime + 11)), set(["foo", "bar"]))
 
     def test_run(self):
         """Test the runner"""
@@ -161,8 +161,8 @@ class TestBeatChecker(unittest.TestCase):
             _restarter_args.append(thing)
 
         beatcheck.run(_restarter, _checker, _timer)
-        self.assertEquals(_checker_args, ["baz"])
-        self.assertEquals(_restarter_args, ["foo", "bar"])
+        self.assertEqual(_checker_args, ["baz"])
+        self.assertEqual(_restarter_args, ["foo", "bar"])
 
     def test_make_service(self):
         """Test makeService"""
@@ -172,7 +172,7 @@ class TestBeatChecker(unittest.TestCase):
         service = masterService.getServiceNamed("beatcheck")
         after = time.time()
         self.assertIsInstance(service, tainternet.TimerService)
-        self.assertEquals(service.step, 5)
+        self.assertEqual(service.step, 5)
         callableThing, args, kwargs = service.call
         self.assertIs(callableThing, beatcheck.run)
         self.assertFalse(kwargs)
@@ -181,11 +181,11 @@ class TestBeatChecker(unittest.TestCase):
         self.assertIs(restarter.func, ctllib.restart)
         self.assertFalse(restarter.keywords)
         (places,) = restarter.args
-        self.assertEquals(places, ctllib.Places(config="config", messages="messages"))
+        self.assertEqual(places, ctllib.Places(config="config", messages="messages"))
         self.assertIs(checker.func, beatcheck.check)
         self.assertFalse(checker.keywords)
         path, start = checker.args
-        self.assertEquals(path.basename(), "config")
+        self.assertEqual(path.basename(), "config")
         self.assertLessEqual(before, start)
         self.assertLessEqual(start, after)
 

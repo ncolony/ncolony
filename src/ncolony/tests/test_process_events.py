@@ -80,21 +80,21 @@ class TestReceiver(unittest.TestCase):
         """Test a simple process addition"""
         message = helper.dumps2utf8(dict(args=["/bin/echo", "hello"]))
         self.receiver.add("hello", message)
-        self.assertEquals(len(self.monitor.events), 1)
+        self.assertEqual(len(self.monitor.events), 1)
         ((tp, name, args, uid, gid, env),) = self.monitor.events
-        self.assertEquals(tp, "ADD")
-        self.assertEquals(name, "hello")
-        self.assertEquals(args, ["/bin/echo", "hello"])
-        self.assertEquals(uid, None)
-        self.assertEquals(gid, None)
+        self.assertEqual(tp, "ADD")
+        self.assertEqual(name, "hello")
+        self.assertEqual(args, ["/bin/echo", "hello"])
+        self.assertEqual(uid, None)
+        self.assertEqual(gid, None)
         self.assertIn("NCOLONY_CONFIG", env)
-        self.assertEquals(env["NCOLONY_CONFIG"], message)
+        self.assertEqual(env["NCOLONY_CONFIG"], message)
         env.pop("NCOLONY_CONFIG")
         self.assertIn("NCOLONY_NAME", env)
-        self.assertEquals(env["NCOLONY_NAME"], "hello")
+        self.assertEqual(env["NCOLONY_NAME"], "hello")
         env.pop("NCOLONY_NAME")
-        self.assertEquals(env, {})
-        self.assertEquals(self.logMessages, ["Added monitored process: hello"])
+        self.assertEqual(env, {})
+        self.assertEqual(self.logMessages, ["Added monitored process: hello"])
 
     def test_add_complicated(self):
         """Test a process addition with all the optional arguments"""
@@ -102,38 +102,38 @@ class TestReceiver(unittest.TestCase):
             dict(args=["/bin/echo", "hello"], uid=0, gid=0, env={"world": "616"})
         )
         self.receiver.add("hello", message)
-        self.assertEquals(len(self.monitor.events), 1)
+        self.assertEqual(len(self.monitor.events), 1)
         ((tp, name, args, uid, gid, env),) = self.monitor.events
-        self.assertEquals(tp, "ADD")
-        self.assertEquals(name, "hello")
-        self.assertEquals(args, ["/bin/echo", "hello"])
-        self.assertEquals(uid, 0)
-        self.assertEquals(gid, 0)
+        self.assertEqual(tp, "ADD")
+        self.assertEqual(name, "hello")
+        self.assertEqual(args, ["/bin/echo", "hello"])
+        self.assertEqual(uid, 0)
+        self.assertEqual(gid, 0)
         self.assertIn("NCOLONY_CONFIG", env)
-        self.assertEquals(env["NCOLONY_CONFIG"], message)
+        self.assertEqual(env["NCOLONY_CONFIG"], message)
         env.pop("NCOLONY_CONFIG")
         env.pop("NCOLONY_NAME")
-        self.assertEquals(env, {"world": "616"})
-        self.assertEquals(self.logMessages, ["Added monitored process: hello"])
+        self.assertEqual(env, {"world": "616"})
+        self.assertEqual(self.logMessages, ["Added monitored process: hello"])
 
     def test_add_with_junk(self):
         """Test a process addition with all the optional arguments"""
         message = helper.dumps2utf8(dict(something=1, args=["/bin/echo", "hello"]))
         self.receiver.add("hello", message)
-        self.assertEquals(len(self.monitor.events), 1)
+        self.assertEqual(len(self.monitor.events), 1)
         ((tp, name, args, uid, gid, env),) = self.monitor.events
-        self.assertEquals(tp, "ADD")
-        self.assertEquals(name, "hello")
-        self.assertEquals(args, ["/bin/echo", "hello"])
-        self.assertEquals(uid, None)
-        self.assertEquals(gid, None)
+        self.assertEqual(tp, "ADD")
+        self.assertEqual(name, "hello")
+        self.assertEqual(args, ["/bin/echo", "hello"])
+        self.assertEqual(uid, None)
+        self.assertEqual(gid, None)
         self.assertIn("NCOLONY_CONFIG", env)
-        self.assertEquals(env["NCOLONY_CONFIG"], message)
-        self.assertEquals(self.logMessages, ["Added monitored process: hello"])
+        self.assertEqual(env["NCOLONY_CONFIG"], message)
+        self.assertEqual(self.logMessages, ["Added monitored process: hello"])
         env.pop("NCOLONY_CONFIG")
         env.pop("NCOLONY_NAME")
-        self.assertEquals(env, {})
-        self.assertEquals(self.logMessages, ["Added monitored process: hello"])
+        self.assertEqual(env, {})
+        self.assertEqual(self.logMessages, ["Added monitored process: hello"])
 
     def test_add_with_inherited_env(self):
         """Test a process addition with all the optional arguments"""
@@ -143,37 +143,37 @@ class TestReceiver(unittest.TestCase):
             dict(args=["/bin/echo", "hello"], env_inherit=["PATH"])
         )
         receiver.add("hello", message)
-        self.assertEquals(len(self.monitor.events), 1)
+        self.assertEqual(len(self.monitor.events), 1)
         ((tp, name, args, uid, gid, env),) = self.monitor.events
-        self.assertEquals(tp, "ADD")
-        self.assertEquals(name, "hello")
-        self.assertEquals(args, ["/bin/echo", "hello"])
-        self.assertEquals(uid, None)
-        self.assertEquals(gid, None)
+        self.assertEqual(tp, "ADD")
+        self.assertEqual(name, "hello")
+        self.assertEqual(args, ["/bin/echo", "hello"])
+        self.assertEqual(uid, None)
+        self.assertEqual(gid, None)
         self.assertIn("NCOLONY_CONFIG", env)
-        self.assertEquals(env["NCOLONY_CONFIG"], message)
-        self.assertEquals(self.logMessages, ["Added monitored process: hello"])
+        self.assertEqual(env["NCOLONY_CONFIG"], message)
+        self.assertEqual(self.logMessages, ["Added monitored process: hello"])
         env.pop("NCOLONY_CONFIG")
         env.pop("NCOLONY_NAME")
         sent_environment = small_environment.copy()
         sent_environment.pop("PYTHONPATH")
-        self.assertEquals(env, sent_environment)
-        self.assertEquals(self.logMessages, ["Added monitored process: hello"])
+        self.assertEqual(env, sent_environment)
+        self.assertEqual(self.logMessages, ["Added monitored process: hello"])
 
     def test_remove(self):
         """Test a process removal"""
         message = helper.dumps2utf8(dict(args=["/bin/echo", "hello"]))
         self.receiver.add("hello", message)
         self.receiver.remove("hello")
-        self.assertEquals(self.monitor.events[-1], ("REMOVE", "hello"))
-        self.assertEquals(self.logMessages[-1], "Removed monitored process: hello")
+        self.assertEqual(self.monitor.events[-1], ("REMOVE", "hello"))
+        self.assertEqual(self.logMessages[-1], "Removed monitored process: hello")
 
     def test_restart(self):
         """Test a process restart"""
         message = helper.dumps2utf8(dict(type="RESTART", name="hello"))
         self.receiver.message(message)
-        self.assertEquals(self.monitor.events, [("RESTART", "hello")])
-        self.assertEquals(self.logMessages, ["Restarting monitored process: hello"])
+        self.assertEqual(self.monitor.events, [("RESTART", "hello")])
+        self.assertEqual(self.logMessages, ["Restarting monitored process: hello"])
 
     def test_unknown_message(self):
         """Test that we reject unknown messages"""
@@ -185,8 +185,8 @@ class TestReceiver(unittest.TestCase):
         """Test a global restart"""
         message = helper.dumps2utf8(dict(type="RESTART-ALL"))
         self.receiver.message(message)
-        self.assertEquals(self.monitor.events, [("RESTART-ALL",)])
-        self.assertEquals(self.logMessages, ["Restarting all monitored processes"])
+        self.assertEqual(self.monitor.events, [("RESTART-ALL",)])
+        self.assertEqual(self.logMessages, ["Restarting all monitored processes"])
 
     def test_restart_group(self):
         """Restarting group of one restarts the process in group"""
@@ -194,7 +194,7 @@ class TestReceiver(unittest.TestCase):
         self.receiver.add("hello", message)
         message = helper.dumps2utf8(dict(type="RESTART-GROUP", group="things"))
         self.receiver.message(message)
-        self.assertEquals(self.monitor.events[-1], ("RESTART", "hello"))
+        self.assertEqual(self.monitor.events[-1], ("RESTART", "hello"))
 
     def test_restart_empty_group(self):
         """Restarting empty group restarts no processes"""

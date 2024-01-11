@@ -145,18 +145,18 @@ class TestMessageSender(DirectoryBasedTest):
         """Test processing one message"""
         self.write("00Message", b"hello")
         self.message()
-        self.assertEquals(self.receiver.events, [("MESSAGE", b"hello")])
+        self.assertEqual(self.receiver.events, [("MESSAGE", b"hello")])
         self.message()
-        self.assertEquals(self.receiver.events, [("MESSAGE", b"hello")])
+        self.assertEqual(self.receiver.events, [("MESSAGE", b"hello")])
 
     def test_repeated_message(self):
         """Test the same message repeated twice"""
         self.write("00Message", b"hello")
         self.message()
-        self.assertEquals(self.receiver.events, [("MESSAGE", b"hello")])
+        self.assertEqual(self.receiver.events, [("MESSAGE", b"hello")])
         self.write("00Message", b"hello")
         self.message()
-        self.assertEquals(
+        self.assertEqual(
             self.receiver.events, [("MESSAGE", b"hello"), ("MESSAGE", b"hello")]
         )
 
@@ -164,10 +164,10 @@ class TestMessageSender(DirectoryBasedTest):
         """Test the same message name with different contents"""
         self.write("00Message", b"hello")
         self.message()
-        self.assertEquals(self.receiver.events, [("MESSAGE", b"hello")])
+        self.assertEqual(self.receiver.events, [("MESSAGE", b"hello")])
         self.write("00Message", b"goodbye")
         self.message()
-        self.assertEquals(
+        self.assertEqual(
             self.receiver.events, [("MESSAGE", b"hello"), ("MESSAGE", b"goodbye")]
         )
 
@@ -198,14 +198,14 @@ class TestEventSender(DirectoryBasedTest):
         """Test one file in the configuration"""
         self.write("one", b"A")
         self.monitor()
-        self.assertEquals(self.receiver.events, [("ADD", "one", b"A")])
+        self.assertEqual(self.receiver.events, [("ADD", "one", b"A")])
 
     def test_redundant_check(self):
         """Test one file in the configuration and no changes"""
         self.write("one", b"A")
         self.monitor()
         self.monitor()
-        self.assertEquals(self.receiver.events, [("ADD", "one", b"A")])
+        self.assertEqual(self.receiver.events, [("ADD", "one", b"A")])
 
     def test_non_redundant_check(self):
         """Test one file in the configuration and then a change"""
@@ -213,7 +213,7 @@ class TestEventSender(DirectoryBasedTest):
         self.monitor()
         self.write("two", b"B")
         self.monitor()
-        self.assertEquals(
+        self.assertEqual(
             self.receiver.events, [("ADD", "one", b"A"), ("ADD", "two", b"B")]
         )
 
@@ -223,7 +223,7 @@ class TestEventSender(DirectoryBasedTest):
         self.monitor()
         self.remove("one")
         self.monitor()
-        self.assertEquals(
+        self.assertEqual(
             self.receiver.events, [("ADD", "one", b"A"), ("REMOVE", "one")]
         )
 
@@ -233,7 +233,7 @@ class TestEventSender(DirectoryBasedTest):
         self.monitor()
         self.write("one", b"B")
         self.monitor()
-        self.assertEquals(
+        self.assertEqual(
             self.receiver.events,
             [("ADD", "one", b"A"), ("REMOVE", "one"), ("ADD", "one", b"B")],
         )

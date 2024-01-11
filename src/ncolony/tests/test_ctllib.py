@@ -43,14 +43,14 @@ class TestArgParsing(unittest.TestCase):
     def test_restart_all(self):
         """Check restart-all subcommand parsing"""
         res = self.parser.parse_args(self.base + ["restart-all"])
-        self.assertEquals(res.messages, "messages")
-        self.assertEquals(res.config, "config")
+        self.assertEqual(res.messages, "messages")
+        self.assertEqual(res.config, "config")
         self.assertIs(res.func, ctllib.restartAll)
 
     def test_restart(self):
         """Check restart subcommand parsing"""
         res = self.parser.parse_args(self.base + ["restart", "hello"])
-        self.assertEquals(res.name, "hello")
+        self.assertEqual(res.name, "hello")
         self.assertIs(res.func, ctllib.restart)
 
     def test_add_needs_cmd(self):
@@ -61,8 +61,8 @@ class TestArgParsing(unittest.TestCase):
     def test_add(self):
         """Check add subcommand parsing"""
         res = self.parser.parse_args(self.base + ["add", "hello", "--cmd", "/bin/echo"])
-        self.assertEquals(res.name, "hello")
-        self.assertEquals(res.cmd, "/bin/echo")
+        self.assertEqual(res.name, "hello")
+        self.assertEqual(res.cmd, "/bin/echo")
         self.assertIs(res.func, ctllib.add)
 
     def test_add_full(self):
@@ -98,20 +98,20 @@ class TestArgParsing(unittest.TestCase):
             "PYTHONPATH",
         ]
         res = self.parser.parse_args(args)
-        self.assertEquals(res.name, "hello")
-        self.assertEquals(res.cmd, "/bin/echo")
-        self.assertEquals(res.args, ["hello", "world"])
-        self.assertEquals(res.env, ["world=616", "status=good"])
-        self.assertEquals(res.env_inherit, ["PATH", "PYTHONPATH"])
-        self.assertEquals(res.uid, 5)
-        self.assertEquals(res.gid, 6)
-        self.assertEquals(res.extras, extras)
+        self.assertEqual(res.name, "hello")
+        self.assertEqual(res.cmd, "/bin/echo")
+        self.assertEqual(res.args, ["hello", "world"])
+        self.assertEqual(res.env, ["world=616", "status=good"])
+        self.assertEqual(res.env_inherit, ["PATH", "PYTHONPATH"])
+        self.assertEqual(res.uid, 5)
+        self.assertEqual(res.gid, 6)
+        self.assertEqual(res.extras, extras)
         self.assertIs(res.func, ctllib.add)
 
     def test_remove(self):
         """Check remove subcommand parsing"""
         res = self.parser.parse_args(self.base + ["remove", "hello"])
-        self.assertEquals(res.name, "hello")
+        self.assertEqual(res.name, "hello")
         self.assertIs(res.func, ctllib.remove)
 
     def test_call(self):
@@ -128,7 +128,7 @@ class TestArgParsing(unittest.TestCase):
         ns.foo = "bar"
         ns.baz = "quux"
         ctllib.call(ns)
-        self.assertEquals(
+        self.assertEqual(
             results,
             [
                 (
@@ -171,7 +171,7 @@ class TestController(unittest.TestCase):
         (fname,) = os.listdir(self.places.messages)
         fname = os.path.join(self.places.messages, fname)
         d = jsonFrom(fname)
-        self.assertEquals(d, dict(type="RESTART-ALL"))
+        self.assertEqual(d, dict(type="RESTART-ALL"))
 
     def test_main_no_ctl(self):
         """Test that control via the main() function works"""
@@ -186,14 +186,14 @@ class TestController(unittest.TestCase):
         (fname,) = os.listdir(self.places.messages)
         fname = os.path.join(self.places.messages, fname)
         d = jsonFrom(fname)
-        self.assertEquals(d, dict(type="RESTART-ALL"))
+        self.assertEqual(d, dict(type="RESTART-ALL"))
 
     def test_add_and_remove(self):
         """Test that add/remove work"""
         ctllib.add(self.places, "hello", cmd="/bin/echo", args=["hello"])
         fname = os.path.join(self.places.config, "hello")
         d = jsonFrom(fname)
-        self.assertEquals(d, dict(args=["/bin/echo", "hello"]))
+        self.assertEqual(d, dict(args=["/bin/echo", "hello"]))
         ctllib.remove(self.places, "hello")
         self.assertFalse(os.path.exists(fname))
 
@@ -210,7 +210,7 @@ class TestController(unittest.TestCase):
         )
         fname = os.path.join(self.places.config, "hello")
         d = jsonFrom(fname)
-        self.assertEquals(
+        self.assertEqual(
             d,
             dict(env={"world": "616"}, goodbye=[1, 2, 3], args=["/bin/echo", "hello"]),
         )
@@ -220,14 +220,14 @@ class TestController(unittest.TestCase):
         ctllib.add(self.places, "hello", cmd="/bin/echo", args=["hello"], uid=1024)
         fname = os.path.join(self.places.config, "hello")
         d = jsonFrom(fname)
-        self.assertEquals(d, dict(uid=1024, args=["/bin/echo", "hello"]))
+        self.assertEqual(d, dict(uid=1024, args=["/bin/echo", "hello"]))
 
     def test_add_with_gid(self):
         """Test that add with optional gid works"""
         ctllib.add(self.places, "hello", cmd="/bin/echo", args=["hello"], gid=1024)
         fname = os.path.join(self.places.config, "hello")
         d = jsonFrom(fname)
-        self.assertEquals(d, dict(gid=1024, args=["/bin/echo", "hello"]))
+        self.assertEqual(d, dict(gid=1024, args=["/bin/echo", "hello"]))
 
     def test_add_with_env_inherit(self):
         """Test that add with optional gid works"""
@@ -236,7 +236,7 @@ class TestController(unittest.TestCase):
         )
         fname = os.path.join(self.places.config, "hello")
         d = jsonFrom(fname)
-        self.assertEquals(d["env_inherit"], ["PATH"])
+        self.assertEqual(d["env_inherit"], ["PATH"])
 
     def test_restart(self):
         """Test that restart works"""
@@ -244,7 +244,7 @@ class TestController(unittest.TestCase):
         (fname,) = os.listdir(self.places.messages)
         fname = os.path.join(self.places.messages, fname)
         d = jsonFrom(fname)
-        self.assertEquals(d, dict(type="RESTART", name="hello"))
+        self.assertEqual(d, dict(type="RESTART", name="hello"))
         ctllib.restart(self.places, "goodbye")
         things = (
             jsonFrom(os.path.join(self.places.messages, fname))
@@ -252,11 +252,11 @@ class TestController(unittest.TestCase):
         )
         names = set()
         for thing in things:
-            self.assertEquals(thing.pop("type"), "RESTART")
+            self.assertEqual(thing.pop("type"), "RESTART")
             ((k, v),) = six.iteritems(thing)
-            self.assertEquals(k, "name")
+            self.assertEqual(k, "name")
             names.add(v)
-        self.assertEquals(names, set(("hello", "goodbye")))
+        self.assertEqual(names, set(("hello", "goodbye")))
 
     def test_restart_all(self):
         """Test that restart-all works"""
@@ -264,7 +264,7 @@ class TestController(unittest.TestCase):
         (fname,) = os.listdir(self.places.messages)
         fname = os.path.join(self.places.messages, fname)
         d = jsonFrom(fname)
-        self.assertEquals(d, dict(type="RESTART-ALL"))
+        self.assertEqual(d, dict(type="RESTART-ALL"))
 
     def test_extra_protection(self):
         """Test that messages have the PID in them"""

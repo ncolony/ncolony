@@ -61,13 +61,13 @@ class TestTransportDirectoryDict(unittest.TestCase):
     def test_add_remove(self):
         """Test adding a file and then removing it"""
         self.tdd["foo"] = DummyTransport(100)
-        self.assertEquals(self.tdd["foo"], DummyTransport(100))
+        self.assertEqual(self.tdd["foo"], DummyTransport(100))
         thing = self.file.children["foo"]
-        self.assertEquals(thing.content, "100")
-        self.assertEquals(thing.removed, False)
+        self.assertEqual(thing.content, "100")
+        self.assertEqual(thing.removed, False)
         del self.tdd["foo"]
         self.assertNotIn("foo", self.tdd)
-        self.assertEquals(thing.removed, True)
+        self.assertEqual(thing.removed, True)
 
 
 # pylint: disable=protected-access
@@ -126,7 +126,7 @@ class TestService(unittest.TestCase):
         """Test that the default reactor is the default reactor"""
         myserv = service.get("", "", 5)
         pm = myserv.getServiceNamed("procmon")
-        self.assertEquals(pm._reactor, reactor)
+        self.assertEqual(pm._reactor, reactor)
 
     def _check(self):
         for f in self.functions:
@@ -150,10 +150,10 @@ class TestService(unittest.TestCase):
         """Test that the service has the right subservices"""
         self.assertIsInstance(self.pm, procmon.ProcessMonitor)
         self.assertIs(self.pm._reactor, self.my_reactor)
-        self.assertEquals(len(self.subservices), 2)
+        self.assertEqual(len(self.subservices), 2)
         for subservice in self.subservices:
             self.assertIsInstance(subservice, internet.TimerService)
-            self.assertEquals(subservice.step, 5)
+            self.assertEqual(subservice.step, 5)
             _, args, kwargs = subservice.call
             self.assertFalse(args)
             self.assertFalse(kwargs)
@@ -164,7 +164,7 @@ class TestService(unittest.TestCase):
         self._write("config", "one", content)
         self._check()
         (process,) = self.my_reactor.spawnedProcesses
-        self.assertEquals(process._args, ["/bin/echo", "hello"])
+        self.assertEqual(process._args, ["/bin/echo", "hello"])
 
     def test_add_and_restart(self):
         """Test that the service can restart a process"""
@@ -256,12 +256,12 @@ class TestOptions(unittest.TestCase):
         paths = set()
         for func in functions:
             paths.add(func.args[0].basename())
-        self.assertEquals(paths, set(["message-dir", "config-dir"]))
+        self.assertEqual(paths, set(["message-dir", "config-dir"]))
         protocols = pm.protocols
         self.assertIsInstance(protocols, service.TransportDirectoryDict)
         self.assertIs(protocols.output, "pid-dir")
-        self.assertEquals(subservices[0].step, 4.5)
-        self.assertEquals(pm.threshold, 0.5)
-        self.assertEquals(pm.killTime, 1.5)
-        self.assertEquals(pm.minRestartDelay, 2.5)
-        self.assertEquals(pm.maxRestartDelay, 3.5)
+        self.assertEqual(subservices[0].step, 4.5)
+        self.assertEqual(pm.threshold, 0.5)
+        self.assertEqual(pm.killTime, 1.5)
+        self.assertEqual(pm.minRestartDelay, 2.5)
+        self.assertEqual(pm.maxRestartDelay, 3.5)

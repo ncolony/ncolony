@@ -20,34 +20,34 @@ class TestServices(unittest.TestCase):
     def test_main_service(self):
         """Options and makeService in main service are correct"""
         sm = ncolony_service.serviceMaker
-        self.assertEquals(sm.tapname, "ncolony")
+        self.assertEqual(sm.tapname, "ncolony")
         self.assertNotEquals(sm.description, "")
         options = sm.options()
         options.parseOptions(["--messages", "foo", "--config", "bar"])
-        self.assertEquals(options["messages"], "foo")
-        self.assertEquals(options["config"], "bar")
+        self.assertEqual(options["messages"], "foo")
+        self.assertEqual(options["config"], "bar")
         self.assertIs(service.makeService, sm.makeService)
 
     def test_beatcheck_service(self):
         """Options and makeService in beatcheck service are correct"""
         sm = ncolony_beatcheck.serviceMaker
-        self.assertEquals(sm.tapname, "ncolony-beatcheck")
+        self.assertEqual(sm.tapname, "ncolony-beatcheck")
         self.assertNotEquals(sm.description, "")
         options = sm.options()
         options.parseOptions(["--messages", "foo", "--config", "bar"])
-        self.assertEquals(options["messages"], "foo")
-        self.assertEquals(options["config"], "bar")
+        self.assertEqual(options["messages"], "foo")
+        self.assertEqual(options["config"], "bar")
         self.assertIs(beatcheck.makeService, sm.makeService)
 
     def test_schedulelib_service(self):
         """Options and makeService in scheduler service are correct"""
         sm = ncolony_schedulelib.serviceMaker
-        self.assertEquals(sm.tapname, "ncolony-scheduler")
+        self.assertEqual(sm.tapname, "ncolony-scheduler")
         self.assertNotEquals(sm.description, "")
         options = sm.options()
         options.parseOptions(
             ["--frequency", "5", "--timeout", "1", "--grace", "1", "--arg", "cat"]
         )
-        self.assertEquals(options["frequency"], 5)
-        self.assertEquals(options["args"], ["cat"])
+        self.assertEqual(options["frequency"], 5)
+        self.assertEqual(options["args"], ["cat"])
         self.assertIs(schedulelib.makeService, sm.makeService)

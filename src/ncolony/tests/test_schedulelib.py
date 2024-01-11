@@ -47,17 +47,17 @@ class TestProcessProtocol(unittest.TestCase):
     def test_process_stdout_one_line(self):
         """Test one stdout line"""
         self.pp.childDataReceived(1, "hello")
-        self.assertEquals(sys.stdout.getvalue(), "[1] hello\n")
+        self.assertEqual(sys.stdout.getvalue(), "[1] hello\n")
 
     def test_process_stdout_two_line(self):
         """Test two stdout lines"""
         self.pp.childDataReceived(1, "hello\nworld")
-        self.assertEquals(sys.stdout.getvalue(), "[1] hello\n[1] world\n")
+        self.assertEqual(sys.stdout.getvalue(), "[1] hello\n[1] world\n")
 
     def test_process_stderr_one_line(self):
         """Test one stderr line"""
         self.pp.childDataReceived(2, "hello")
-        self.assertEquals(sys.stdout.getvalue(), "[2] hello\n")
+        self.assertEqual(sys.stdout.getvalue(), "[2] hello\n")
 
     def test_end(self):
         """Test process end"""
@@ -111,9 +111,9 @@ class TestRunProcess(unittest.TestCase):
         # pylint: enable=protected-access
         terminate, kill = self.reactor.getDelayedCalls()
         self.assertTrue(terminate.active())
-        self.assertEquals(terminate.getTime(), timeout)
+        self.assertEqual(terminate.getTime(), timeout)
         self.assertTrue(kill.active())
-        self.assertEquals(kill.getTime(), timeout + grace)
+        self.assertEqual(kill.getTime(), timeout + grace)
         process.processEnded(0)
         self.assertFalse(terminate.active())
         self.assertFalse(kill.active())
@@ -123,7 +123,7 @@ class TestRunProcess(unittest.TestCase):
             "A process has ended without apparent errors: "
             "process finished with exit code 0.\n"
         )
-        self.assertEquals(output, message)
+        self.assertEqual(output, message)
 
     def test_run_process_failing(self):
         """Test process failure causes a log message"""
@@ -144,7 +144,7 @@ class TestRunProcess(unittest.TestCase):
             "A process has ended with a probable error condition: "
             "process ended with exit code 1.\n"
         )
-        self.assertEquals(output, message)
+        self.assertEqual(output, message)
 
     def test_run_process_stuck(self):
         """Test process gets TERM if it does not end by itself"""
@@ -167,7 +167,7 @@ class TestRunProcess(unittest.TestCase):
             "A process has ended without apparent errors: "
             "process finished with exit code 0.\n"
         )
-        self.assertEquals(output, message)
+        self.assertEqual(output, message)
 
     def test_run_process_stuck_hard(self):
         """Test process gets KILL if TERM doesn't kill it"""
@@ -190,7 +190,7 @@ class TestRunProcess(unittest.TestCase):
             "A process has ended with a probable error condition: "
             "process ended with exit code 1.\n"
         )
-        self.assertEquals(output, message)
+        self.assertEqual(output, message)
 
     def test_run_process_pass_through_unexpected_fail(self):
         """Test that non-process-related failures fall through"""
@@ -223,10 +223,10 @@ class TestService(unittest.TestCase):
         """Test correct parsing of a command line"""
         args = self.getArgs()
         self.parser.parseOptions(args)
-        self.assertEquals(self.parser["args"], ["/bin/echo", "hello"])
-        self.assertEquals(self.parser["timeout"], 10)
-        self.assertEquals(self.parser["grace"], 2)
-        self.assertEquals(self.parser["frequency"], 30)
+        self.assertEqual(self.parser["args"], ["/bin/echo", "hello"])
+        self.assertEqual(self.parser["timeout"], 10)
+        self.assertEqual(self.parser["grace"], 2)
+        self.assertEqual(self.parser["frequency"], 30)
 
     def helper_test_required(self, value):
         """Helper method: test that a given parameter is required"""
@@ -263,8 +263,8 @@ class TestService(unittest.TestCase):
         func, args, kwargs = service.call
         self.assertFalse(kwargs)
         self.assertIs(func, schedulelib.runProcess)
-        self.assertEquals(args, (opts["args"], opts["timeout"], opts["grace"], reactor))
-        self.assertEquals(service.step, opts["frequency"])
+        self.assertEqual(args, (opts["args"], opts["timeout"], opts["grace"], reactor))
+        self.assertEqual(service.step, opts["frequency"])
 
     def test_make_service_with_health(self):
         """Test schedulelib with heart beater"""

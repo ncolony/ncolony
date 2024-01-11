@@ -100,22 +100,22 @@ class TestState(BaseTestHTTPChecker):
         self.assertFalse(self.state.check())
         s = repr(self.state)
         cardS = repr(self.state.card)
-        self.assertEquals(cardS[0], "<")
-        self.assertEquals(cardS[-1], ">")
+        self.assertEqual(cardS[0], "<")
+        self.assertEqual(cardS[-1], ">")
         cardS = cardS[1:-1]
         parts = cardS.split(":")
-        self.assertEquals(len(parts), 3)
+        self.assertEqual(len(parts), 3)
         values = dict(x.split("=") for x in parts[-1].split(","))
-        self.assertEquals(values.pop("bad"), "0")
-        self.assertEquals(values.pop("maxBad"), "0")
-        self.assertEquals(values, {})
+        self.assertEqual(values.pop("bad"), "0")
+        self.assertEqual(values.pop("maxBad"), "0")
+        self.assertEqual(values, {})
         self.assertIn(cardS, s)
-        self.assertEquals(s[0], "<")
-        self.assertEquals(s[-1], ">")
+        self.assertEqual(s[0], "<")
+        self.assertEqual(s[-1], ">")
         s = s[1:-1]
         s = s.replace(cardS, "")
         parts = s.split(":", 2)
-        self.assertEquals(len(parts), 3)
+        self.assertEqual(len(parts), 3)
         values = parts[2]
         for portion in (
             "card=<>",
@@ -128,9 +128,9 @@ class TestState(BaseTestHTTPChecker):
             values = values.replace(portion, "")
         values = values.strip(",")
         name, value = values.split("=", 1)
-        self.assertEquals(name, "content")
+        self.assertEqual(name, "content")
         # pylint: disable=eval-used
-        self.assertEquals(eval(value), self.params)
+        self.assertEqual(eval(value), self.params)
         # pylint: enable=eval-used
 
     def test_no_check(self):
@@ -182,9 +182,9 @@ class TestState(BaseTestHTTPChecker):
         self.assertFalse(self.state.check())
         ((method, gotUrl, headers, body),) = self.agent.calls
         self.assertIsNone(body)
-        self.assertEquals(method, "GET")
+        self.assertEqual(method, "GET")
         url = next(six.itervalues(self.params))["url"]
-        self.assertEquals(url, gotUrl)
+        self.assertEqual(url, gotUrl)
         self.assertIsInstance(headers, client.Headers)
         (userAgent,) = headers.getRawHeaders("user-agent")
         self.assertIn("Twisted/" + twisted.__version__, userAgent)
@@ -217,18 +217,18 @@ class TestCheck(BaseTestHTTPChecker):
     def test_check_empty(self):
         """empty directory causes empty states"""
         ret = httpcheck.check(self.settings, self.states, self.location)
-        self.assertEquals(ret, [])
-        self.assertEquals(self.states, {})
+        self.assertEqual(ret, [])
+        self.assertEqual(self.states, {})
 
     def test_check_simplestate(self):
         """one configuration in directory is checked"""
         self.location.child("child").setContent(helper.dumps2utf8(self.params))
         ret = httpcheck.check(self.settings, self.states, self.location)
-        self.assertEquals(ret, [])
+        self.assertEqual(ret, [])
         ((name, state),) = six.iteritems(self.states)
-        self.assertEquals(name, "child")
+        self.assertEqual(name, "child")
         httpcheck.check(self.settings, self.states, self.location)
-        self.assertEquals(ret, [])
+        self.assertEqual(ret, [])
         self.reactor.advance(3)
         httpcheck.check(self.settings, self.states, self.location)
         self.reactor.advance(3)
@@ -236,12 +236,12 @@ class TestCheck(BaseTestHTTPChecker):
         (bad,) = ret
         (err,) = self.flushLoggedErrors()
         err.trap(defer.CancelledError)
-        self.assertEquals(bad, "child")
+        self.assertEqual(bad, "child")
         self.location.child("child").remove()
         ret = httpcheck.check(self.settings, self.states, self.location)
-        self.assertEquals(ret, [])
+        self.assertEqual(ret, [])
         self.assertTrue(state.closed)
-        self.assertEquals(self.states, {})
+        self.assertEqual(self.states, {})
 
     def test_run(self):
         """run restarts each bad thing"""
@@ -252,7 +252,7 @@ class TestCheck(BaseTestHTTPChecker):
             return [1, 2, 3]
 
         httpcheck.run(restarter, _check)
-        self.assertEquals(lst, [1, 2, 3])
+        self.assertEqual(lst, [1, 2, 3])
 
     def test_make_service(self):
         """Test makeService"""
@@ -260,20 +260,20 @@ class TestCheck(BaseTestHTTPChecker):
         masterService = httpcheck.makeService(opt)
         service = masterService.getServiceNamed("httpcheck")
         self.assertIsInstance(service, tainternet.TimerService)
-        self.assertEquals(service.step, 5)
+        self.assertEqual(service.step, 5)
         callableThing, args, kwargs = service.call
         self.assertIs(callableThing, httpcheck.run)
         self.assertFalse(kwargs)
         restarter, checker = args
         self.assertFalse(restarter.keywords)
         (places,) = restarter.args
-        self.assertEquals(places, ctllib.Places(config="config", messages="messages"))
+        self.assertEqual(places, ctllib.Places(config="config", messages="messages"))
         self.assertIs(restarter.func, ctllib.restart)
         self.assertIs(checker.func, httpcheck.check)
         self.assertFalse(checker.keywords)
         settings, states, location = checker.args
-        self.assertEquals(location, filepath.FilePath(opt["config"]))
-        self.assertEquals(states, {})
+        self.assertEqual(location, filepath.FilePath(opt["config"]))
+        self.assertEqual(states, {})
         self.assertIs(settings.reactor, reactor)
         agent = settings.agent
         self.assertIsInstance(agent, client.Agent)
