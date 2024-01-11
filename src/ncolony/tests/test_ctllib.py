@@ -10,8 +10,6 @@ import os
 import shutil
 import unittest
 
-import six
-
 from ncolony import ctllib
 
 
@@ -253,7 +251,7 @@ class TestController(unittest.TestCase):
         names = set()
         for thing in things:
             self.assertEqual(thing.pop("type"), "RESTART")
-            ((k, v),) = six.iteritems(thing)
+            [(k, v)] = thing.items()
             self.assertEqual(k, "name")
             names.add(v)
         self.assertEqual(names, set(("hello", "goodbye")))
