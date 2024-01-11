@@ -46,7 +46,7 @@ class Receiver:
         """
         parsedContents = json.loads(contents.decode("utf-8"))
         parsedContents = {
-            key: value for key, value in sparsedContents.items() if key in VALID_KEYS
+            key: value for key, value in parsedContents.items() if key in VALID_KEYS
         }
         parsedContents["name"] = name
         parsedContents["env"] = parsedContents.get("env", {})
