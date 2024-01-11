@@ -203,4 +203,4 @@ class TestReceiver(unittest.TestCase):
         self.receiver.remove("hello")
         message = helper.dumps2utf8(dict(type="RESTART-GROUP", group="things"))
         self.receiver.message(message)
-        self.assertNotEquals(self.monitor.events[-1][0], "RESTART")
+        self.assertNotEqual(self.monitor.events[-1][0], "RESTART")

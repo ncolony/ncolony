@@ -24,7 +24,7 @@ class TestServices(unittest.TestCase):
         """Options and makeService in main service are correct"""
         sm = ncolony_service.serviceMaker
         self.assertEqual(sm.tapname, "ncolony")
-        self.assertNotEquals(sm.description, "")
+        self.assertNotEqual(sm.description, "")
         options = sm.options()
         options.parseOptions(["--messages", "foo", "--config", "bar"])
         self.assertEqual(options["messages"], "foo")
@@ -35,7 +35,7 @@ class TestServices(unittest.TestCase):
         """Options and makeService in beatcheck service are correct"""
         sm = ncolony_beatcheck.serviceMaker
         self.assertEqual(sm.tapname, "ncolony-beatcheck")
-        self.assertNotEquals(sm.description, "")
+        self.assertNotEqual(sm.description, "")
         options = sm.options()
         options.parseOptions(["--messages", "foo", "--config", "bar"])
         self.assertEqual(options["messages"], "foo")
@@ -46,7 +46,7 @@ class TestServices(unittest.TestCase):
         """Options and makeService in scheduler service are correct"""
         sm = ncolony_schedulelib.serviceMaker
         self.assertEqual(sm.tapname, "ncolony-scheduler")
-        self.assertNotEquals(sm.description, "")
+        self.assertNotEqual(sm.description, "")
         options = sm.options()
         options.parseOptions(
             ["--frequency", "5", "--timeout", "1", "--grace", "1", "--arg", "cat"]

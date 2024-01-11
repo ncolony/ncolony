@@ -15,7 +15,7 @@ def func(session):
     session.install("-r", "requirements-tests.txt")
     session.install("-e", ".")
     session.run(
-        *"python -Werror -W ignore::DeprecationWarning -W ignore::ImportWarning -m ncolony tests.functional_test".split()
+        *"python -Werror -W ignore::DeprecationWarning -W ignore::ImportWarning -m ncolony.tests.functional_test".split()
     )
 
 
