@@ -14,7 +14,7 @@ dependencies = ["twisted", "gather"]
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
-tests = ["virtue", "pyhamcrest", "coverage[toml]"]
+tests = ["coverage[toml]"]
 mypy = ["mypy"]
 lint = ["flake8", "black", "pylint"]
 docs = ["sphinx"]
