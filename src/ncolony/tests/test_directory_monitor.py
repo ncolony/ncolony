@@ -46,6 +46,9 @@ class EventRecorderNoAdd(object):
         """Dummy remove method"""
         pass
 
+    def message(self, contents):
+        """Get a new message event"""
+        pass
 
 @interface.implementer(interfaces.IMonitorEventReceiver)
 class EventRecorderNoRemove(object):
@@ -54,6 +57,10 @@ class EventRecorderNoRemove(object):
 
     def add(self, name, content):
         """Dummy add method"""
+        pass
+
+    def message(self, contents):
+        """Get a new message event"""
         pass
 # pylint: enable=too-few-public-methods
 

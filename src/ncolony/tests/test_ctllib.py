@@ -145,6 +145,18 @@ class TestController(unittest.TestCase):
         d = jsonFrom(fname)
         self.assertEquals(d, dict(type='RESTART-ALL'))
 
+    def test_main_no_ctl(self):
+        """Test that control via the main() function works"""
+        argv = [
+                '--messages', self.places.messages,
+                '--config', self.places.config,
+                'restart-all']
+        ctllib.main(argv)
+        fname, = os.listdir(self.places.messages)
+        fname = os.path.join(self.places.messages, fname)
+        d = jsonFrom(fname)
+        self.assertEquals(d, dict(type='RESTART-ALL'))
+
     def test_add_and_remove(self):
         """Test that add/remove work"""
         ctllib.add(self.places, 'hello', cmd='/bin/echo', args=['hello'])

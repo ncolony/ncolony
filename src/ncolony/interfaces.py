@@ -44,12 +44,9 @@ class IMonitorEventReceiver(interface.Interface):
 
     def add(name, contents):
         """New file appeared"""
-        pass
 
     def remove(name):
         """File went away"""
-        pass
 
     def message(contents):
         """New message"""
-        pass

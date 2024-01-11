@@ -30,7 +30,7 @@ def tests(session):
         "run",
         "--branch",
         "--source=ncolony",
-        "--omit=**/__main__.py",
+        "--omit=**/__main__.py,**/tests/*.py",
         "-m",
         "twisted.trial",
         *tests,
