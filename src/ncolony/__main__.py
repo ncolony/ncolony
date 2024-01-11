@@ -6,8 +6,6 @@ For use as 'python -m ncolony ...'
 """
 import sys
 
-import gather
-
 from ncolony import ctllib
 
 if __name__ != "__main__":

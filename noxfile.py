@@ -8,24 +8,28 @@ nox.options.sessions = ["lint", "tests", "mypy", "build"]
 
 VERSIONS = ["3.12", "3.11"]
 
+
 @nox.session(python=VERSIONS)
 def func(session):
     tmpdir = session.create_tmp()
     session.install("-r", "requirements-tests.txt")
     session.install("-e", ".")
-    session.run(*"python -Werror -W ignore::DeprecationWarning -W ignore::ImportWarning -m ncolony tests.functional_test".split())
+    session.run(
+        *"python -Werror -W ignore::DeprecationWarning -W ignore::ImportWarning -m ncolony tests.functional_test".split()
+    )
+
 
 @nox.session(python=VERSIONS)
 def tests(session):
     tmpdir = session.create_tmp()
     session.install("-r", "requirements-tests.txt")
-    session.install("-e", ".")    
+    session.install("-e", ".")
     tests = session.posargs or ["ncolony"]
     session.run(
         "python",
         "-Wall",
         "-Wignore::DeprecationWarning",
-        "-m", 
+        "-m",
         "coverage",
         "run",
         "--branch",
@@ -59,7 +63,7 @@ def lint(session):
     session.install("-r", "requirements-lint.txt")
     session.install("-e", ".")
     session.run("black", "--check", "--diff", *files)
-    black_compat = ["--max-line-length=88", "--ignore=E203,E503"]
+    black_compat = ["--max-line-length=88", "--ignore=E203,E503,W503"]
     session.run("flake8", *black_compat, "src/")
     session.run(*"pylint --rcfile admin/pylintrc ncolony".split())
     session.run(*"python -m ncolony tests.nitpicker".split())
