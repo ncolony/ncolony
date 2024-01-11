@@ -15,7 +15,7 @@ from ncolony import interfaces
 
 
 @interface.implementer(interfaces.IMonitorEventReceiver)
-class EventRecorder(object):
+class EventRecorder:
 
     """An event receiver that just records the events"""
 
@@ -38,7 +38,7 @@ class EventRecorder(object):
 
 # pylint: disable=too-few-public-methods
 @interface.implementer(interfaces.IMonitorEventReceiver)
-class EventRecorderNoAdd(object):
+class EventRecorderNoAdd:
 
     """Dummy bad implementation of event receiver interface"""
 
@@ -52,7 +52,7 @@ class EventRecorderNoAdd(object):
 
 
 @interface.implementer(interfaces.IMonitorEventReceiver)
-class EventRecorderNoRemove(object):
+class EventRecorderNoRemove:
 
     """Dummy bad implementation of event receiver interface"""
 

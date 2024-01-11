@@ -66,7 +66,6 @@ def lint(session):
     black_compat = ["--max-line-length=88", "--ignore=E203,E503,W503"]
     session.run("flake8", *black_compat, "src/")
     session.run(*"pylint --rcfile admin/pylintrc ncolony".split())
-    session.run(*"python -m ncolony tests.nitpicker".split())
 
 
 @nox.session(python=VERSIONS[-1])

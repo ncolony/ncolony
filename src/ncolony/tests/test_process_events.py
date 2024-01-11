@@ -13,7 +13,7 @@ from ncolony import interfaces
 from ncolony.tests import helper
 
 
-class DummyProcessMonitor(object):
+class DummyProcessMonitor:
 
     """Something that looks like a process monitor"""
 

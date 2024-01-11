@@ -22,7 +22,7 @@ VALID_KEYS = frozenset(["args", "uid", "gid", "env", "env_inherit", "group"])
 
 
 @interface.implementer(interfaces.IMonitorEventReceiver)
-class Receiver(object):
+class Receiver:
 
     """A wrapper around ProcessMonitor that responds to events
 

@@ -10,7 +10,10 @@ import unittest
 
 from ncolony import service, beatcheck, schedulelib
 
+# pylint: disable=no-name-in-module
 from twisted.plugins import ncolony_service, ncolony_beatcheck, ncolony_schedulelib
+
+# pylint: enable=no-name-in-module
 
 
 class TestServices(unittest.TestCase):

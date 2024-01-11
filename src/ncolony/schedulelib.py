@@ -29,7 +29,7 @@ from ncolony.client import heart
 
 
 @interface.implementer(tiinterfaces.IProcessProtocol)
-class ProcessProtocol(object):
+class ProcessProtocol:
 
     """Process protocol that manages short-lived processes"""
 

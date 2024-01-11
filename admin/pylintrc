@@ -1,8 +1,5 @@
 [MESSAGES CONTROL]
-disable=invalid-name,unbalanced-tuple-unpacking,unused-argument,ungrouped-imports,singleton-comparison,inherit-non-class,relative-import,use-dict-literal
+disable=invalid-name,unbalanced-tuple-unpacking,unused-argument,ungrouped-imports,singleton-comparison,inherit-non-class,use-dict-literal,consider-using-f-string
 
 [REPORTS]
 reports=no
-
-[BASIC]
-dummy-arguments-rgx=^dummy

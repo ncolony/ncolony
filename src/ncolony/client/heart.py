@@ -15,7 +15,7 @@ from twisted.python import filepath
 from twisted.application import internet as tainternet, service as taservice
 
 
-class Heart(object):
+class Heart:
 
     """A Heart.
 

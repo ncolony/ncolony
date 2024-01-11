@@ -16,7 +16,7 @@ from ncolony.client import heart
 # pylint: disable=too-few-public-methods
 
 
-class DummyFile(object):
+class DummyFile:
 
     """Fake a filepath enough for hearts"""
 

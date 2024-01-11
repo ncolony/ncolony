@@ -20,7 +20,7 @@ from twisted.runner.test import test_procmon
 from ncolony import service
 
 
-class DummyFile(object):
+class DummyFile:
 
     """filepath.FilePath clone"""
 

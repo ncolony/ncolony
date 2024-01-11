@@ -26,7 +26,7 @@ from ncolony.tests import test_beatcheck, helper
 # pylint: disable=too-few-public-methods
 
 
-class DummyHTTPAgent(object):
+class DummyHTTPAgent:
 
     """Simulate an HTTPAgent"""
 

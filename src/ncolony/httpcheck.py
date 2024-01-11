@@ -21,7 +21,7 @@ from ncolony import beatcheck
 from ncolony.client import heart
 
 
-class _ScoreCard(object):
+class _ScoreCard:
     def __init__(self, maxBad=0):
         self.maxBad = maxBad
         self.bad = 0
@@ -61,7 +61,7 @@ _standardHeaders = client.Headers({"User-Agent": [_USER_AGENT]})
 # pylint: disable=too-many-instance-attributes
 
 
-class State(object):
+class State:
 
     """State of an HTTP check"""
 
