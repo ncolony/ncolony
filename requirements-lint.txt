@@ -13,7 +13,7 @@ attrs==23.2.0
     #   twisted
 automat==22.10.0
     # via twisted
-black==23.12.1
+black==24.3.0
     # via ncolony (pyproject.toml)
 click==8.1.7
     # via black
